@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.7 2005/04/01 06:36:03 hito Exp $ */
+/* $Id: jsgraph.js,v 1.8 2005/04/01 08:29:55 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -145,6 +145,9 @@ function mouse_resize_move_dom (e) {
     Mouse_y = e.clientY;
     if (this.graph) {
       if (this.firstChild) {
+	if (this.style.cursor != 'move') {
+	  this.style.cursor = this.frame.style.cursor;
+	}
 	this.removeChild(this.firstChild);
       }
       this.graph.update_position();
