@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.6 2005/03/31 06:23:25 hito Exp $ */
+/* $Id: jsgraph.js,v 1.7 2005/04/01 06:36:03 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -144,6 +144,9 @@ function mouse_resize_move_dom (e) {
     Mouse_x = e.clientX;
     Mouse_y = e.clientY;
     if (this.graph) {
+      if (this.firstChild) {
+	this.removeChild(this.firstChild);
+      }
       this.graph.update_position();
     }
 
@@ -231,15 +234,18 @@ function mouse_down_dom (e) {
 }
 
 function mouse_up_dom (e) {
-    if (this.graph && Is_mouse_down) {
-	if (Mouse_position != 0) {
-	    this.graph.clear();
-	    this.graph.draw();
-	} else {
-	    this.graph.update_position();
-	}
+  if (this.graph && Is_mouse_down) {
+    if (!this.firstChild) {
+      this.appendChild(this.frame);
     }
-    Is_mouse_down = false;
+    if (Mouse_position != 0) {
+      this.graph.clear();
+      this.graph.draw();
+    } else {
+      this.graph.update_position();
+    }
+  }
+  Is_mouse_down = false;
 }
 
 function mouse_over_dom (e) {
@@ -325,6 +331,7 @@ Caption.prototype = new Text("");
 Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
+    var parent_frame = document.createElement('div');
     var frame   = document.createElement('div');
     var scale_x = document.createElement('div');
     var scale_y = document.createElement('div');
@@ -337,37 +344,63 @@ function JSGraph(id) {
     offset_x = graph.offsetLeft;
     offset_y = graph.offsetTop;
 
+    parent_frame.style.position = 'absolute';
+    parent_frame.style.overflow = 'hidden';
+    parent_frame.style.position = 'absolute';
+    parent_frame.style.overflow = 'hidden';
+    parent_frame.style.backgroundColor = '#c0c0c0';
+    parent_frame.style.top = (offset_y + 100) + 'px';
+    parent_frame.style.left = (offset_x + 150) + 'px';
+    parent_frame.style.width = '400px';
+    parent_frame.style.height = '300px';
+    parent_frame.style.borderColor = '#000000';
+    parent_frame.style.borderWidth = '3px';
+    parent_frame.style.borderStyle = 'ridge';
+    parent_frame.graph = this;
+    graph.appendChild(parent_frame);
+    this.parent_frame = parent_frame;
+    
+    if (IE) {
+        parent_frame.onmousemove = mouse_resize_move_dom;
+        parent_frame.onmousedown = mouse_down_dom;
+        parent_frame.onmouseup = mouse_up_dom;
+        parent_frame.onmouseout = mouse_up_dom;
+    } else {
+	parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+	parent_frame.addEventListener("mousedown", mouse_down_dom, true);
+	parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
+	parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
+    }
+
+
+    frame.style.position = 'absolute';
+    frame.style.overflow = 'hidden';
     frame.style.position = 'absolute';
     frame.style.overflow = 'hidden';
     frame.style.backgroundColor = '#c0c0c0';
-    frame.style.top = (offset_y + 100) + 'px';
-    frame.style.left = (offset_x + 150) + 'px';
+    frame.style.top = '0px';
+    frame.style.left = '0px';
     frame.style.width = '400px';
     frame.style.height = '300px';
     frame.style.borderColor = '#000000';
-    frame.style.borderWidth = '3px';
-    frame.style.borderStyle = 'ridge';
+    frame.style.borderWidth = '0px';
+    frame.style.borderStyle = 'none';
 
     frame.gauge = new Object();
     frame.gauge.width = '1';
     frame.gauge.length = '5';
     frame.gauge.color = '#000000';
     frame.graph = this;
-    
-    if (IE) {
-        frame.onmousemove = mouse_resize_move_dom;
-        frame.onmousedown = mouse_down_dom;
-        frame.onmouseup = mouse_up_dom;
-        frame.onmouseout = mouse_up_dom;
-    } else {
-	frame.addEventListener("mousemove", mouse_resize_move_dom, true);
-	frame.addEventListener("mousedown", mouse_down_dom, true);
-	frame.addEventListener("mouseup",   mouse_up_dom, true);
-	frame.addEventListener("mouseout",  mouse_up_dom, true);
-    }
 
     this.frame = frame;
-    graph.appendChild(frame);
+    parent_frame.frame = frame;
+    parent_frame.appendChild(frame);
+
+    if (IE) {
+        frame.onmousemove = mouse_resize_move_dom;
+    } else {
+	frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+    }
 
     legend.style.position = 'absolute';
     legend.style.backgroundColor = '#c0c0c0';
@@ -940,11 +973,15 @@ JSGraph.prototype.gauge_log_y = function () {
 }
 
 JSGraph.prototype.update_position = function () {
+    var parent_frame = this.parent_frame;
     var frame = this.frame;
-    var width  = parseInt(frame.style.width);
-    var height = parseInt(frame.style.height);
-    var left   = parseInt(frame.style.left);
-    var top    = parseInt(frame.style.top);
+    var width  = parseInt(parent_frame.style.width);
+    var height = parseInt(parent_frame.style.height);
+    var left   = parseInt(parent_frame.style.left);
+    var top    = parseInt(parent_frame.style.top);
+
+    frame.style.width = parent_frame.style.width;
+    frame.style.height = parent_frame.style.height;
 
     this.title.x(left + this.title.text.offset_x);
     this.title.y(top  + this.title.text.offset_y);
