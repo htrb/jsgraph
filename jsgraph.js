@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.3 2005/03/29 07:45:06 hito Exp $ */
+/* $Id: jsgraph.js,v 1.4 2005/03/30 08:36:02 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -33,6 +33,10 @@ if (window.addEventListener) {
     IE = false;
 } else {
     IE = true;
+}
+
+Math.log10 = function(x) {
+  return this.log(x) / this.LN10;
 }
 
 /**********************************************************************
@@ -251,7 +255,7 @@ function Text(s) {
 
     text.style.position = 'absolute';
     text.style.fontSize = Font_size + 'px';
-    text.appendChild(document.createTextNode(s));
+    text.innerHTML = s;
     this.text = text;
 }
 
@@ -265,12 +269,7 @@ Text.prototype.init = function(node, x, y) {
 }
 
 Text.prototype.set_text = function (s) {
-    var node = this.text.childNodes;
-
-    while (node.length > 0) {
-	this.text.removeChild(node[0]);
-    }
-    this.text.appendChild(document.createTextNode(s));
+    text.innerHTML = s;
 }
 
 Text.prototype.size = function (size) {
@@ -501,6 +500,10 @@ JSGraph.prototype.autoscale = function () {
     }
 
     if (this.scale_x.type == 0) {
+	if (minx - maxx < 1E-15) {
+	    minx -= Math.abs(minx) * 0.1;
+	    maxx += Math.abs(maxx) * 0.1;
+	}
 	this.min_x = minx - (maxx - minx) * 0.05;
 	this.max_x = maxx + (maxx - minx) * 0.05;
     } else {
@@ -508,6 +511,10 @@ JSGraph.prototype.autoscale = function () {
 	this.max_x = maxx * 1.1;
     }
     if (this.scale_y.type == 0) {
+	if (miny - maxy < 1E-15) {
+	    miny -= Math.abs(miny) * 0.1;
+	    maxy += Math.abs(maxy) * 0.1;
+	}
 	this.min_y = miny - (maxy - miny) * 0.05;
 	this.max_y = maxy + (maxy - miny) * 0.05;
     } else {
@@ -666,7 +673,7 @@ JSGraph.prototype.gauge_x = function () {
 	this.max_x = d;
     }
 
-    m = Math.ceil(Math.log(this.max_x - this.min_x)/Math.log(10));
+    m = Math.ceil(Math.log10(this.max_x - this.min_x));
     inc = Math.pow(10, m - 1);
 
     start = Math.ceil(this.min_x / inc);
@@ -688,10 +695,9 @@ JSGraph.prototype.gauge_x = function () {
 	text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
     }
 
-    m = Math.floor(Math.log(inc * Math.abs((start == 0)? 1: start)) / Math.log(10));
+    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)));
     if (m != 0) {
-	str = "*1E" + m;
-	text = new Text(String(str));
+	text = new Text("&times;10<sup>" + m + "</sup>");
 	text.init(this.scale_x, width, this.scale_x.offset + 25);
     }
 
@@ -709,7 +715,7 @@ JSGraph.prototype.gauge_x = function () {
 	n = this.get_x(start * inc);
 	this.draw_gauge1_x(n);
 	for (m = 1, d = start + 0.1; m < 10; ++m, d += 0.1) {
-	    n = this.get_x(d*inc, m);
+	    n = this.get_x(d*inc);
 	    if (m == 5) {
 		this.draw_gauge2_x(n);
 	    } else {
@@ -726,8 +732,8 @@ JSGraph.prototype.get_x = function (x) {
 	if (this.max_x <= 0 || this.min_x <= 0 || x <= 0) {
 	    return -1;
 	}
-	return parseInt(this.frame.style.width) * (Math.log(x)/Math.LN10 - Math.log(this.min_x)/Math.LN10)
-	/(Math.log(this.max_x)/Math.LN10 - Math.log(this.min_x)/Math.LN10);
+	return parseInt(this.frame.style.width) * (Math.log10(x) - Math.log10(this.min_x))
+	/(Math.log10(this.max_x) - Math.log10(this.min_x));
     }
 }
 
@@ -753,7 +759,7 @@ JSGraph.prototype.gauge_y = function () {
 	this.max_y = d;
     }
 
-    m = Math.ceil(Math.log(this.max_y - this.min_y)/Math.log(10));
+    m = Math.ceil(Math.log10(this.max_y - this.min_y));
     inc = Math.pow(10, m - 1);
 
     start = Math.ceil(this.min_y / inc);
@@ -777,11 +783,10 @@ JSGraph.prototype.gauge_y = function () {
 		  n - Font_size / 2);
     }
 
-    m = Math.floor(Math.log(inc * Math.abs((start == 0)? 1: start)) / Math.log(10));
+    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)));
     if (m != 0) {
-	str = "*1E" + m;
-	text = new Text(String(str));
-	text.init(this.scale_y, this.scale_y.offset - 25,  -25);
+	text = new Text("&times;10<sup>" + m + "</sup>");
+	text.init(this.scale_y, this.scale_y.offset - 40,  -30);
     }
 
     
@@ -798,7 +803,7 @@ JSGraph.prototype.gauge_y = function () {
 	n = this.get_y(start * inc);
 	this.draw_gauge1_y(n);
 	for (m = 1, d = start + 0.1; m < 10; ++m, d += 0.1) {
-	    n = this.get_y(d*inc, m);
+	    n = this.get_y(d*inc);
 	    if (m == 5) {
 		this.draw_gauge2_y(n);
 	    } else {
@@ -815,8 +820,8 @@ JSGraph.prototype.get_y = function (y) {
 	if (this.max_y <= 0 || this.min_y <= 0 || y <= 0) {
 	    return -1;
 	}
-	return parseInt(this.frame.style.height) * (Math.log(this.max_y)/Math.LN10 - Math.log(y)/Math.LN10)
-	/(Math.log(this.max_y)/Math.LN10 - Math.log(this.min_y)/Math.LN10);
+	return parseInt(this.frame.style.height) * (Math.log10(this.max_y) - Math.log10(y))
+	/(Math.log10(this.max_y) - Math.log10(this.min_y));
     }
 }
 
@@ -831,14 +836,18 @@ JSGraph.prototype.gauge_log_x = function () {
 	return;
     }
 
-    max = Math.log(this.max_x)/Math.LN10;
-    min = Math.log(this.min_x)/Math.LN10;
+    max = Math.log10(this.max_x);
+    min = Math.log10(this.min_x);
     if(max - min < 1){
 	this.gauge_x();
 	return;
+    } else if (max - min > 20) {
+	inc = Math.ceil((max - min) / 10) + 1;
+    } else {
+	inc = 1;
     }
 
-    for(i = Math.ceil(min); i < max; i++){
+    for(i = Math.ceil(min); i < max; i += inc){
 	x = Math.pow(10, i);
 
 	if (x > this.max_x) {
@@ -848,22 +857,27 @@ JSGraph.prototype.gauge_log_x = function () {
 	str = i.toFixed(0); 
 	n = this.get_x(x);
 	len = str.length;
-	text = new Text(String(str));
-	text.init(this.scale_x, n - (len - 2) * Font_size / 4, this.scale_x.offset);
-	text = new Text(String("10"));
-	text.init(this.scale_x, n - (len + 2) * Font_size / 4, this.scale_x.offset + Font_size * 3 / 4);
+	text = new Text("10<sup>" + str + "</sup>");
+	text.init(this.scale_x, n - (len + 1) * Font_size / 4, this.scale_x.offset);
+	this.draw_gauge1_x(n);
     }
 
-    for(i = Math.floor(min); i < max; i++){
+    for(i = Math.floor(min); i < max; i += inc){
 	x = Math.pow(10, i);
 
 	n = this.get_x(x);
-	this.draw_gauge1_x(n);
-	for(m = 2; m < 10; ++m){
-	    n = this.get_x(x * m, m);
-	    if (m == 5) {
-		this.draw_gauge2_x(n);
-	    } else {
+	if (inc == 1) {
+	    for(m = 2; m < 10; ++m){
+		n = this.get_x(x * m);
+		if (m == 5) {
+		    this.draw_gauge2_x(n);
+		} else {
+		    this.draw_gauge3_x(n);
+		}
+	    }
+	} else {
+	    for (m = 1; m <= inc; m++) {
+		n = this.get_x(x *= 10);
 		this.draw_gauge3_x(n);
 	    }
 	}
@@ -871,20 +885,24 @@ JSGraph.prototype.gauge_log_x = function () {
 }
 
 JSGraph.prototype.gauge_log_y = function () {
-    var max, min, i, m, width, height, n, y;
+    var max, min, i, m, width, height, n, y, inc;
 
     if(this.max_y <= 0 || this.min_y <= 0) {
 	return;
     }
 
-    max = Math.log(this.max_y)/Math.LN10;
-    min = Math.log(this.min_y)/Math.LN10;
+    max = Math.log10(this.max_y);
+    min = Math.log10(this.min_y);
     if(max - min < 1){
 	this.gauge_y();
 	return;
+    } else if (max - min > 20) {
+	inc = Math.ceil((max - min) / 10) + 1;
+    } else {
+	inc = 1;
     }
 
-    for(i = Math.ceil(min); i < max; i++){
+    for(i = Math.ceil(min); i < max; i += inc){
 	y = Math.pow(10, i);
 
 	if (y > this.max_y) {
@@ -894,24 +912,28 @@ JSGraph.prototype.gauge_log_y = function () {
 	str = i.toFixed(0); 
 	n = this.get_y(y);
 	len = str.length;
-	text = new Text(String(str));
-	text.init(this.scale_y,
-		  this.scale_y.offset - (len - 1) * Font_size / 2, n - Font_size);
-	text = new Text(String("10"));
-	text.init(this.scale_y,
-		  this.scale_y.offset - (len + 1) * Font_size / 2, n);
+	text = new Text("10<sup>" + str + "</sup>");
+ 	text.init(this.scale_y,
+ 		  this.scale_y.offset - len * Font_size / 2, n - Font_size);
+	this.draw_gauge1_y(n);
     }
 
-    for(i = Math.floor(min); i < max; i++){
+    for(i = Math.floor(min); i < max; i += inc){
 	y = Math.pow(10, i);
 
 	n = this.get_y(y);
-	this.draw_gauge1_y(n);
-	for(m = 2; m < 10; ++m){
-	    n = this.get_y(y * m, m);
-	    if (m == 5) {
-		this.draw_gauge2_y(n);
-	    } else {
+	if (inc == 1) {
+	    for(m = 2; m < 10; ++m){
+		n = this.get_y(y * m);
+		if (m == 5) {
+		    this.draw_gauge2_y(n);
+		} else {
+		    this.draw_gauge3_y(n);
+		}
+	    }
+	} else {
+	    for (m = 1; m <= inc; m++) {
+		n = this.get_y(y *= 10);
 		this.draw_gauge3_y(n);
 	    }
 	}
@@ -1031,6 +1053,9 @@ Data.prototype.clear = function () {
 }
 
 Data.prototype.add_data = function (x, y) {
+  if (!isFinite(x) || !isFinite(y)) {
+    return;
+  }
   if (this.data.length < 1){
     this.min_x = x;
     this.max_x = x;
