@@ -17,6 +17,7 @@
  * 
  */
 
+/* $Id: jsgraph.js,v 1.2 2005/02/08 00:43:25 hito Exp $ */
 /* 2003-06-20 Version 0.3 */
 
 /**********************************************************************
@@ -418,6 +419,7 @@ function JSGraph(id) {
     scale_x.style.backgroundColor = '#c0c0c0';
     scale_x.offset = 5;
     scale_x.graph = this;
+    scale_x.type = 0;
     this.scale_x = scale_x;
     graph.appendChild(scale_x);
 
@@ -426,6 +428,7 @@ function JSGraph(id) {
     scale_y.style.backgroundColor = '#c0c0c0';
     scale_y.offset = -10;
     scale_y.graph = this;
+    scale_y.type = 0;
     this.scale_y = scale_y;
     graph.appendChild(scale_y);
 
@@ -498,10 +501,20 @@ JSGraph.prototype.autoscale = function () {
       maxy =  1;
     }
 
-    this.min_x = minx - (maxx - minx) * 0.05;
-    this.max_x = maxx + (maxx - minx) * 0.05;
-    this.min_y = miny - (maxy - miny) * 0.05;
-    this.max_y = maxy + (maxy - miny) * 0.05;
+    if (this.scale_x.type == 0) {
+	this.min_x = minx - (maxx - minx) * 0.05;
+	this.max_x = maxx + (maxx - minx) * 0.05;
+    } else {
+	this.min_x = minx * 0.9;
+	this.max_x = maxx * 1.1;
+    }
+    if (this.scale_y.type == 0) {
+	this.min_y = miny - (maxy - miny) * 0.05;
+	this.max_y = maxy + (maxy - miny) * 0.05;
+    } else {
+	this.min_y = miny * 0.9;
+	this.max_y = maxy * 1.1;
+    }
 }
 
 
@@ -521,7 +534,7 @@ JSGraph.prototype.draw_each_data = function (data) {
 
 JSGraph.prototype.draw_data = function () {
     var i, x, y;
-    data = this.data;
+    var data = this.data;
 
     for (i = 0; i < data.length; i++) {
 	if (data[i].draw) {
@@ -708,11 +721,23 @@ JSGraph.prototype.gauge_x = function () {
 }
 
 JSGraph.prototype.get_x = function (x) {
-    return parseInt(this.frame.style.width) * (x - this.min_x)/(this.max_x - this.min_x);
+    if (this.scale_x.type == 0) {
+	return parseInt(this.frame.style.width) * (x - this.min_x)/(this.max_x - this.min_x);
+    } else {
+	if (this.max_x <= 0 || this.min_x <= 0 || x <= 0) {
+	    return -1;
+	}
+	return parseInt(this.frame.style.width) * (Math.log(x)/Math.LN10 - Math.log(this.min_x)/Math.LN10)
+	/(Math.log(this.max_x)/Math.LN10 - Math.log(this.min_x)/Math.LN10);
+    }
 }
 
 JSGraph.prototype.get_data_x = function (x) {
-    return this.min_x + (this.max_x - this.min_x) * x / parseFloat(this.frame.style.width);
+    if (this.scale_x.type == 0) {
+	return this.min_x + (this.max_x - this.min_x) * x / parseFloat(this.frame.style.width);
+    } else {
+	return 0;
+    }
 }
 
 JSGraph.prototype.gauge_y = function () {
@@ -785,11 +810,114 @@ JSGraph.prototype.gauge_y = function () {
 }
 
 JSGraph.prototype.get_y = function (y) {
-    return parseInt(this.frame.style.height) * (1 - (y - this.min_y)/(this.max_y - this.min_y));
+    if (this.scale_y.type == 0) {
+	return parseInt(this.frame.style.height) * (1 - (y - this.min_y)/(this.max_y - this.min_y));
+    } else {
+	if (this.max_y <= 0 || this.min_y <= 0 || y <= 0) {
+	    return -1;
+	}
+	return parseInt(this.frame.style.height) * (Math.log(this.max_y)/Math.LN10 - Math.log(y)/Math.LN10)
+	/(Math.log(this.max_y)/Math.LN10 - Math.log(this.min_y)/Math.LN10);
+    }
 }
 
 JSGraph.prototype.get_data_y = function (y) {
     return this.min_y + (this.max_y - this.min_y)* (1 - y / parseFloat(this.frame.style.height));
+}
+
+JSGraph.prototype.gauge_log_x = function () {
+    var max, min, i, m, width, height, x, n;
+
+    if(this.max_x <= 0 || this.min_x <= 0) {
+	return;
+    }
+
+    max = Math.log(this.max_x)/Math.LN10;
+    min = Math.log(this.min_x)/Math.LN10;
+    if(max - min < 1){
+	this.gauge_x();
+	return;
+    }
+
+    for(i = Math.ceil(min); i < max; i++){
+	x = Math.pow(10, i);
+
+	if (x > this.max_x) {
+	    break;
+	}
+
+	str = i.toFixed(0); 
+	n = this.get_x(x);
+	len = str.length;
+	text = new Text(String(str));
+	text.init(this.scale_x, n - (len - 2) * Font_size / 4, this.scale_x.offset);
+	text = new Text(String("10"));
+	text.init(this.scale_x, n - (len + 2) * Font_size / 4, this.scale_x.offset + Font_size * 3 / 4);
+    }
+
+    for(i = Math.floor(min); i < max; i++){
+	x = Math.pow(10, i);
+
+	n = this.get_x(x);
+	this.draw_gauge1_x(n);
+	for(m = 2; m < 10; ++m){
+	    n = this.get_x(x * m, m);
+	    if (m == 5) {
+		this.draw_gauge2_x(n);
+	    } else {
+		this.draw_gauge3_x(n);
+	    }
+	}
+    }
+}
+
+JSGraph.prototype.gauge_log_y = function () {
+    var max, min, i, m, width, height, n, y;
+
+    if(this.max_y <= 0 || this.min_y <= 0) {
+	return;
+    }
+
+    max = Math.log(this.max_y)/Math.LN10;
+    min = Math.log(this.min_y)/Math.LN10;
+    if(max - min < 1){
+	this.gauge_y();
+	return;
+    }
+
+    for(i = Math.ceil(min); i < max; i++){
+	y = Math.pow(10, i);
+
+	if (y > this.max_y) {
+	    break;
+	}
+
+	str = i.toFixed(0); 
+	n = this.get_y(y);
+	len = str.length;
+	text = new Text(String(str));
+	text.init(this.scale_y,
+		  this.scale_y.offset - (len - 1) * Font_size / 2, n - Font_size);
+	text = new Text(String("10"));
+	text.init(this.scale_y,
+		  this.scale_y.offset - (len + 1) * Font_size / 2, n);
+    }
+
+    for(i = Math.floor(min); i < max; i++){
+	y = Math.pow(10, i);
+
+	n = this.get_y(y);
+	this.draw_gauge1_y(n);
+	for(m = 2; m < 10; ++m){
+	    n = this.get_y(y * m, m);
+	    if (m == 5) {
+		this.draw_gauge2_y(n);
+	    } else {
+		this.draw_gauge3_y(n);
+	    }
+	}
+    }
+    return;
 }
 
 JSGraph.prototype.update_position = function () {
@@ -846,10 +974,34 @@ JSGraph.prototype.draw = function () {
     document.body.style.cursor='wait';
     this.clear();
     this.update_position();
-    this.gauge_x();
-    this.gauge_y();
+    if (this.scale_x.type == 0) {
+	this.gauge_x();
+    } else {
+	this.gauge_log_x();
+    }
+    if (this.scale_y.type == 0) {
+	this.gauge_y();
+    } else {
+	this.gauge_log_y();
+    }
     this.draw_data();
     document.body.style.cursor='auto';
+}
+
+JSGraph.prototype.scale_x_type = function (type) {
+    if (type == "linear") {
+	this.scale_x.type = 0;
+    } else {
+	this.scale_x.type = 1;
+    }
+}
+
+JSGraph.prototype.scale_y_type = function (type) {
+    if (type == "linear") {
+	this.scale_y.type = 0;
+    } else {
+	this.scale_y.type = 1;
+    }
 }
 
 /**********************************************************************
@@ -869,6 +1021,14 @@ function Data() {
 
 Data.prototype.length = function () {
     return this.data.length;
+}
+
+Data.prototype.clear = function () {
+    this.min_x = 0;
+    this.max_x = 1;
+    this.min_y = 0;
+    this.max_y = 1;
+    this.data.length = 0;
 }
 
 Data.prototype.add_data = function (x, y) {
