@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.4 2005/03/30 08:36:02 hito Exp $ */
+/* $Id: jsgraph.js,v 1.5 2005/03/31 01:58:58 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -260,16 +260,14 @@ function Text(s) {
 }
 
 Text.prototype.init = function(node, x, y) {
-    text = this.text;
+    this.text.style.left = x + 'px';
+    this.text.style.top = y + 'px';
 
-    text.style.left = x + 'px';
-    text.style.top = y + 'px';
-
-    node.appendChild(text);
+    node.appendChild(this.text);
 }
 
 Text.prototype.set_text = function (s) {
-    text.innerHTML = s;
+    this.text.innerHTML = s;
 }
 
 Text.prototype.size = function (size) {
