@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.8 2005/04/01 08:29:55 hito Exp $ */
+/* $Id: jsgraph.js,v 1.9 2005/04/01 08:44:47 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -143,7 +143,7 @@ function mouse_resize_move_dom (e) {
     resize_move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
     Mouse_y = e.clientY;
-    if (this.graph) {
+    if (this.frame) {
       if (this.firstChild) {
 	if (this.style.cursor != 'move') {
 	  this.style.cursor = this.frame.style.cursor;
@@ -159,13 +159,13 @@ function mouse_resize_move_dom (e) {
   if (IE) {
     x = e.offsetX;
     y = e.offsetY;
-    if (e.srcElement.tagName == 'DIV' && this.graph) {
+    if (e.srcElement.tagName == 'DIV' && this.parent_frame) {
       is_frame = true;
     }
   } else {
     x = e.layerX;
     y = e.layerY;
-    if (e.currentTarget == e.target && this.graph) {
+    if (e.currentTarget == e.target && this.parent_frame) {
       is_frame = true;
     }
   }
@@ -394,6 +394,7 @@ function JSGraph(id) {
     frame.gauge.length = '5';
     frame.gauge.color = '#000000';
     frame.graph = this;
+    frame.parent_frame = parent_frame;
 
     this.frame = frame;
     parent_frame.frame = frame;
@@ -505,7 +506,7 @@ JSGraph.prototype.autoscale = function () {
     }
 
     for (i = 0; i < data.length; i++) {
-      	data[i].autoscale();
+	data[i].autoscale();
 
         if (! data[i].draw) {
 	    continue;
