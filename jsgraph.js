@@ -17,8 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.2 2005/02/08 00:43:25 hito Exp $ */
-/* 2003-06-20 Version 0.3 */
+/* $Id: jsgraph.js,v 1.3 2005/03/29 07:45:06 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1080,6 +1079,9 @@ Data.prototype.autoscale = function () {
     }
 
     for (i = 0; i < this.data.length; i++) {
+	if (! isFinite(this.data[i][0]) || ! isFinite(this.data[i][1])) {
+	    continue;
+	}
 	if (this.data[i][0] < minx) {
 	    minx = this.data[i][0];
 	}
