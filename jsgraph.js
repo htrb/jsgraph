@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.5 2005/03/31 01:58:58 hito Exp $ */
+/* $Id: jsgraph.js,v 1.6 2005/03/31 06:23:25 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -498,7 +498,7 @@ JSGraph.prototype.autoscale = function () {
     }
 
     if (this.scale_x.type == 0) {
-	if (minx - maxx < 1E-15) {
+	if (maxx - minx < 1E-15) {
 	    minx -= Math.abs(minx) * 0.1;
 	    maxx += Math.abs(maxx) * 0.1;
 	}
@@ -509,7 +509,7 @@ JSGraph.prototype.autoscale = function () {
 	this.max_x = maxx * 1.1;
     }
     if (this.scale_y.type == 0) {
-	if (miny - maxy < 1E-15) {
+	if (maxy - miny < 1E-15) {
 	    miny -= Math.abs(miny) * 0.1;
 	    maxy += Math.abs(maxy) * 0.1;
 	}
