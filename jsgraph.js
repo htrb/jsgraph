@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.10 2005/04/01 10:01:09 hito Exp $ */
+/* $Id: jsgraph.js,v 1.11 2005/04/07 04:33:10 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -30,8 +30,19 @@ Edge_width = 30;
 Font_size = 16; /* px */
 
 if (window.addEventListener) {
+  document.create_element = function (e) {
+    return this.createElement(e);
+  }
   IE = false;
 } else {
+  document.create_element = function (e) {
+    var element;
+    element = this.createElement(e);
+    element.addEventListener = function (ev, fun) {
+      this["on" + ev] = fun;
+    }
+    return element;
+  }
   IE = true;
 }
 
@@ -303,25 +314,17 @@ Text.prototype.offset_y = function (y) {
 Definition of Caption Object.
 ***********************************************************************/
 function Caption(s) {
-  var text = document.createElement('span');
+  var text = document.create_element('span');
 
   text.style.position = 'absolute';
   text.style.fontSize = Font_size + 'px';
   text.appendChild(document.createTextNode(s));
 
-  if (IE) {
-    text.onmousemove = mouse_move_dom;
-    text.onmousedown = mouse_down_dom;
-    text.onmouseup = mouse_up_dom;
-    text.onmouseout = mouse_up_dom;
-    text.onmouseover = mouse_over_dom;
-  } else {
-    text.addEventListener("mousemove", mouse_move_dom, true);
-    text.addEventListener("mousedown", mouse_down_dom, true);
-    text.addEventListener("mouseup",   mouse_up_dom, true);
-    text.addEventListener("mouseout",  mouse_up_dom, true);
-    text.addEventListener("mouseover", mouse_over_dom, true);
-  }
+  text.addEventListener("mousemove", mouse_move_dom, true);
+  text.addEventListener("mousedown", mouse_down_dom, true);
+  text.addEventListener("mouseup",   mouse_up_dom, true);
+  text.addEventListener("mouseout",  mouse_up_dom, true);
+  text.addEventListener("mouseover", mouse_over_dom, true);
 
   text.offset_x = 0;
   text.offset_y = 0;
@@ -334,12 +337,12 @@ Caption.prototype = new Text("");
 Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
-  var parent_frame = document.createElement('div');
-  var frame   = document.createElement('div');
+  var parent_frame = document.create_element('div');
+  var frame   = document.create_element('div');
+  var legend  = document.create_element('table');
   var scale_x = document.createElement('div');
   var scale_y = document.createElement('div');
-  var legend  = document.createElement('table')
-    var graph   = document.getElementById(id);
+  var graph   = document.getElementById(id);
   var width, offset_x, offset_y;
 
   this.graph = graph;
@@ -360,21 +363,14 @@ function JSGraph(id) {
   parent_frame.style.borderWidth = '3px';
   parent_frame.style.borderStyle = 'ridge';
   parent_frame.graph = this;
+
+  parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+  parent_frame.addEventListener("mousedown", mouse_down_dom, true);
+  parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
+  parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
+
   graph.appendChild(parent_frame);
   this.parent_frame = parent_frame;
-    
-  if (IE) {
-    parent_frame.onmousemove = mouse_resize_move_dom;
-    parent_frame.onmousedown = mouse_down_dom;
-    parent_frame.onmouseup = mouse_up_dom;
-    parent_frame.onmouseout = mouse_up_dom;
-  } else {
-    parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
-    parent_frame.addEventListener("mousedown", mouse_down_dom, true);
-    parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
-    parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
-  }
-
 
   frame.style.position = 'absolute';
   frame.style.overflow = 'hidden';
@@ -396,15 +392,11 @@ function JSGraph(id) {
   frame.graph = this;
   frame.parent_frame = parent_frame;
 
+  frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+
   this.frame = frame;
   parent_frame.frame = frame;
   parent_frame.appendChild(frame);
-
-  if (IE) {
-    frame.onmousemove = mouse_resize_move_dom;
-  } else {
-    frame.addEventListener("mousemove", mouse_resize_move_dom, true);
-  }
 
   legend.style.position = 'absolute';
   legend.style.backgroundColor = '#c0c0c0';
@@ -414,19 +406,11 @@ function JSGraph(id) {
   legend.offset_x = 40;
   legend.offset_y = 0;
 
-  if (IE) {
-    legend.onmousemove = mouse_move_dom;
-    legend.onmousedown = mouse_down_dom;
-    legend.onmouseup = mouse_up_dom;
-    legend.onmouseout = mouse_up_dom;
-    legend.onmouseover = mouse_over_dom;
-  } else {
-    legend.addEventListener("mousemove", mouse_move_dom, true);
-    legend.addEventListener("mousedown", mouse_down_dom, true);
-    legend.addEventListener("mouseup",   mouse_up_dom, true);
-    legend.addEventListener("mouseout",  mouse_up_dom, true);
-    legend.addEventListener("mouseover", mouse_over_dom, true);
-  }
+  legend.addEventListener("mousemove", mouse_move_dom, true);
+  legend.addEventListener("mousedown", mouse_down_dom, true);
+  legend.addEventListener("mouseup",   mouse_up_dom, true);
+  legend.addEventListener("mouseout",  mouse_up_dom, true);
+  legend.addEventListener("mouseover", mouse_over_dom, true);
 
   graph.appendChild(legend);
   this.legend = legend;
