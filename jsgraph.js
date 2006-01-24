@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.11 2005/04/07 04:33:10 hito Exp $ */
+/* $Id: jsgraph.js,v 1.12 2006/01/24 09:25:44 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -260,6 +260,9 @@ function mouse_up_dom (e) {
     }
   }
   Is_mouse_down = false;
+  if (this.graph) {
+      this.graph.draw();
+  }
 }
 
 function mouse_over_dom (e) {
@@ -338,7 +341,7 @@ Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
   var parent_frame = document.create_element('div');
-  var frame   = document.create_element('div');
+  var frame   = document.create_element('canvas');
   var legend  = document.create_element('table');
   var scale_x = document.createElement('div');
   var scale_y = document.createElement('div');
@@ -372,17 +375,17 @@ function JSGraph(id) {
   graph.appendChild(parent_frame);
   this.parent_frame = parent_frame;
 
-  frame.style.position = 'absolute';
-  frame.style.overflow = 'hidden';
-  frame.style.position = 'absolute';
+  //  frame.style.position = 'absolute';
   frame.style.overflow = 'hidden';
   frame.style.backgroundColor = '#c0c0c0';
   frame.style.top = '0px';
   frame.style.left = '0px';
   frame.style.width = '400px';
   frame.style.height = '300px';
-  frame.style.borderColor = '#000000';
-  frame.style.borderWidth = '0px';
+  frame.width = 400;
+  frame.height = 300;
+  frame.style.borderColor = '#FF0000';
+  frame.style.borderWidth = '1px';
   frame.style.borderStyle = 'none';
 
   frame.gauge = new Object();
@@ -395,6 +398,7 @@ function JSGraph(id) {
   frame.addEventListener("mousemove", mouse_resize_move_dom, true);
 
   this.frame = frame;
+  this.canvas = frame.getContext('2d');
   parent_frame.frame = frame;
   parent_frame.appendChild(frame);
 
@@ -543,18 +547,56 @@ JSGraph.prototype.autoscale = function () {
 }
 
 
-JSGraph.prototype.draw_each_data = function (data) {
+JSGraph.prototype.draw_each_data_l = function (data) {
+  var i, x, y;
+
+  this.canvas.save();
+  this.canvas.strokeStyle = data.color;
+  this.canvas.lineWidth = data.width;
+  this.canvas.beginPath();
+
+  for (i = 0; i < data.length(); i++) {
+    x = this.get_x(data.data[i][0]);
+    y = this.get_y(data.data[i][1]);
+
+    this.graph_line(x, y, i);
+  }
+  this.graph_line(x, y, -1);
+  this.canvas.restore();
+}
+
+JSGraph.prototype.draw_each_data_c = function (data) {
   var i, x, y;
 
   for (i = 0; i < data.length(); i++) {
     x = this.get_x(data.data[i][0]);
     y = this.get_y(data.data[i][1]);
 
-    this.create_rectangle(this.frame,
-			  x - data.size / 2,
-			  y - data.size / 2,
-			  data.size, data.size, data.color);
+    this.fill_circle(x, y, data.size / 2.0, data.color);
   }
+}
+
+JSGraph.prototype.draw_each_data_r = function (data) {
+  var i, x, y;
+
+  for (i = 0; i < data.length(); i++) {
+    x = this.get_x(data.data[i][0]);
+    y = this.get_y(data.data[i][1]);
+
+    this.fill_rectangle(x - data.size / 2,
+			y - data.size / 2,
+			data.size, data.size, data.color);
+  }
+}
+
+JSGraph.prototype.graph_line = function (x, y, i) {
+    if (i == 0) {
+	this.canvas.moveTo(x, y);
+    } else if (i == -1) {
+	this.canvas.stroke();
+    } else {
+	this.canvas.lineTo(x, y);
+    }
 }
 
 JSGraph.prototype.draw_data = function () {
@@ -562,10 +604,28 @@ JSGraph.prototype.draw_data = function () {
   var data = this.data;
 
   for (i = 0; i < data.length; i++) {
-    if (data[i].draw) {
-      this.draw_each_data(data[i]);
-      this.add_legend(data[i].caption, data[i].color);
-    }
+      if (data[i].draw) {
+	  switch (data[i].style) {
+	  case "c":
+	      this.draw_each_data_c(data[i]);
+	      break;
+	  case "l":
+	      this.draw_each_data_l(data[i]);
+	      break;
+	  case "lc":
+	      this.draw_each_data_l(data[i]);
+	      this.draw_each_data_c(data[i]);
+	      break;
+	  case "lr":
+	      this.draw_each_data_l(data[i]);
+	      this.draw_each_data_r(data[i]);
+	      break;
+	  default:
+	      this.draw_each_data_r(data[i]);
+	      this.draw_each_data_l(data[i]);
+	  }
+	  this.add_legend(data[i].caption, data[i].color);
+      }
   }
 }
 
@@ -573,68 +633,63 @@ JSGraph.prototype.add_data = function (data) {
   this.data.push(data);
 }
 
-JSGraph.prototype.create_rectangle = function (parent, x, y, width, height, color) {
+JSGraph.prototype.fill_rectangle = function (x, y, width, height, color) {
   if (!isFinite(x) || !isFinite(y)) {
     return;
   }
 
-  var rect = document.createElement('image');
-
-  rect.style.backgroundColor = color;
-  rect.style.position = 'absolute';
-  rect.style.top = y + 'px';
-  rect.style.left = x + 'px';
-  rect.style.width = width + 'px';
-  rect.style.height = height + 'px';
-  rect.style.minHeight = '1px';
-  rect.style.minWidth  = '1px';
-  rect.style.borderWidth = '0px';
-  rect.style.padding = '0px';
-  rect.style.margin = '0px';
-
-  parent.appendChild(rect);
+  if (this.frame) {
+      this.canvas.fillStyle = color;
+      this.canvas.fillRect (x, y, width, height);
+  }
 }
 
-JSGraph.prototype.create_gauge = function (x, y) {
-  var gauge = document.createElement('image');
 
-  gauge.style.backgroundColor = this.frame.gauge.color;
-  gauge.style.position = 'absolute';
-  gauge.style.top = y + 'px';
-  gauge.style.left = x + 'px';
-  gauge.style.minHeight = '1px';
-  gauge.style.minWidth = '1px';
-  gauge.style.borderWidth = '0px';
-  gauge.style.padding = '0px';
-  gauge.style.margin = '0px';
-    
-  return gauge;
+JSGraph.prototype.fill_circle = function (x, y, r, color) {
+  if (!isFinite(x) || !isFinite(y)) {
+    return;
+  }
+
+  if (this.frame) {
+      this.canvas.save();
+
+      this.canvas.fillStyle = color;
+      this.canvas.beginPath();
+      this.canvas.arc(x, y, r, 0, 360, false);
+      this.canvas.closePath();
+      this.canvas.fill();
+
+      this.canvas.restore();
+  }
+}
+
+JSGraph.prototype.line = function (x1, y1, x2, y2) {
+    this.canvas.save();
+
+    this.canvas.fillStyle = "#000000";
+    this.canvas.beginPath();
+    this.canvas.lineWidth = 1.0;
+    this.canvas.moveTo(x1, y1);
+    this.canvas.lineTo(x2, y2);
+    this.canvas.stroke();
+
+    this.canvas.restore();
 }
 
 JSGraph.prototype.create_gauge_x = function (x, y, len) {
-  var gauge = this.create_gauge(x, y, len);
-  var frame = this.frame;
-
-  gauge.style.width = frame.gauge.width + 'px';
-  gauge.style.height = len + 'px';
-  frame.appendChild(gauge);
+    this.line(x, y, x, y + len);
 }
 
 JSGraph.prototype.create_gauge_y = function (x, y, len) {
-  var gauge = this.create_gauge(x, y, len);
-  var frame = this.frame;
-
-  gauge.style.width = len + 'px';
-  gauge.style.height = frame.gauge.width + 'px';
-  frame.appendChild(gauge);
+    this.line(x, y, x + len, y);
 }
 
 JSGraph.prototype.draw_gauge1_x = function (x) {
-  this.create_gauge_x(x, 0, parseInt(this.frame.style.height));
+  this.create_gauge_x(x, 0, this.frame.height);
 }
 
 JSGraph.prototype.draw_gauge1_y = function (y) {
-  this.create_gauge_y(0, y, parseInt(this.frame.style.width));
+  this.create_gauge_y(0, y, this.frame.width);
 }
 
 JSGraph.prototype.draw_gauge2_x = function (x) {
@@ -746,19 +801,19 @@ JSGraph.prototype.gauge_x = function () {
 
 JSGraph.prototype.get_x = function (x) {
   if (this.scale_x.type == 0) {
-    return parseInt(this.frame.style.width) * (x - this.min_x)/(this.max_x - this.min_x);
+    return this.frame.width * (x - this.min_x)/(this.max_x - this.min_x);
   } else {
     if (this.max_x <= 0 || this.min_x <= 0 || x <= 0) {
       return -1;
     }
-    return parseInt(this.frame.style.width) * (Math.log10(x) - Math.log10(this.min_x))
+    return this.frame.width * (Math.log10(x) - Math.log10(this.min_x))
     /(Math.log10(this.max_x) - Math.log10(this.min_x));
   }
 }
 
 JSGraph.prototype.get_data_x = function (x) {
   if (this.scale_x.type == 0) {
-    return this.min_x + (this.max_x - this.min_x) * x / parseFloat(this.frame.style.width);
+    return this.min_x + (this.max_x - this.min_x) * x / this.frame.width;
   } else {
     return 0;
   }
@@ -834,18 +889,18 @@ JSGraph.prototype.gauge_y = function () {
 
 JSGraph.prototype.get_y = function (y) {
   if (this.scale_y.type == 0) {
-    return parseInt(this.frame.style.height) * (1 - (y - this.min_y)/(this.max_y - this.min_y));
+    return this.frame.height * (1 - (y - this.min_y)/(this.max_y - this.min_y));
   } else {
     if (this.max_y <= 0 || this.min_y <= 0 || y <= 0) {
       return -1;
     }
-    return parseInt(this.frame.style.height) * (Math.log10(this.max_y) - Math.log10(y))
+    return this.frame.height * (Math.log10(this.max_y) - Math.log10(y))
     /(Math.log10(this.max_y) - Math.log10(this.min_y));
   }
 }
 
 JSGraph.prototype.get_data_y = function (y) {
-  return this.min_y + (this.max_y - this.min_y)* (1 - y / parseFloat(this.frame.style.height));
+  return this.min_y + (this.max_y - this.min_y)* (1 - y / this.frame.height);
 }
 
 JSGraph.prototype.gauge_log_x = function () {
@@ -970,6 +1025,8 @@ JSGraph.prototype.update_position = function () {
 
   frame.style.width = parent_frame.style.width;
   frame.style.height = parent_frame.style.height;
+  frame.width = width;
+  frame.height = height;
 
   this.title.x(left + this.title.text.offset_x);
   this.title.y(top  + this.title.text.offset_y);
@@ -1012,6 +1069,8 @@ JSGraph.prototype.clear = function () {
   while (node.rows.length > 0) {
     node.deleteRow(0);
   }
+
+  this.canvas.clearRect(0, 0, this.frame.width, this.frame.height);
 }
 
 JSGraph.prototype.draw = function () {
@@ -1061,6 +1120,8 @@ function Data() {
   this.max_y = 1;
   this.draw = false;
   this.caption = "Data";
+  this.width = 2;
+  this.style = "c";
 }
 
 Data.prototype.length = function () {
@@ -1165,4 +1226,8 @@ Data.prototype.set_text = function (s) {
 
 Data.prototype.set_color = function (s) {
   this.color = s;
+}
+
+Data.prototype.set_style = function (s) {
+  this.style = s;
 }
