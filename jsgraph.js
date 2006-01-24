@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.13 2006/01/24 09:51:05 hito Exp $ */
+/* $Id: jsgraph.js,v 1.14 2006/01/24 13:03:52 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -646,7 +646,6 @@ JSGraph.prototype.fill_circle = function (x, y, r, color) {
       this.canvas.fillStyle = color;
       this.canvas.beginPath();
       this.canvas.arc(x, y, r, 0, 360, false);
-      this.canvas.closePath();
       this.canvas.fill();
 
       this.canvas.restore();
