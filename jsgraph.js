@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.12 2006/01/24 09:25:44 hito Exp $ */
+/* $Id: jsgraph.js,v 1.13 2006/01/24 09:51:05 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -546,22 +546,22 @@ JSGraph.prototype.autoscale = function () {
   }
 }
 
-
 JSGraph.prototype.draw_each_data_l = function (data) {
   var i, x, y;
 
   this.canvas.save();
+
   this.canvas.strokeStyle = data.color;
   this.canvas.lineWidth = data.width;
   this.canvas.beginPath();
 
-  for (i = 0; i < data.length(); i++) {
-    x = this.get_x(data.data[i][0]);
-    y = this.get_y(data.data[i][1]);
-
-    this.graph_line(x, y, i);
+  this.canvas.moveTo(this.get_x(data.data[0][0]),
+		     this.get_y(data.data[0][1]));
+  for (i = 1; i < data.length(); i++) {
+      this.canvas.lineTo(this.get_x(data.data[i][0]),
+			 this.get_y(data.data[i][1]));
   }
-  this.graph_line(x, y, -1);
+  this.canvas.stroke();
   this.canvas.restore();
 }
 
@@ -587,16 +587,6 @@ JSGraph.prototype.draw_each_data_r = function (data) {
 			y - data.size / 2,
 			data.size, data.size, data.color);
   }
-}
-
-JSGraph.prototype.graph_line = function (x, y, i) {
-    if (i == 0) {
-	this.canvas.moveTo(x, y);
-    } else if (i == -1) {
-	this.canvas.stroke();
-    } else {
-	this.canvas.lineTo(x, y);
-    }
 }
 
 JSGraph.prototype.draw_data = function () {
@@ -663,10 +653,10 @@ JSGraph.prototype.fill_circle = function (x, y, r, color) {
   }
 }
 
-JSGraph.prototype.line = function (x1, y1, x2, y2) {
+JSGraph.prototype.line = function (x1, y1, x2, y2, color) {
     this.canvas.save();
 
-    this.canvas.fillStyle = "#000000";
+    this.canvas.strokeStyle = color;
     this.canvas.beginPath();
     this.canvas.lineWidth = 1.0;
     this.canvas.moveTo(x1, y1);
@@ -677,11 +667,11 @@ JSGraph.prototype.line = function (x1, y1, x2, y2) {
 }
 
 JSGraph.prototype.create_gauge_x = function (x, y, len) {
-    this.line(x, y, x, y + len);
+    this.line(x, y, x, y + len, '#000000');
 }
 
 JSGraph.prototype.create_gauge_y = function (x, y, len) {
-    this.line(x, y, x + len, y);
+    this.line(x, y, x + len, y, '#000000');
 }
 
 JSGraph.prototype.draw_gauge1_x = function (x) {
