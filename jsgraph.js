@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.14 2006/01/24 13:03:52 hito Exp $ */
+/* $Id: jsgraph.js,v 1.15 2006/01/25 01:23:24 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -474,6 +474,10 @@ JSGraph.prototype.set_border_color = function (color) {
 JSGraph.prototype.add_legend = function (str, color) {
   var table = this.legend;
   var row = table.rows.length;
+
+  if (str == null) {
+      return;
+  }
 
   table.insertRow(row);
   table.rows[row].insertCell(0);
@@ -1108,7 +1112,7 @@ function Data() {
   this.min_y = 0;
   this.max_y = 1;
   this.draw = false;
-  this.caption = "Data";
+  this.caption = null;
   this.width = 2;
   this.style = "c";
 }
