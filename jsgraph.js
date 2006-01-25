@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2003, Hiroyuki Ito. ZXB01226@nifty.com
+ * Copyright (C) 2003-2006, Hiroyuki Ito. ZXB01226@nifty.com
  * 
  * "JSGraph" is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.16 2006/01/25 07:33:59 hito Exp $ */
+/* $Id: jsgraph.js,v 1.17 2006/01/25 08:56:55 hito Exp $ */
 
 /**********************************************************************
 Global variables.
