@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.15 2006/01/25 01:23:24 hito Exp $ */
+/* $Id: jsgraph.js,v 1.16 2006/01/25 07:33:59 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -257,12 +257,10 @@ function mouse_up_dom (e) {
       this.graph.draw();
     } else {
       this.graph.update_position();
+      this.graph.draw();
     }
   }
   Is_mouse_down = false;
-  if (this.graph) {
-      this.graph.draw();
-  }
 }
 
 function mouse_over_dom (e) {
