@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.18 2006/01/26 05:44:43 hito Exp $ */
+/* $Id: jsgraph.js,v 1.19 2006/01/26 06:31:35 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1202,6 +1202,13 @@ JSGraph.prototype.draw = function () {
   }
   this.draw_data();
   document.body.style.cursor='auto';
+  if (this.draw_event_listner) {
+      this.draw_event_listner(this);
+  }
+}
+
+JSGraph.prototype.set_draw_event_listner = function (func) {
+    this.draw_event_listner = func;
 }
 
 JSGraph.prototype.scale_x_type = function (type) {
