@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.19 2006/01/26 06:31:35 hito Exp $ */
+/* $Id: jsgraph.js,v 1.20 2006/01/26 06:35:08 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -556,6 +556,7 @@ function JSGraph(id) {
 }
 
 JSGraph.prototype.resize_mode = function () {
+  this.parent_frame.style.cursor='move';
   this.parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
   this.parent_frame.addEventListener("mousedown", mouse_down_dom, true);
   this.parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
@@ -565,7 +566,6 @@ JSGraph.prototype.resize_mode = function () {
   this.frame.addEventListener("mousedown", event_none_dom, true);
   this.frame.addEventListener("mouseup",   event_none_dom, true);
   this.frame.addEventListener("mouseout",  event_none_dom, true);
-  this.parent_frame.style.cursor='move';
 }
 
 JSGraph.prototype.scale_mode = function () {
