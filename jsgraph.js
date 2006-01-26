@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.17 2006/01/25 08:56:55 hito Exp $ */
+/* $Id: jsgraph.js,v 1.18 2006/01/26 05:44:43 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -239,9 +239,6 @@ function mouse_down_dom (e) {
     Mouse_position = 7;
   } else if (x < Edge_width) {
     Mouse_position = 8;
-  } else {
-    Mouse_position = 0;
-    this.style.cursor='move';
   }
 
   Is_mouse_down = true;
@@ -267,6 +264,97 @@ function mouse_over_dom (e) {
   this.style.cursor='move';
 }
 
+function mouse_down_scale_dom (e) {
+  var x, y;
+
+  if (IE) {
+    e = window.event;
+    x = e.offsetX;
+    y = e.offsetY;
+    if (e.button != 1) {
+      return;
+    }
+  } else {
+    x = e.layerX;
+    y = e.layerY;
+    if (e.button != 0) {
+      return;
+    }
+  }
+
+  Mouse_x = x;
+  Mouse_y = y;
+
+  Mouse_client_x = e.clientX;
+  Mouse_client_y = e.clientY;
+
+  Is_mouse_down = true;
+}
+
+function mouse_up_scale_dom (e) {
+  if (Is_mouse_down) {
+    var x, y, scale;
+    Is_mouse_down = false;
+
+    if (this.scale_div) {
+      scale = this.scale_div;
+    } else {
+      scale = this;
+    }
+    x = parseInt(scale.style.left);
+    y = parseInt(scale.style.top);
+    scale.graph.min_x = scale.graph.get_data_x(x);
+    scale.graph.max_y = scale.graph.get_data_y(y);
+    scale.graph.max_x = scale.graph.get_data_x(x + parseInt(scale.style.width));
+    scale.graph.min_y = scale.graph.get_data_y(y + parseInt(scale.style.height));
+    scale.graph.draw();
+
+    scale.style.visibility = 'hidden';
+    scale.style.left = '0px';
+    scale.style.top  = '0px';
+    scale.style.width = '0px';
+    scale.style.height = '0px';
+  }
+  Is_mouse_down = false;
+}
+
+function mouse_move_scale_dom (e) {
+  if (Is_mouse_down) {
+    var x, y, w, h, scale;
+    if (this.scale_div) {
+      scale = this.scale_div;
+      x = e.layerX;
+      y = e.layerY;
+      w = Math.abs(Mouse_x - x);
+      h = Math.abs(Mouse_y - y);
+      x = Math.min(Mouse_x, x);
+      y = Math.min(Mouse_y, y);
+      scale.style.left = x + 'px';
+      scale.style.top  = y + 'px';
+    } else {
+      scale = this;
+      w = e.layerX;
+      h = e.layerY;
+      if (Mouse_client_x > e.clientX) {
+	x = parseInt(scale.style.left) + w;
+	w = parseInt(scale.style.width) - w;
+	scale.style.left = x + 'px';
+      }
+      if (Mouse_client_y > e.clientY) {
+	y = parseInt(scale.style.top) + h;
+	h = parseInt(scale.style.height) - h;
+	scale.style.top = y + 'px';
+      }
+    }
+    scale.style.visibility = 'visible';
+    scale.style.width = w + 'px';
+    scale.style.height = h + 'px';
+  }
+}
+
+function event_none_dom (e) {
+  return;
+}
 /**********************************************************************
 Definition of Text Object.
 ***********************************************************************/
@@ -339,11 +427,12 @@ Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
   var parent_frame = document.create_element('div');
-  var frame   = document.create_element('canvas');
-  var legend  = document.create_element('table');
-  var scale_x = document.createElement('div');
-  var scale_y = document.createElement('div');
-  var graph   = document.getElementById(id);
+  var frame     = document.create_element('canvas');
+  var legend    = document.create_element('table');
+  var scale_x   = document.createElement('div');
+  var scale_y   = document.createElement('div');
+  var scale_div = document.createElement('div');
+  var graph     = document.getElementById(id);
   var width, offset_x, offset_y;
 
   this.graph = graph;
@@ -351,8 +440,6 @@ function JSGraph(id) {
   offset_x = graph.offsetLeft;
   offset_y = graph.offsetTop;
 
-  parent_frame.style.position = 'absolute';
-  parent_frame.style.overflow = 'hidden';
   parent_frame.style.position = 'absolute';
   parent_frame.style.overflow = 'hidden';
   parent_frame.style.backgroundColor = '#c0c0c0';
@@ -364,11 +451,6 @@ function JSGraph(id) {
   parent_frame.style.borderWidth = '3px';
   parent_frame.style.borderStyle = 'ridge';
   parent_frame.graph = this;
-
-  parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
-  parent_frame.addEventListener("mousedown", mouse_down_dom, true);
-  parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
-  parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
 
   graph.appendChild(parent_frame);
   this.parent_frame = parent_frame;
@@ -392,12 +474,26 @@ function JSGraph(id) {
   frame.gauge.color = '#000000';
   frame.graph = this;
   frame.parent_frame = parent_frame;
+  frame.scale_div = scale_div;
 
-  frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+  scale_div.style.position = 'absolute';
+  scale_div.style.borderColor = '#000000';
+  scale_div.style.borderWidth = '1px';
+  scale_div.style.borderStyle = 'dotted';
+  scale_div.style.visibility = 'hidden';
+  scale_div.style.width = '100px';
+  scale_div.style.height = '100px';
+  scale_div.style.left = '0px';
+  scale_div.style.top = '0px';
+  scale_div.style.margin = '0px';
+  scale_div.addEventListener("mouseup",   mouse_up_scale_dom, true);
+  scale_div.addEventListener("mousemove", mouse_move_scale_dom, true);
+  scale_div.graph = this;
 
   this.frame = frame;
   this.canvas = frame.getContext('2d');
   parent_frame.frame = frame;
+  parent_frame.appendChild(scale_div);
   parent_frame.appendChild(frame);
 
   legend.style.position = 'absolute';
@@ -416,7 +512,6 @@ function JSGraph(id) {
 
   graph.appendChild(legend);
   this.legend = legend;
-
 
   this.title = new Caption("Graph");
   this.title.init(graph, 0, 0);
@@ -457,6 +552,33 @@ function JSGraph(id) {
   this.max_y = -50000;
 
   this.data = new Array(0);
+  this.scale_mode();
+}
+
+JSGraph.prototype.resize_mode = function () {
+  this.parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+  this.parent_frame.addEventListener("mousedown", mouse_down_dom, true);
+  this.parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
+  this.parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
+
+  this.frame.addEventListener("mousemove", mouse_resize_move_dom, true);
+  this.frame.addEventListener("mousedown", event_none_dom, true);
+  this.frame.addEventListener("mouseup",   event_none_dom, true);
+  this.frame.addEventListener("mouseout",  event_none_dom, true);
+  this.parent_frame.style.cursor='move';
+}
+
+JSGraph.prototype.scale_mode = function () {
+  this.parent_frame.style.cursor='default';
+  this.parent_frame.addEventListener("mousemove", event_none_dom, true);
+  this.parent_frame.addEventListener("mousedown", event_none_dom, true);
+  this.parent_frame.addEventListener("mouseup",   event_none_dom, true);
+  this.parent_frame.addEventListener("mouseout",  event_none_dom, true);
+
+  this.frame.addEventListener("mousedown", mouse_down_scale_dom, true);
+  this.frame.addEventListener("mouseup",   mouse_up_scale_dom, true);
+  this.frame.addEventListener("mouseout",  event_none_dom, true);
+  this.frame.addEventListener("mousemove", mouse_move_scale_dom, true);
 }
 
 JSGraph.prototype.set_color = function (color) {
