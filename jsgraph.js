@@ -17,12 +17,13 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.20 2006/01/26 06:35:08 hito Exp $ */
+/* $Id: jsgraph.js,v 1.21 2006/01/26 07:37:53 hito Exp $ */
 
 /**********************************************************************
 Global variables.
 ***********************************************************************/
 Is_mouse_down = false;
+Is_mouse_down_scale = false;
 Mouse_x = 0;
 Mouse_y = 0;
 Mouse_position = 0;
@@ -288,13 +289,13 @@ function mouse_down_scale_dom (e) {
   Mouse_client_x = e.clientX;
   Mouse_client_y = e.clientY;
 
-  Is_mouse_down = true;
+  Is_mouse_down_scale = true;
 }
 
 function mouse_up_scale_dom (e) {
-  if (Is_mouse_down) {
+  if (Is_mouse_down_scale) {
     var x, y, scale;
-    Is_mouse_down = false;
+    Is_mouse_down_scale = false;
 
     if (this.scale_div) {
       scale = this.scale_div;
@@ -315,11 +316,11 @@ function mouse_up_scale_dom (e) {
     scale.style.width = '0px';
     scale.style.height = '0px';
   }
-  Is_mouse_down = false;
+  Is_mouse_down_scale = false;
 }
 
 function mouse_move_scale_dom (e) {
-  if (Is_mouse_down) {
+  if (Is_mouse_down_scale) {
     var x, y, w, h, scale;
     if (this.scale_div) {
       scale = this.scale_div;
