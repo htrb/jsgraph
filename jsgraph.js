@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.21 2006/01/26 07:37:53 hito Exp $ */
+/* $Id: jsgraph.js,v 1.22 2006/01/27 05:04:28 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -304,10 +304,10 @@ function mouse_up_scale_dom (e) {
     }
     x = parseInt(scale.style.left);
     y = parseInt(scale.style.top);
-    scale.graph.min_x = scale.graph.get_data_x(x);
-    scale.graph.max_y = scale.graph.get_data_y(y);
-    scale.graph.max_x = scale.graph.get_data_x(x + parseInt(scale.style.width));
-    scale.graph.min_y = scale.graph.get_data_y(y + parseInt(scale.style.height));
+    scale.graph.set_scale(scale.graph.get_data_x(x),
+			  scale.graph.get_data_y(y),
+			  scale.graph.get_data_x(x + parseInt(scale.style.width)),
+			  scale.graph.get_data_y(y + parseInt(scale.style.height)));
     scale.graph.draw();
 
     scale.style.visibility = 'hidden';
@@ -350,6 +350,13 @@ function mouse_move_scale_dom (e) {
     scale.style.visibility = 'visible';
     scale.style.width = w + 'px';
     scale.style.height = h + 'px';
+  } else {
+      x = e.layerX;
+      y = e.layerY;
+      if (e.currentTarget == e.target && this.parent_frame) {
+	  window.status= "X: " + this.graph.get_data_x(x).toExponential(8) +
+	      "  Y: " + this.graph.get_data_y(y).toExponential(8);
+      }
   }
 }
 
@@ -1226,6 +1233,21 @@ JSGraph.prototype.scale_y_type = function (type) {
   } else {
     this.scale_y.type = 1;
   }
+}
+
+JSGraph.prototype.set_scale = function (minx, miny, maxx, maxy) {
+    if (minx) {
+	this.min_x = minx;
+    }
+    if (maxx) {
+	this.max_x = maxx;
+    }
+    if (miny) {
+	this.min_y = miny;
+    }
+    if (maxy) {
+	this.max_y = maxy;
+    }
 }
 
 /**********************************************************************
