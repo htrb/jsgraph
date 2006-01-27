@@ -17,13 +17,15 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.22 2006/01/27 05:04:28 hito Exp $ */
+/* $Id: jsgraph.js,v 1.23 2006/01/27 09:24:58 hito Exp $ */
 
 /**********************************************************************
 Global variables.
 ***********************************************************************/
 Is_mouse_down = false;
 Is_mouse_down_scale = false;
+Is_mouse_move_scale = false;
+Scale_region_size_min = 6;
 Mouse_x = 0;
 Mouse_y = 0;
 Mouse_position = 0;
@@ -294,29 +296,42 @@ function mouse_down_scale_dom (e) {
 
 function mouse_up_scale_dom (e) {
   if (Is_mouse_down_scale) {
-    var x, y, scale;
-    Is_mouse_down_scale = false;
-
-    if (this.scale_div) {
-      scale = this.scale_div;
-    } else {
-      scale = this;
-    }
-    x = parseInt(scale.style.left);
-    y = parseInt(scale.style.top);
-    scale.graph.set_scale(scale.graph.get_data_x(x),
-			  scale.graph.get_data_y(y),
-			  scale.graph.get_data_x(x + parseInt(scale.style.width)),
-			  scale.graph.get_data_y(y + parseInt(scale.style.height)));
-    scale.graph.draw();
-
-    scale.style.visibility = 'hidden';
-    scale.style.left = '0px';
-    scale.style.top  = '0px';
-    scale.style.width = '0px';
-    scale.style.height = '0px';
+      var x, y, w, h, scale;
+      if (this.scale_div) {
+	  scale = this.scale_div;
+      } else {
+	  scale = this;
+      }
+      if (Is_mouse_move_scale) {
+	  x = parseInt(scale.style.left);
+	  y = parseInt(scale.style.top);
+	  w = parseInt(scale.style.width);
+	  h = parseInt(scale.style.height);
+	  if (w > Scale_region_size_min && h > Scale_region_size_min) {
+	      scale.graph.set_scale(scale.graph.get_data_x(x),
+				    scale.graph.get_data_y(y),
+				    scale.graph.get_data_x(x + w),
+				    scale.graph.get_data_y(y + h));
+	  }
+      } else {
+	  x = scale.graph.get_data_x(Mouse_x);
+	  y = scale.graph.get_data_y(Mouse_y);
+	  w = scale.graph.max_x - scale.graph.min_x;
+	  h = scale.graph.max_y - scale.graph.min_y;
+	  scale.graph.set_scale(x - w / 2,
+				y - h / 2,
+				x + w / 2,
+				y + h / 2);
+      }
   }
   Is_mouse_down_scale = false;
+  Is_mouse_move_scale = false;
+  scale.graph.draw();
+  scale.style.visibility = 'hidden';
+  scale.style.left = '0px';
+  scale.style.top  = '0px';
+  scale.style.width = '0px';
+  scale.style.height = '0px';
 }
 
 function mouse_move_scale_dom (e) {
@@ -350,6 +365,7 @@ function mouse_move_scale_dom (e) {
     scale.style.visibility = 'visible';
     scale.style.width = w + 'px';
     scale.style.height = h + 'px';
+    Is_mouse_move_scale = true;
   } else {
       x = e.layerX;
       y = e.layerY;
@@ -558,6 +574,8 @@ function JSGraph(id) {
   this.max_x =  10;
   this.min_y = -53000;
   this.max_y = -50000;
+
+  this.zoom_ratio = 1.4;
 
   this.data = new Array(0);
   this.scale_mode();
@@ -1233,6 +1251,26 @@ JSGraph.prototype.scale_y_type = function (type) {
   } else {
     this.scale_y.type = 1;
   }
+}
+
+JSGraph.prototype.zoom_out = function () {
+    var w, h;
+    w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
+    h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
+    this.min_x -= w;
+    this.max_x += w;
+    this.min_y -= h;
+    this.max_y += h;
+}
+
+JSGraph.prototype.zoom_in = function () {
+    var w, h;
+    w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
+    h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
+    this.min_x += w;
+    this.max_x -= w;
+    this.min_y += h;
+    this.max_y -= h;
 }
 
 JSGraph.prototype.set_scale = function (minx, miny, maxx, maxy) {
