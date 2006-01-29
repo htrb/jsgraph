@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.23 2006/01/27 09:24:58 hito Exp $ */
+/* $Id: jsgraph.js,v 1.24 2006/01/29 00:04:54 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -43,6 +43,9 @@ if (window.addEventListener) {
     element = this.createElement(e);
     element.addEventListener = function (ev, fun) {
       this["on" + ev] = fun;
+    }
+    element.addEventListener = function (ev, fun) {
+      this["on" + ev] = event_none_dom;
     }
     return element;
   }
@@ -589,21 +592,21 @@ JSGraph.prototype.resize_mode = function () {
   this.parent_frame.addEventListener("mouseout",  mouse_up_dom, true);
 
   this.frame.addEventListener("mousemove", mouse_resize_move_dom, true);
-  this.frame.addEventListener("mousedown", event_none_dom, true);
-  this.frame.addEventListener("mouseup",   event_none_dom, true);
-  this.frame.addEventListener("mouseout",  event_none_dom, true);
+  this.frame.removeEventListener("mousedown", mouse_down_scale_dom, true);
+  this.frame.removeEventListener("mouseup",   mouse_up_scale_dom, true);
+  this.frame.removeEventListener("mousemove", mouse_move_scale_dom, true);
 }
 
 JSGraph.prototype.scale_mode = function () {
   this.parent_frame.style.cursor='default';
-  this.parent_frame.addEventListener("mousemove", event_none_dom, true);
-  this.parent_frame.addEventListener("mousedown", event_none_dom, true);
-  this.parent_frame.addEventListener("mouseup",   event_none_dom, true);
-  this.parent_frame.addEventListener("mouseout",  event_none_dom, true);
+  this.parent_frame.removeEventListener("mousemove", mouse_resize_move_dom, true);
+  this.parent_frame.removeEventListener("mousedown", mouse_down_dom, true);
+  this.parent_frame.removeEventListener("mouseup",   mouse_up_dom, true);
+  this.parent_frame.removeEventListener("mouseout",  mouse_up_dom, true);
 
+  this.frame.removeEventListener("mousemove", mouse_resize_move_dom, true);
   this.frame.addEventListener("mousedown", mouse_down_scale_dom, true);
   this.frame.addEventListener("mouseup",   mouse_up_scale_dom, true);
-  this.frame.addEventListener("mouseout",  event_none_dom, true);
   this.frame.addEventListener("mousemove", mouse_move_scale_dom, true);
 }
 
