@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.24 2006/01/29 00:04:54 hito Exp $ */
+/* $Id: jsgraph.js,v 1.25 2006/01/29 00:05:32 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -44,7 +44,7 @@ if (window.addEventListener) {
     element.addEventListener = function (ev, fun) {
       this["on" + ev] = fun;
     }
-    element.addEventListener = function (ev, fun) {
+    element.removeEventListener = function (ev, fun) {
       this["on" + ev] = event_none_dom;
     }
     return element;
