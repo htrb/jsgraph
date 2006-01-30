@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.27 2006/01/30 05:13:51 hito Exp $ */
+/* $Id: jsgraph.js,v 1.28 2006/01/30 10:07:35 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -55,6 +55,126 @@ if (window.addEventListener) {
 Math.log10 = function(x) {
   return this.log(x) / this.LN10;
 }
+
+function create_canvas() {
+    if (IE) {
+	var div;
+	div = document.create_element('div');
+	div.getContext = function (s) {
+	    var canvas;
+	    canvas = new IE_Canvas(this);
+	    return canvas;
+	}
+	if (!document.namespaces.v) {
+	    document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+	    document.createStyleSheet().addRule("v\\:*",
+						"behavior: url(#default#VML);");
+	}
+	return div;
+    } else {
+	return document.create_element('canvas');
+    }
+}
+
+function IE_Canvas(div) {
+    this.lineWidth = 1.0;
+    this.strokeStyle = "#000000";
+    this.fillStyle = "#000000";
+    this.restore_buf = new Array(0);
+    this.path = new Array(0);
+    this.parent = div;
+    this.current_shape = null;
+}
+
+IE_Canvas.prototype = {
+    arc: function (x, y, r, sa, ea, dir) {
+	var arc  = document.createElement("v:oval");
+	this.current_shape = 'arc';
+	arc.fillcolor = this.fillStyle;
+	arc.strokecolor = this.fillStyle;
+	arc.style.position = "absolute";
+	arc.style.left = (x - r) + "px";
+	arc.style.top = (y - r) + "px";
+	r *= 2;
+	arc.style.width = r + "px";
+	arc.style.height = r + "px";
+	this.parent.appendChild(arc);
+    },
+
+    restore: function () {
+	var style;
+	style = this.restore_buf.pop;
+	if (style) {
+	    this.strokeStyle = style[0];
+	    this.fillStyle = style[1];
+	    this.lineWidth = style[2];
+	}
+    },
+
+    save: function () {
+	this.restore_buf.push([this.strokeStyle, this.fillStyle, this.lineWidth]);
+    },
+
+    beginPath: function () {
+	this.path.length = 0;
+    },
+
+    lineTo: function (x, y) {
+	this.path.push([x, y]);
+	this.current_shape = 'line';
+    },
+
+    moveTo: function (x, y) {
+	this.path.push([x, y]);
+    },
+
+    fillRect: function (x, y, width, height) {
+	this.beginPath();
+	this.moveTo(x, y);
+	this.lineTo(x + width, y);
+	this.lineTo(x + width, y + height);
+	this.lineTo(x, y + height);
+	this.fill();
+    },
+
+    end_path: function (fill) {
+	var line, i;
+	if (this.current_shape != 'line') {
+	    return;
+	}
+
+	line = document.createElement("v:polyline");
+	line.filled = fill;
+	line.fillcolor = this.fillStyle;
+	if (fill) {
+	  line.strokecolor = this.fillStyle;
+	} else {
+	  line.strokecolor = this.strokeStyle;
+	}
+	line.strokeweight = this.lineWidth;
+	line.points = ""
+	for (i = 0; i < this.path.length; i++) {
+	    line.points += " " + this.path[i][0] + "," + this.path[i][1];
+	}
+	this.current_shape = null;
+	this.parent.appendChild(line);
+    },
+
+    stroke: function () {
+	this.end_path(false);
+    },
+
+    fill: function () {
+	this.end_path(true);
+    },
+
+    clearRect: function () {
+	var i;
+	for (i = 0; i < this.parent.childNodes.length; i++) {
+	    this.parent.removeChild(this.parent.firstChild);
+	}
+    }
+};
 
 /**********************************************************************
 Event Handlers.
@@ -336,12 +456,22 @@ function mouse_up_scale_dom (e) {
 }
 
 function mouse_move_scale_dom (e) {
-  if (Is_mouse_down_scale) {
-    var x, y, w, h, scale;
-    if (this.scale_div) {
-      scale = this.scale_div;
+  var x, y;
+
+  if (IE) {
+      e = window.event;
+      x = e.offsetX;
+      y = e.offsetY;
+  } else {
       x = e.layerX;
       y = e.layerY;
+  }
+
+  if (Is_mouse_down_scale) {
+    var w, h, scale;
+
+    if (this.scale_div) {
+      scale = this.scale_div;
       w = Math.abs(Mouse_x - x);
       h = Math.abs(Mouse_y - y);
       x = Math.min(Mouse_x, x);
@@ -350,8 +480,8 @@ function mouse_move_scale_dom (e) {
       scale.style.top  = y + 'px';
     } else {
       scale = this;
-      w = e.layerX;
-      h = e.layerY;
+      w = x;
+      h = y;
       if (Mouse_client_x > e.clientX) {
 	x = parseInt(scale.style.left) + w;
 	w = parseInt(scale.style.width) - w;
@@ -368,8 +498,6 @@ function mouse_move_scale_dom (e) {
     scale.style.height = h + 'px';
     Is_mouse_move_scale = true;
   } else {
-      x = e.layerX;
-      y = e.layerY;
       if (e.currentTarget == e.target && this.parent_frame) {
 	  window.status= "X: " + this.graph.get_data_x(x).toExponential(8) +
 	      "  Y: " + this.graph.get_data_y(y).toExponential(8);
@@ -423,8 +551,8 @@ Text.prototype = {
 
     offset_y: function (y) {
 	this.text.offset_y = y;
-    },
-}
+    }
+};
 
 /**********************************************************************
 Definition of Caption Object.
@@ -454,11 +582,11 @@ Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
   var parent_frame = document.create_element('div');
-  var frame     = document.create_element('canvas');
+  var frame     = create_canvas();
   var legend    = document.create_element('table');
   var scale_x   = document.createElement('div');
   var scale_y   = document.createElement('div');
-  var scale_div = document.createElement('div');
+  var scale_div = document.create_element('div');
   var graph     = document.getElementById(id);
   var width, offset_x, offset_y;
 
@@ -1289,8 +1417,8 @@ JSGraph.prototype = {
 	if (maxy) {
 	    this.max_y = maxy;
 	}
-    },
-}
+    }
+};
 
 /**********************************************************************
 Definition of Data Object.
@@ -1416,5 +1544,5 @@ Data.prototype = {
 
     set_style: function (s) {
 	this.style = s;
-    },
-}
+    }
+};
