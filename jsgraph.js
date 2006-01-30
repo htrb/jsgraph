@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.25 2006/01/29 00:05:32 hito Exp $ */
+/* $Id: jsgraph.js,v 1.26 2006/01/30 01:44:28 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -28,7 +28,7 @@ Is_mouse_move_scale = false;
 Scale_region_size_min = 6;
 Mouse_x = 0;
 Mouse_y = 0;
-Mouse_position = 0;
+Mouse_position = 'C';
 Edge_width = 30;
 Font_size = 16; /* px */
 
@@ -65,9 +65,8 @@ function change_curser (node, x, y) {
   var cursor = node.style.cursor;
 
   if (x >= Edge_width && width - x >= Edge_width &&
-      y >= Edge_width && height - y >= Edge_width &&
-      cursor != 'auto') {
-    node.style.cursor='auto';
+      y >= Edge_width && height - y >= Edge_width) {
+    node.style.cursor = 'move';
     return;
   } else if (y < Edge_width) {
     if (x < Edge_width) {
@@ -99,37 +98,37 @@ function resize_move (node, x, y) {
   var top    = parseInt(node.style.top);
 
   switch (Mouse_position) {
-  case 1:
+  case 'NW':
     node.style.left = (left + x) + 'px';
     node.style.top = (top + y) + 'px';
     node.style.width = (width - x) + 'px';
     node.style.height = (height - y) + 'px';
     break;
-  case 2:
+  case 'NE':
     node.style.top = (top + y) + 'px';
     node.style.width = (width + x) + 'px';
     node.style.height = (height - y) + 'px';
     break;
-  case 3:
+  case 'SE':
     node.style.width = (width + x) + 'px';
     node.style.height = (height + y) + 'px';
     break;
-  case 4:
+  case 'SW':
     node.style.left = (left + x) + 'px';
     node.style.width = (width - x) + 'px';
     node.style.height = (height + y) + 'px';
     break;
-  case 5:
+  case 'N':
     node.style.top = (top + y) + 'px';
     node.style.height = (height - y) + 'px';
     break;
-  case 6:
+  case 'E':
     node.style.width = (width + x) + 'px';
     break;
-  case 7:
+  case 'S':
     node.style.height = (height + y) + 'px';
     break;
-  case 8:
+  case 'W':
     node.style.left = (left + x) + 'px';
     node.style.width = (width - x) + 'px';
     break;
@@ -162,10 +161,10 @@ function mouse_resize_move_dom (e) {
     Mouse_y = e.clientY;
     if (this.frame) {
       if (this.firstChild) {
-	if (this.style.cursor != 'move') {
-	  this.style.cursor = this.frame.style.cursor;
+	var i;
+	for (i = 0; i < this.childNodes.length; i++) {
+	  this.removeChild(this.firstChild);
 	}
-	this.removeChild(this.firstChild);
       }
       this.graph.update_position();
     }
@@ -188,11 +187,7 @@ function mouse_resize_move_dom (e) {
   }
 
   if (is_frame) {
-    window.status= "X: " + this.graph.get_data_x(x).toExponential(8) +
-      "  Y: " + this.graph.get_data_y(y).toExponential(8);
     change_curser(this, x, y);
-  } else {
-    this.style.cursor='auto';
   }
 }
 
@@ -230,21 +225,23 @@ function mouse_down_dom (e) {
   Mouse_x = e.clientX;
   Mouse_y = e.clientY;
   if (x < Edge_width && y < Edge_width) {
-    Mouse_position = 1;
+    Mouse_position = 'NW';
   } else if (width - x < Edge_width && y < Edge_width) {
-    Mouse_position = 2;
+    Mouse_position = 'NE';
   } else if (width - x < Edge_width && height - y < Edge_width) {
-    Mouse_position = 3;
+    Mouse_position = 'SE';
   } else if (x < Edge_width && height - y < Edge_width) {
-    Mouse_position = 4;
+    Mouse_position = 'SW';
   } else if (y < Edge_width) {
-    Mouse_position = 5;
+    Mouse_position = 'N';
   } else if (width - x < Edge_width) {
-    Mouse_position = 6;
+    Mouse_position = 'E';
   } else if (height - y < Edge_width) {
-    Mouse_position = 7;
+    Mouse_position = 'S';
   } else if (x < Edge_width) {
-    Mouse_position = 8;
+    Mouse_position = 'W';
+  } else {
+    Mouse_position = "C";
   }
 
   Is_mouse_down = true;
@@ -254,6 +251,7 @@ function mouse_up_dom (e) {
   if (this.graph && Is_mouse_down) {
     if (!this.firstChild) {
       this.appendChild(this.frame);
+      this.appendChild(this.frame.scale_div);
     }
     if (Mouse_position != 0) {
       this.graph.clear();
@@ -585,7 +583,7 @@ function JSGraph(id) {
 }
 
 JSGraph.prototype.resize_mode = function () {
-  this.parent_frame.style.cursor='move';
+  this.frame.style.cursor='move';
   this.parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
   this.parent_frame.addEventListener("mousedown", mouse_down_dom, true);
   this.parent_frame.addEventListener("mouseup",   mouse_up_dom, true);
@@ -598,7 +596,7 @@ JSGraph.prototype.resize_mode = function () {
 }
 
 JSGraph.prototype.scale_mode = function () {
-  this.parent_frame.style.cursor='default';
+  this.frame.style.cursor='default';
   this.parent_frame.removeEventListener("mousemove", mouse_resize_move_dom, true);
   this.parent_frame.removeEventListener("mousedown", mouse_down_dom, true);
   this.parent_frame.removeEventListener("mouseup",   mouse_up_dom, true);
