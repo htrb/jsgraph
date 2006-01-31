@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.33 2006/01/31 07:29:41 hito Exp $ */
+/* $Id: jsgraph.js,v 1.34 2006/01/31 12:36:41 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -52,8 +52,7 @@ if (window.addEventListener) {
   }
   if (!document.namespaces.v) {
     document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-    document.createStyleSheet().addRule("v\\:*",
-					"behavior: url(#default#VML); antialias: false;");
+    document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML);");
   }
   IE = true;
 }
