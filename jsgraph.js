@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.28 2006/01/30 10:07:35 hito Exp $ */
+/* $Id: jsgraph.js,v 1.29 2006/01/31 02:25:49 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -49,6 +49,11 @@ if (window.addEventListener) {
     }
     return element;
   }
+  if (!document.namespaces.v) {
+      document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+      document.createStyleSheet().addRule("v\\:*",
+					  "behavior: url(#default#VML);");
+  }
   IE = true;
 }
 
@@ -56,26 +61,10 @@ Math.log10 = function(x) {
   return this.log(x) / this.LN10;
 }
 
-function create_canvas() {
-    if (IE) {
-	var div;
-	div = document.create_element('div');
-	div.getContext = function (s) {
-	    var canvas;
-	    canvas = new IE_Canvas(this);
-	    return canvas;
-	}
-	if (!document.namespaces.v) {
-	    document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-	    document.createStyleSheet().addRule("v\\:*",
-						"behavior: url(#default#VML);");
-	}
-	return div;
-    } else {
-	return document.create_element('canvas');
-    }
-}
 
+/**********************************************************************
+Definition of IE_Canvas Object.
+***********************************************************************/
 function IE_Canvas(div) {
     this.lineWidth = 1.0;
     this.strokeStyle = "#000000";
@@ -87,18 +76,28 @@ function IE_Canvas(div) {
 }
 
 IE_Canvas.prototype = {
+
+    create_vml_element: function(shape, x, y, w, h) {
+	var e = document.createElement(shape);
+	e.fillcolor = this.fillStyle;
+	e.strokecolor = this.fillStyle;
+	e.style.position = "absolute";
+	e.style.left = x + "px";
+	e.style.top = y + "px";
+	e.style.width = w + "px";
+	e.style.height = h + "px";
+	this.parent.appendChild(e);
+	return e;
+    },
+
     arc: function (x, y, r, sa, ea, dir) {
-	var arc  = document.createElement("v:oval");
+	this.create_vml_element("v:oval", x - r, y - r, r * 2, r * 2);
 	this.current_shape = 'arc';
-	arc.fillcolor = this.fillStyle;
-	arc.strokecolor = this.fillStyle;
-	arc.style.position = "absolute";
-	arc.style.left = (x - r) + "px";
-	arc.style.top = (y - r) + "px";
-	r *= 2;
-	arc.style.width = r + "px";
-	arc.style.height = r + "px";
-	this.parent.appendChild(arc);
+    },
+
+    fillRect: function (x, y, w, h) {
+	this.create_vml_element("v:rect", x, y, w, h);
+	this.current_shape = 'rect';
     },
 
     restore: function () {
@@ -128,22 +127,13 @@ IE_Canvas.prototype = {
 	this.path.push([x, y]);
     },
 
-    fillRect: function (x, y, width, height) {
-	this.beginPath();
-	this.moveTo(x, y);
-	this.lineTo(x + width, y);
-	this.lineTo(x + width, y + height);
-	this.lineTo(x, y + height);
-	this.fill();
-    },
-
     end_path: function (fill) {
 	var line, i;
 	if (this.current_shape != 'line') {
 	    return;
 	}
 
-	line = document.createElement("v:polyline");
+	line = document.create_element("v:polyline");
 	line.filled = fill;
 	line.fillcolor = this.fillStyle;
 	if (fill) {
@@ -268,11 +258,13 @@ function move (node, x, y) {
   node.offset_y += y;
 }
 
-function mouse_resize_move_dom (e) {
-  var x, y, is_frame = false;
+function mouse_resize_move_dom () {
+  var e, x, y, is_frame = false;
 
   if (IE) {
     e = window.event;
+  } else {
+    e = arguments[0];
   }
 
   if (Is_mouse_down) {
@@ -311,9 +303,12 @@ function mouse_resize_move_dom (e) {
   }
 }
 
-function mouse_move_dom (e) {
+function mouse_move_dom () {
+  var e;
   if (IE) {
     e = window.event;
+  } else {
+    e = arguments[0];
   }
   if (Is_mouse_down) {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
@@ -322,8 +317,8 @@ function mouse_move_dom (e) {
   }
 }
 
-function mouse_down_dom (e) {
-  var x, y;
+function mouse_down_dom () {
+  var e, x, y;
   var width  = parseInt(this.style.width);
   var height = parseInt(this.style.height);
 
@@ -335,6 +330,7 @@ function mouse_down_dom (e) {
       return;
     }
   } else {
+    e = arguments[0];
     x = e.layerX;
     y = e.layerY;
     if (e.button != 0) {
@@ -367,7 +363,7 @@ function mouse_down_dom (e) {
   Is_mouse_down = true;
 }
 
-function mouse_up_dom (e) {
+function mouse_up_dom () {
   if (this.graph && Is_mouse_down) {
     if (!this.firstChild) {
       this.appendChild(this.frame);
@@ -384,12 +380,12 @@ function mouse_up_dom (e) {
   Is_mouse_down = false;
 }
 
-function mouse_over_dom (e) {
+function mouse_over_dom () {
   this.style.cursor='move';
 }
 
-function mouse_down_scale_dom (e) {
-  var x, y;
+function mouse_down_scale_dom () {
+  var e, x, y;
 
   if (IE) {
     e = window.event;
@@ -399,6 +395,7 @@ function mouse_down_scale_dom (e) {
       return;
     }
   } else {
+    e = arguments[0];
     x = e.layerX;
     y = e.layerY;
     if (e.button != 0) {
@@ -415,13 +412,15 @@ function mouse_down_scale_dom (e) {
   Is_mouse_down_scale = true;
 }
 
-function mouse_up_scale_dom (e) {
+function mouse_up_scale_dom () {
   if (Is_mouse_down_scale) {
       var x, y, w, h, scale;
       if (this.scale_div) {
 	  scale = this.scale_div;
-      } else {
+      } else if (this.graph) {
 	  scale = this;
+      } else {
+	return false;
       }
       if (Is_mouse_move_scale) {
 	  x = parseInt(scale.style.left);
@@ -455,14 +454,15 @@ function mouse_up_scale_dom (e) {
   scale.style.height = '0px';
 }
 
-function mouse_move_scale_dom (e) {
-  var x, y;
+function mouse_move_scale_dom () {
+  var e, x, y;
 
   if (IE) {
       e = window.event;
       x = e.offsetX;
       y = e.offsetY;
   } else {
+      e = arguments[0];
       x = e.layerX;
       y = e.layerY;
   }
@@ -478,20 +478,26 @@ function mouse_move_scale_dom (e) {
       y = Math.min(Mouse_y, y);
       scale.style.left = x + 'px';
       scale.style.top  = y + 'px';
-    } else {
+    } else if (this.graph) {
       scale = this;
       w = x;
       h = y;
       if (Mouse_client_x > e.clientX) {
 	x = parseInt(scale.style.left) + w;
 	w = parseInt(scale.style.width) - w;
+	x--;
 	scale.style.left = x + 'px';
       }
       if (Mouse_client_y > e.clientY) {
 	y = parseInt(scale.style.top) + h;
 	h = parseInt(scale.style.height) - h;
+	y--;
 	scale.style.top = y + 'px';
       }
+      w++;
+      h++;
+    } else {
+      return false;
     }
     scale.style.visibility = 'visible';
     scale.style.width = w + 'px';
@@ -505,8 +511,8 @@ function mouse_move_scale_dom (e) {
   }
 }
 
-function event_none_dom (e) {
-  return;
+function event_none_dom () {
+  return false;
 }
 /**********************************************************************
 Definition of Text Object.
@@ -582,12 +588,12 @@ Definition of JSGraph Object.
 ***********************************************************************/
 function JSGraph(id) {
   var parent_frame = document.create_element('div');
-  var frame     = create_canvas();
   var legend    = document.create_element('table');
   var scale_x   = document.createElement('div');
   var scale_y   = document.createElement('div');
   var scale_div = document.create_element('div');
   var graph     = document.getElementById(id);
+  var frame     = this.create_canvas();
   var width, offset_x, offset_y;
 
   this.graph = graph;
@@ -648,8 +654,8 @@ function JSGraph(id) {
   this.frame = frame;
   this.canvas = frame.getContext('2d');
   parent_frame.frame = frame;
-  parent_frame.appendChild(scale_div);
   parent_frame.appendChild(frame);
+  parent_frame.appendChild(scale_div);
 
   legend.style.position = 'absolute';
   legend.style.backgroundColor = '#c0c0c0';
@@ -713,6 +719,22 @@ function JSGraph(id) {
 }
 
 JSGraph.prototype = {
+    create_canvas: function() {
+	if (IE) {
+	    var div;
+	    div = document.create_element('div');
+	    div.getContext = function (s) {
+		var canvas;
+		canvas = new IE_Canvas(this);
+		return canvas;
+	    }
+	    div.addEventListener("selectstart", event_none_dom);
+	    return div;
+	} else {
+	    return document.create_element('canvas');
+	}
+    },
+
     resize_mode: function () {
 	this.frame.style.cursor='move';
 	this.parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
