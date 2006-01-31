@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.31 2006/01/31 06:37:34 hito Exp $ */
+/* $Id: jsgraph.js,v 1.32 2006/01/31 07:20:09 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -47,6 +47,7 @@ if (window.addEventListener) {
     element.removeEventListener = function (ev, fun) {
       this["on" + ev] = event_none_dom;
     }
+    element.addEventListener("selectstart", event_none_dom);
     return element;
   }
   if (!document.namespaces.v) {
@@ -403,6 +404,10 @@ function mouse_down_scale_dom () {
     }
   }
 
+  if (! this.scale_div) {
+      return false;
+  }
+
   Mouse_x = x;
   Mouse_y = y;
 
@@ -420,6 +425,8 @@ function mouse_up_scale_dom () {
   } else if (this.graph) {
       scale = this;
   } else {
+      Is_mouse_down_scale = false;
+      Is_mouse_move_scale = false;
       return false;
   }
   if (Is_mouse_down_scale) {
@@ -467,6 +474,7 @@ function mouse_move_scale_dom () {
   if (Is_mouse_down_scale) {
     var w, h, scale;
 
+    Is_mouse_move_scale = true;
     if (this.scale_div) {
       scale = this.scale_div;
       w = Math.abs(Mouse_x - x);
@@ -499,7 +507,6 @@ function mouse_move_scale_dom () {
     scale.style.visibility = 'visible';
     scale.style.width = w + 'px';
     scale.style.height = h + 'px';
-    Is_mouse_move_scale = true;
   } else {
       if (e.currentTarget == e.target && this.parent_frame) {
 	  window.status = "X: " + this.graph.get_data_x(x).toExponential(8) +
@@ -725,7 +732,6 @@ JSGraph.prototype = {
 		canvas = new IE_Canvas(this);
 		return canvas;
 	    }
-	    div.addEventListener("selectstart", event_none_dom);
 	    return div;
 	} else {
 	    return document.create_element('canvas');
@@ -1433,7 +1439,7 @@ JSGraph.prototype = {
 
     zoom_in: function () {
 	var w, h;
-	if (this.scale_x_type == "linear") {
+	if (this.scale_x.type == 0) {
 	    w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
 	    this.min_x += w;
 	    this.max_x -= w;
@@ -1441,7 +1447,7 @@ JSGraph.prototype = {
 	    this.min_x *= this.zoom_ratio;
 	    this.max_x /= this.zoom_ratio;
 	}
-	if (this.scale_y_type == "linear") {
+	if (this.scale_y.type == 0) {
 	    h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
 	    this.min_y += h;
 	    this.max_y -= h;
@@ -1468,7 +1474,7 @@ JSGraph.prototype = {
 
     centering: function (x, y) {
 	var w, h, minx, maxx, miny, maxy;
-	if (this.scale_x_type == 0) {
+	if (this.scale_x.type == 0) {
 	  w = this.max_x - this.min_x;
 	  minx = x - w / 2;
 	  maxx = x + w / 2;
@@ -1477,7 +1483,7 @@ JSGraph.prototype = {
 	  minx = x / w;
 	  maxx = x * w;
 	}
-	if (this.scale_x_type == 0) {
+	if (this.scale_y.type == 0) {
 	  h = this.max_y - this.min_y;
 	  miny = y - h / 2;
 	  maxy = y + h / 2;
