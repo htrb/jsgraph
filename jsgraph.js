@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.29 2006/01/31 02:25:49 hito Exp $ */
+/* $Id: jsgraph.js,v 1.30 2006/01/31 04:10:28 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -436,12 +436,7 @@ function mouse_up_scale_dom () {
       } else {
 	  x = scale.graph.get_data_x(Mouse_x);
 	  y = scale.graph.get_data_y(Mouse_y);
-	  w = scale.graph.max_x - scale.graph.min_x;
-	  h = scale.graph.max_y - scale.graph.min_y;
-	  scale.graph.set_scale(x - w / 2,
-				y - h / 2,
-				x + w / 2,
-				y + h / 2);
+	  scale.graph.centering(x, y);
       }
   }
   Is_mouse_down_scale = false;
@@ -505,7 +500,7 @@ function mouse_move_scale_dom () {
     Is_mouse_move_scale = true;
   } else {
       if (e.currentTarget == e.target && this.parent_frame) {
-	  window.status= "X: " + this.graph.get_data_x(x).toExponential(8) +
+	  window.status = "X: " + this.graph.get_data_x(x).toExponential(8) +
 	      "  Y: " + this.graph.get_data_y(y).toExponential(8);
       }
   }
@@ -1107,7 +1102,9 @@ JSGraph.prototype = {
 	if (this.scale_x.type == 0) {
 	    return this.min_x + (this.max_x - this.min_x) * x / this.frame.width;
 	} else {
-	    return 0;
+	    return Math.pow(10,
+		     x / this.frame.width * (Math.log10(this.max_x) - Math.log10(this.min_x))
+		     + Math.log10(this.min_x));
 	}
     },
 
@@ -1192,7 +1189,13 @@ JSGraph.prototype = {
     },
 
     get_data_y: function (y) {
-	return this.min_y + (this.max_y - this.min_y)* (1 - y / this.frame.height);
+	if (this.scale_y.type == 0) {
+	    return this.min_y + (this.max_y - this.min_y)* (1 - y / this.frame.height);
+	} else {
+	    return Math.pow(10,
+			    Math.log10(this.max_y) - y / this.frame.height *
+			    (Math.log10(this.max_y) - Math.log10(this.min_y)));
+	}
     },
 
     gauge_log_x: function () {
@@ -1408,22 +1411,42 @@ JSGraph.prototype = {
 
     zoom_out: function () {
 	var w, h;
-	w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
-	h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
-	this.min_x -= w;
-	this.max_x += w;
-	this.min_y -= h;
-	this.max_y += h;
+	if (this.scale_x.type == 0) {
+	    w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
+	    this.min_x -= w;
+	    this.max_x += w;
+	} else {
+	    this.min_x /= this.zoom_ratio;
+	    this.max_x *= this.zoom_ratio;
+	}
+	if (this.scale_y.type == 0) {
+	    h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
+	    this.min_y -= h;
+	    this.max_y += h;
+	} else {
+	    this.min_y /= this.zoom_ratio;
+	    this.max_y *= this.zoom_ratio;
+	}
     },
 
     zoom_in: function () {
 	var w, h;
-	w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
-	h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
-	this.min_x += w;
-	this.max_x -= w;
-	this.min_y += h;
-	this.max_y -= h;
+	if (this.scale_x_type == "linear") {
+	    w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
+	    this.min_x += w;
+	    this.max_x -= w;
+	} else {
+	    this.min_x *= this.zoom_ratio;
+	    this.max_x /= this.zoom_ratio;
+	}
+	if (this.scale_y_type == "linear") {
+	    h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
+	    this.min_y += h;
+	    this.max_y -= h;
+	} else {
+	    this.min_y *= this.zoom_ratio;
+	    this.max_y /= this.zoom_ratio;
+	}
     },
 
     set_scale: function (minx, miny, maxx, maxy) {
@@ -1439,7 +1462,31 @@ JSGraph.prototype = {
 	if (maxy) {
 	    this.max_y = maxy;
 	}
+    },
+
+    centering: function (x, y) {
+	var w, h, minx, maxx, miny, maxy;
+	if (this.scale_x_type == 0) {
+	  w = this.max_x - this.min_x;
+	  minx = x - w / 2;
+	  maxx = x + w / 2;
+	} else {
+	  w = Math.sqrt(this.max_x / this.min_x);
+	  minx = x / w;
+	  maxx = x * w;
+	}
+	if (this.scale_x_type == 0) {
+	  h = this.max_y - this.min_y;
+	  miny = y - h / 2;
+	  maxy = y + h / 2;
+	} else {
+	  h = Math.sqrt(this.max_y / this.min_y);
+	  miny = y / h;
+	  maxy = y * h;
+	}
+	this.set_scale(minx, miny, maxx, maxy);
     }
+
 };
 
 /**********************************************************************
