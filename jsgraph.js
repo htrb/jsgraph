@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.30 2006/01/31 04:10:28 hito Exp $ */
+/* $Id: jsgraph.js,v 1.31 2006/01/31 06:37:34 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -52,7 +52,7 @@ if (window.addEventListener) {
   if (!document.namespaces.v) {
       document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
       document.createStyleSheet().addRule("v\\:*",
-					  "behavior: url(#default#VML);");
+					  "behavior: url(#default#VML); antialias: false;");
   }
   IE = true;
 }
@@ -413,15 +413,17 @@ function mouse_down_scale_dom () {
 }
 
 function mouse_up_scale_dom () {
+  var scale;
+
+  if (this.scale_div) {
+      scale = this.scale_div;
+  } else if (this.graph) {
+      scale = this;
+  } else {
+      return false;
+  }
   if (Is_mouse_down_scale) {
-      var x, y, w, h, scale;
-      if (this.scale_div) {
-	  scale = this.scale_div;
-      } else if (this.graph) {
-	  scale = this;
-      } else {
-	return false;
-      }
+      var x, y, w, h;
       if (Is_mouse_move_scale) {
 	  x = parseInt(scale.style.left);
 	  y = parseInt(scale.style.top);
@@ -893,7 +895,7 @@ JSGraph.prototype = {
 	var data = this.data;
 
 	for (i = 0; i < data.length; i++) {
-	    if (data[i].draw) {
+	    if (data[i].draw && data[i].length() > 0) {
 		switch (data[i].style) {
 		case "c":
 		    this.draw_each_data_c(data[i]);
