@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.34 2006/01/31 12:36:41 hito Exp $ */
+/* $Id: jsgraph.js,v 1.35 2006/02/01 09:42:37 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -31,6 +31,7 @@ Mouse_y = 0;
 Mouse_position = 'C';
 Edge_width = 30;
 Font_size = 16; /* px */
+XMLHttp = null;
 
 if (window.addEventListener) {
   document.create_element = function (e) {
@@ -56,6 +57,27 @@ if (window.addEventListener) {
   }
   IE = true;
 }
+
+create_http_request = function () {
+  var xmlhttp = false;
+
+  try {
+    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+  } catch (e) {
+    try {
+      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    } catch (E) {
+      xmlhttp = false;
+    }
+  }
+
+  if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
+    xmlhttp = new XMLHttpRequest();
+  }
+  return xmlhttp;
+}
+
+XMLHttp = create_http_request();
 
 Math.log10 = function(x) {
   return this.log(x) / this.LN10;
@@ -607,7 +629,7 @@ function JSGraph(id) {
   parent_frame.style.position = 'absolute';
   parent_frame.style.overflow = 'hidden';
   parent_frame.style.backgroundColor = '#c0c0c0';
-  parent_frame.style.top = (offset_y + 100) + 'px';
+  parent_frame.style.top = (offset_y + 40) + 'px';
   parent_frame.style.left = (offset_x + 150) + 'px';
   parent_frame.style.width = '400px';
   parent_frame.style.height = '300px';
@@ -1066,7 +1088,7 @@ JSGraph.prototype = {
     m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)));
     if (m != 0) {
       text = new Text("&times;10<sup>" + m + "</sup>");
-      text.init(this.scale_x, width, this.scale_x.offset + 25);
+      text.init(this.scale_x, width, this.scale_x.offset + Font_size);
     }
 
     
@@ -1511,6 +1533,7 @@ function Data() {
   this.caption = null;
   this.width = 2;
   this.style = "c";
+  this.loaded = false;
 }
 
 Data.prototype = {
@@ -1563,6 +1586,50 @@ Data.prototype = {
 	this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
       }
     }
+  },
+
+  load: function (path) {
+    var fs, i, data = this;
+
+    this.loaded = false;
+    if (arguments.length > 1) {
+      fs = arguments[1];
+    } else {
+      fs = new RegExp("[ ,\t]+");
+    }
+
+    XMLHttp.open('GET', path, true);
+    i = 0;
+    XMLHttp.onreadystatechange = function() {
+      var text;
+      if (XMLHttp.readyState == 4) {
+	if (XMLHttp.status != 200) {
+	  return;
+	}
+	text = XMLHttp.responseText.split("\n");
+	for (i = 0; i < text.length; i++) {
+	  var d = text[i].split(fs);
+	  if(d.length > 1) {
+	    data.add_data(parseFloat(d[0]), parseFloat(d[1]));
+	  }
+	}
+	data.loaded = true;
+      }
+    }
+    XMLHttp.send(null);
+  },
+
+  wait: function(cb) {
+    var data = this;
+    wait_until_data_loaded = function () {
+      if (data.loaded) {
+	cb();
+	return;
+      } else {
+	window.setTimeout("wait_until_data_loaded()", 100);
+      }
+    }
+    wait_until_data_loaded();
   },
 
   autoscale: function () {
@@ -1620,5 +1687,13 @@ Data.prototype = {
 
   set_style: function (s) {
     this.style = s;
+  },
+
+  set_line_width: function (w) {
+    this.width = w;
+  },
+
+  set_mark_size: function (s) {
+    this.size = s;
   }
 };
