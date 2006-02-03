@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.35 2006/02/01 09:42:37 hito Exp $ */
+/* $Id: jsgraph.js,v 1.36 2006/02/03 08:27:46 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -181,8 +181,7 @@ IE_Canvas.prototype = {
   },
 
   clearRect: function () {
-    var i;
-    for (i = 0; i < this.parent.childNodes.length; i++) {
+    while (this.parent.childNodes.length > 0) {
       this.parent.removeChild(this.parent.firstChild);
     }
   }
@@ -195,6 +194,9 @@ function change_curser (node, x, y) {
   var width  = parseInt(node.style.width);
   var height = parseInt(node.style.height);
   var cursor = node.style.cursor;
+  if (node.frame) {
+    node = node.frame;
+  }
 
   if (x >= Edge_width && width - x >= Edge_width &&
       y >= Edge_width && height - y >= Edge_width) {
@@ -309,9 +311,7 @@ function mouse_resize_move_dom () {
   if (IE) {
     x = e.offsetX;
     y = e.offsetY;
-    if (e.srcElement.tagName == 'DIV' && this.parent_frame) {
-      is_frame = true;
-    }
+    is_frame = true;
   } else {
     x = e.layerX;
     y = e.layerY;
@@ -1373,11 +1373,6 @@ JSGraph.prototype = {
 
   clear: function () {
     var node;
-
-    node = this.frame.childNodes;
-    while (node.length > 0) {
-      this.frame.removeChild(node[0]);
-    }
 
     node = this.scale_x.childNodes;
     while (node.length > 0) {
