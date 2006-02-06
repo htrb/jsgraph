@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.37 2006/02/06 04:57:35 hito Exp $ */
+/* $Id: jsgraph.js,v 1.38 2006/02/06 10:11:45 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -543,12 +543,14 @@ function event_none_dom () {
 Definition of Text Object.
 ***********************************************************************/
 
-function Text(s) {
+function Text() {
   var text = document.createElement('span');
 
   text.style.position = 'absolute';
   text.style.fontSize = Font_size + 'px';
-  text.innerHTML = s;
+  if (arguments.length > 0){
+    text.innerHTML = arguments[0];
+  }
   this.text = text;
 }
 
@@ -561,7 +563,12 @@ Text.prototype = {
   },
 
   set_text: function (s) {
-    this.text.innerHTML = s;
+    if (s == null) {
+      this.text.style.visibility = 'hidden';
+    } else {
+      this.text.innerHTML = String(s);
+      this.text.style.visibility = 'visible';
+    }
   },
 
   size: function (size) {
@@ -633,7 +640,7 @@ JSGraph.prototype = {
 
     offset_x = 140;
     offset_y = 60;
-    w = parseInt(graph.style.width) - offset_x - 320;
+    w = parseInt(graph.style.width) - offset_x - 160;
     h = parseInt(graph.style.height) - offset_y - 80;
 
     parent_frame.style.position = 'absolute';
@@ -1728,6 +1735,9 @@ Definition of JSG Object.
 ***********************************************************************/
 function JSG(id) {
   this.init(id);
+  this.caption_x.set_text(null);
+  this.caption_y.set_text(null);
+  this.title.set_text(null);
   this.Colors = [
 		'#9900cc',
 		'#669900',
