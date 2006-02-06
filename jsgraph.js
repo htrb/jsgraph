@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.36 2006/02/03 08:27:46 hito Exp $ */
+/* $Id: jsgraph.js,v 1.37 2006/02/06 04:57:35 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -611,139 +611,149 @@ Caption.prototype = new Text("");
 /**********************************************************************
 Definition of JSGraph Object.
 ***********************************************************************/
-function JSGraph(id) {
-  var parent_frame = document.create_element('div');
-  var legend    = document.create_element('table');
-  var scale_x   = document.createElement('div');
-  var scale_y   = document.createElement('div');
-  var scale_div = document.create_element('div');
-  var graph     = document.getElementById(id);
-  var frame     = this.create_canvas();
-  var width, offset_x, offset_y;
-
-  this.graph = graph;
-
-  offset_x = graph.offsetLeft;
-  offset_y = graph.offsetTop;
-
-  parent_frame.style.position = 'absolute';
-  parent_frame.style.overflow = 'hidden';
-  parent_frame.style.backgroundColor = '#c0c0c0';
-  parent_frame.style.top = (offset_y + 40) + 'px';
-  parent_frame.style.left = (offset_x + 150) + 'px';
-  parent_frame.style.width = '400px';
-  parent_frame.style.height = '300px';
-  parent_frame.style.borderColor = '#000000';
-  parent_frame.style.borderWidth = '3px';
-  parent_frame.style.borderStyle = 'ridge';
-  parent_frame.graph = this;
-
-  graph.appendChild(parent_frame);
-  this.parent_frame = parent_frame;
-
-  //  frame.style.position = 'absolute';
-  frame.style.overflow = 'hidden';
-  frame.style.backgroundColor = '#c0c0c0';
-  frame.style.top = '0px';
-  frame.style.left = '0px';
-  frame.style.width = '400px';
-  frame.style.height = '300px';
-  frame.width = 400;
-  frame.height = 300;
-  frame.style.borderColor = '#FF0000';
-  frame.style.borderWidth = '1px';
-  frame.style.borderStyle = 'none';
-
-  frame.gauge = new Object();
-  frame.gauge.width = '1';
-  frame.gauge.length = '5';
-  frame.gauge.color = '#000000';
-  frame.graph = this;
-  frame.parent_frame = parent_frame;
-  frame.scale_div = scale_div;
-
-  scale_div.style.position = 'absolute';
-  scale_div.style.borderColor = '#000000';
-  scale_div.style.borderWidth = '1px';
-  scale_div.style.borderStyle = 'dotted';
-  scale_div.style.visibility = 'hidden';
-  scale_div.style.width = '100px';
-  scale_div.style.height = '100px';
-  scale_div.style.left = '0px';
-  scale_div.style.top = '0px';
-  scale_div.style.margin = '0px';
-  scale_div.addEventListener("mouseup",   mouse_up_scale_dom, true);
-  scale_div.addEventListener("mousemove", mouse_move_scale_dom, true);
-  scale_div.graph = this;
-
-  this.frame = frame;
-  this.canvas = frame.getContext('2d');
-  parent_frame.frame = frame;
-  parent_frame.appendChild(frame);
-  parent_frame.appendChild(scale_div);
-
-  legend.style.position = 'absolute';
-  legend.style.backgroundColor = '#c0c0c0';
-  legend.style.borderColor = '#000000';
-  legend.style.borderWidth = '3px';
-  legend.style.borderStyle = 'ridge';
-  legend.offset_x = 40;
-  legend.offset_y = 0;
-
-  legend.addEventListener("mousemove", mouse_move_dom, true);
-  legend.addEventListener("mousedown", mouse_down_dom, true);
-  legend.addEventListener("mouseup",   mouse_up_dom, true);
-  legend.addEventListener("mouseout",  mouse_up_dom, true);
-  legend.addEventListener("mouseover", mouse_over_dom, true);
-
-  graph.appendChild(legend);
-  this.legend = legend;
-
-  this.title = new Caption("Graph");
-  this.title.init(graph, 0, 0);
-  this.title.text.offset_x = parseInt(frame.style.width) / 2 - 25;
-  this.title.text.offset_y = -25;
-
-  this.caption_y = new Caption("Y-Axis");
-  this.caption_y.init(graph, 0, 0);
-  this.caption_y.text.offset_x = -100;
-  this.caption_y.text.offset_y = (parseInt(frame.style.height) - Font_size) / 2;
-
-  this.caption_x = new Caption("X-Axis");
-  this.caption_x.init(graph, 0, 0);
-  this.caption_x.text.offset_x = parseInt(frame.style.width) / 2 - 25;
-  this.caption_x.text.offset_y = 40;
-
-  scale_x.style.position = 'absolute';
-  scale_x.style.overflow = 'visible';
-  scale_x.style.backgroundColor = '#c0c0c0';
-  scale_x.offset = 5;
-  scale_x.graph = this;
-  scale_x.type = 0;
-  this.scale_x = scale_x;
-  graph.appendChild(scale_x);
-
-  scale_y.style.position = 'absolute';
-  scale_y.style.overflow = 'visible';
-  scale_y.style.backgroundColor = '#c0c0c0';
-  scale_y.offset = -10;
-  scale_y.graph = this;
-  scale_y.type = 0;
-  this.scale_y = scale_y;
-  graph.appendChild(scale_y);
-
-  this.min_x = 0;
-  this.max_x =  10;
-  this.min_y = -53000;
-  this.max_y = -50000;
-
-  this.zoom_ratio = 1.4;
-
-  this.data = new Array(0);
-  this.scale_mode();
+function JSGraph() {
+  if (arguments.length > 0) {
+    this.init(arguments[0]);
+  }
 }
 
 JSGraph.prototype = {
+  init: function(id) {
+    var w, h;
+    var parent_frame = document.create_element('div');
+    var legend    = document.create_element('table');
+    var scale_x   = document.createElement('div');
+    var scale_y   = document.createElement('div');
+    var scale_div = document.create_element('div');
+    var graph     = document.getElementById(id);
+    var frame     = this.create_canvas();
+    var offset_x, offset_y;
+
+    this.graph = graph;
+
+    offset_x = 140;
+    offset_y = 60;
+    w = parseInt(graph.style.width) - offset_x - 320;
+    h = parseInt(graph.style.height) - offset_y - 80;
+
+    parent_frame.style.position = 'absolute';
+    parent_frame.style.overflow = 'hidden';
+    parent_frame.style.backgroundColor = '#c0c0c0';
+    parent_frame.style.top = (graph.offsetTop + offset_y) + 'px';
+    parent_frame.style.left = (graph.offsetLeft + offset_x) + 'px';
+    parent_frame.style.width = w + 'px';
+    parent_frame.style.height = h + 'px';
+    parent_frame.style.borderColor = '#000000';
+    parent_frame.style.borderWidth = '3px';
+    parent_frame.style.borderStyle = 'ridge';
+    parent_frame.graph = this;
+
+    graph.appendChild(parent_frame);
+    this.parent_frame = parent_frame;
+
+    //  frame.style.position = 'absolute';
+    frame.style.overflow = 'hidden';
+    frame.style.backgroundColor = '#c0c0c0';
+    frame.style.top = '0px';
+    frame.style.left = '0px';
+    frame.style.width = w + 'px';
+    frame.style.height = h + 'px';
+    frame.width = w;
+    frame.height = h;
+    frame.style.borderColor = '#FF0000';
+    frame.style.borderWidth = '1px';
+    frame.style.borderStyle = 'none';
+
+    frame.gauge = new Object();
+    frame.gauge.width = '1';
+    frame.gauge.length = '5';
+    frame.gauge.color = '#000000';
+    frame.graph = this;
+    frame.parent_frame = parent_frame;
+    frame.scale_div = scale_div;
+
+    scale_div.style.position = 'absolute';
+    scale_div.style.borderColor = '#000000';
+    scale_div.style.borderWidth = '1px';
+    scale_div.style.borderStyle = 'dotted';
+    scale_div.style.visibility = 'hidden';
+    scale_div.style.width = '100px';
+    scale_div.style.height = '100px';
+    scale_div.style.left = '0px';
+    scale_div.style.top = '0px';
+    scale_div.style.margin = '0px';
+    scale_div.addEventListener("mouseup",   mouse_up_scale_dom, true);
+    scale_div.addEventListener("mousemove", mouse_move_scale_dom, true);
+    scale_div.graph = this;
+
+    this.frame = frame;
+    this.canvas = frame.getContext('2d');
+    parent_frame.frame = frame;
+    parent_frame.appendChild(frame);
+    parent_frame.appendChild(scale_div);
+
+    legend.style.position = 'absolute';
+    legend.style.backgroundColor = '#c0c0c0';
+    legend.style.borderColor = '#000000';
+    legend.style.borderWidth = '3px';
+    legend.style.borderStyle = 'ridge';
+    legend.offset_x = 40;
+    legend.offset_y = 0;
+
+    legend.addEventListener("mousemove", mouse_move_dom, true);
+    legend.addEventListener("mousedown", mouse_down_dom, true);
+    legend.addEventListener("mouseup",   mouse_up_dom, true);
+    legend.addEventListener("mouseout",  mouse_up_dom, true);
+    legend.addEventListener("mouseover", mouse_over_dom, true);
+
+    graph.appendChild(legend);
+    this.legend = legend;
+
+    this.title = new Caption("Graph");
+    this.title.init(graph, 0, 0);
+    this.title.text.offset_x = parseInt(frame.style.width) / 2 - 25;
+    this.title.text.offset_y = -25;
+
+    this.caption_y = new Caption("Y-Axis");
+    this.caption_y.init(graph, 0, 0);
+    this.caption_y.text.offset_x = -100;
+    this.caption_y.text.offset_y = (parseInt(frame.style.height) - Font_size) / 2;
+
+    this.caption_x = new Caption("X-Axis");
+    this.caption_x.init(graph, 0, 0);
+    this.caption_x.text.offset_x = parseInt(frame.style.width) / 2 - 25;
+    this.caption_x.text.offset_y = 40;
+
+    scale_x.style.position = 'absolute';
+    scale_x.style.overflow = 'visible';
+    scale_x.style.backgroundColor = '#c0c0c0';
+    scale_x.offset = 5;
+    scale_x.graph = this;
+    scale_x.type = 0;
+    this.scale_x = scale_x;
+    graph.appendChild(scale_x);
+
+    scale_y.style.position = 'absolute';
+    scale_y.style.overflow = 'visible';
+    scale_y.style.backgroundColor = '#c0c0c0';
+    scale_y.offset = -10;
+    scale_y.graph = this;
+    scale_y.type = 0;
+    this.scale_y = scale_y;
+    graph.appendChild(scale_y);
+
+    this.min_x = 0;
+    this.max_x = 10;
+    this.min_y = -53000;
+    this.max_y = -50000;
+
+    this.zoom_ratio = 1.4;
+
+    this.data = new Array(0);
+    this.scale_mode();
+    this.update_position();
+  },
+
   create_canvas: function() {
     if (IE) {
       var div;
@@ -1339,6 +1349,12 @@ JSGraph.prototype = {
     return;
   },
 
+  set_size: function (w, h) {
+    this.parent_frame.style.width = w + "px";
+    this.parent_frame.style.height = h + "px";
+    update_position();
+  },
+
   update_position: function () {
     var parent_frame = this.parent_frame;
     var frame = this.frame;
@@ -1583,32 +1599,47 @@ Data.prototype = {
     }
   },
 
-  load: function (path) {
-    var fs, i, data = this;
+  read_data: function (s) {
+    var i, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    var data, xy_data;
 
-    this.loaded = false;
-    if (arguments.length > 1) {
-      fs = arguments[1];
-    } else {
-      fs = new RegExp("[ ,\t]+");
+    switch (arguments.length) {
+    case 5:
+      rs = arguments[4];
+    case 4:
+      fs = arguments[3];
+    case 3:
+      col_y = parseInt(arguments[2]) - 1;
+      col_x = parseInt(arguments[1]) - 1;
+      break;
     }
+    data = s.split(rs);
+    for (i = 0; i < data.length; i++) {
+      xy_data = data[i].split(fs);
+      if (xy_data.length > 1) {
+	this.add_data(parseFloat(xy_data[col_x]),
+		      parseFloat(xy_data[col_y]));
+      }
+    }
+  },
+
+  load: function (path) {
+    var i, self, arg;
+
+    self = this;
+    this.loaded = false;
+    arg = arguments;
 
     XMLHttp.open('GET', path, true);
-    i = 0;
     XMLHttp.onreadystatechange = function() {
-      var text;
+      var text, a;
       if (XMLHttp.readyState == 4) {
 	if (XMLHttp.status != 200) {
 	  return;
 	}
-	text = XMLHttp.responseText.split("\n");
-	for (i = 0; i < text.length; i++) {
-	  var d = text[i].split(fs);
-	  if(d.length > 1) {
-	    data.add_data(parseFloat(d[0]), parseFloat(d[1]));
-	  }
-	}
-	data.loaded = true;
+	arg[0] = XMLHttp.responseText;
+	self.read_data.apply(self, arg);
+	self.loaded = true;
       }
     }
     XMLHttp.send(null);
@@ -1691,4 +1722,55 @@ Data.prototype = {
   set_mark_size: function (s) {
     this.size = s;
   }
+};
+/**********************************************************************
+Definition of JSG Object.
+***********************************************************************/
+function JSG(id) {
+  this.init(id);
+  this.Colors = [
+		'#9900cc',
+		'#669900',
+		'#6699cc',
+		'#ff99ff',
+		'#cccc99',
+		'#999999',
+		'#ffcc00',
+		'#ffffcc',
+		'#ccffff',
+		'#ffccff',
+		'#003366',
+		'#990066',
+		'#993300',
+		'#669900',
+		'#6699cc',
+		'#0066cc',
+		];
+  this.Style = "lc";
+  this.X = 1;
+  this.Y = 2;
+  this.FS = new RegExp("[ ,\t]+");
+  this.RS = "\n";
+}
+
+JSG.prototype = new JSGraph();
+JSG.prototype.load = function() {
+  var self = this;
+  var recursive_load = function(files, i) {
+    var data = new Data();
+    self.add_data(data);
+    data.set_color(self.Colors[i % self.Colors.length]);
+    data.set_style(self.Style);
+    data.load(files[i], self.X, self.Y, self.FS, self.RS);
+    data.set_text(files[i]);
+    data.wait(function() {
+      if (i < files.length - 1) {
+	recursive_load(files, i + 1);
+      } else {
+	self.autoscale();
+	self.draw();
+      }
+    });
+  }
+  recursive_load(arguments, 0);
 };
