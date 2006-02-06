@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.38 2006/02/06 10:11:45 hito Exp $ */
+/* $Id: jsgraph.js,v 1.39 2006/02/06 10:29:07 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1594,6 +1594,7 @@ Data.prototype = {
   },
 
   str2data: function (s, sep1, sep2) {
+    /* this function is obsolete */
     var i;
     var data = s.split(sep1);
     var xy_data;
