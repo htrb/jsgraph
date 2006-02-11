@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.39 2006/02/06 10:29:07 hito Exp $ */
+/* $Id: jsgraph.js,v 1.40 2006/02/11 23:55:42 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -58,6 +58,10 @@ if (window.addEventListener) {
   IE = true;
 }
 
+
+/**********************************************************************
+Utility functions
+***********************************************************************/
 create_http_request = function () {
   var xmlhttp = false;
 
@@ -83,6 +87,9 @@ Math.log10 = function(x) {
   return this.log(x) / this.LN10;
 }
 
+mjd2unix = function (mjd) {
+  return (mjd - 40588) * 86400;
+}
 
 /**********************************************************************
 Definition of IE_Canvas Object.
@@ -571,6 +578,14 @@ Text.prototype = {
     }
   },
 
+  get_text: function () {
+    if (this.text.style.visibility == 'hidden') {
+      return null;
+    } else {
+      return this.text.innerHTML;
+    }
+  },
+
   size: function (size) {
     this.text.style.fontSize = size + 'px';
   },
@@ -622,6 +637,29 @@ function JSGraph() {
   if (arguments.length > 0) {
     this.init(arguments[0]);
   }
+  this.Colors = [
+		'#9900cc',
+		'#669900',
+		'#6699cc',
+		'#ff99ff',
+		'#cccc99',
+		'#999999',
+		'#ffcc00',
+		'#ffffcc',
+		'#ccffff',
+		'#ffccff',
+		'#003366',
+		'#990066',
+		'#993300',
+		'#669900',
+		'#6699cc',
+		'#0066cc',
+		];
+  this.Style = "lc";
+  this.X = 1;
+  this.Y = 2;
+  this.FS = new RegExp("[ ,\t]+");
+  this.RS = "\n";
 }
 
 JSGraph.prototype = {
@@ -636,11 +674,16 @@ JSGraph.prototype = {
     var frame     = this.create_canvas();
     var offset_x, offset_y;
 
+    this.SCALE_TYPE_LINEAR = 0;
+    this.SCALE_TYPE_LOG    = 1;
+    this.SCALE_TYPE_UNIX   = 2;
+    this.SCALE_TYPE_MJD    = 3;
+
     this.graph = graph;
 
     offset_x = 140;
     offset_y = 60;
-    w = parseInt(graph.style.width) - offset_x - 160;
+    w = parseInt(graph.style.width) - offset_x - 200;
     h = parseInt(graph.style.height) - offset_y - 80;
 
     parent_frame.style.position = 'absolute';
@@ -736,7 +779,7 @@ JSGraph.prototype = {
     scale_x.style.backgroundColor = '#c0c0c0';
     scale_x.offset = 5;
     scale_x.graph = this;
-    scale_x.type = 0;
+    scale_x.type = this.SCALE_TYPE_LINEAR;
     this.scale_x = scale_x;
     graph.appendChild(scale_x);
 
@@ -745,7 +788,7 @@ JSGraph.prototype = {
     scale_y.style.backgroundColor = '#c0c0c0';
     scale_y.offset = -10;
     scale_y.graph = this;
-    scale_y.type = 0;
+    scale_y.type = this.SCALE_TYPE_LINEAR;
     this.scale_y = scale_y;
     graph.appendChild(scale_y);
 
@@ -848,14 +891,14 @@ JSGraph.prototype = {
       if (data[i].min_x < minx) {
 	minx = data[i].min_x;
       }
-      if(data[i].max_x > maxx) {
+      if (data[i].max_x > maxx) {
 	maxx = data[i].max_x
       }
 
       if (data[i].min_y < miny) {
 	miny = data[i].min_y;
       }
-      if(data[i].max_y > maxy) {
+      if (data[i].max_y > maxy) {
 	maxy = data[i].max_y
       }
     }
@@ -867,27 +910,27 @@ JSGraph.prototype = {
       maxy =  1;
     }
 
-    if (this.scale_x.type == 0) {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
+      this.min_x = minx * 0.9;
+      this.max_x = maxx * 1.1;
+    } else {
       if (maxx - minx < 1E-15) {
 	minx -= Math.abs(minx) * 0.1;
 	maxx += Math.abs(maxx) * 0.1;
       }
       this.min_x = minx - (maxx - minx) * 0.05;
       this.max_x = maxx + (maxx - minx) * 0.05;
-    } else {
-      this.min_x = minx * 0.9;
-      this.max_x = maxx * 1.1;
     }
-    if (this.scale_y.type == 0) {
+    if (this.scale_y.type == this.SCALE_TYPE_LOG) {
+      this.min_y = miny * 0.9;
+      this.max_y = maxy * 1.1;
+    } else {
       if (maxy - miny < 1E-15) {
 	miny -= Math.abs(miny) * 0.1;
 	maxy += Math.abs(maxy) * 0.1;
       }
       this.min_y = miny - (maxy - miny) * 0.05;
       this.max_y = maxy + (maxy - miny) * 0.05;
-    } else {
-      this.min_y = miny * 0.9;
-      this.max_y = maxy * 1.1;
     }
   },
 
@@ -1071,10 +1114,10 @@ JSGraph.prototype = {
     var frame = this.frame;
     var width  = parseInt(frame.style.width);
 
-    if(this.min_x == this.max_x){
+    if (this.min_x == this.max_x){
       this.min_x -= 1;
       this.max_x += 1;
-    }else if(this.min_x > this.max_x){
+    }else if (this.min_x > this.max_x){
       d = this.min_x;
       this.min_x = this.max_x;
       this.max_x = d;
@@ -1087,14 +1130,14 @@ JSGraph.prototype = {
     str = Math.abs(start).toFixed(0);
     len = str.length;
 
-    for(j = start; j <= this.max_x / inc; j++){
+    for (j = start; j <= this.max_x / inc; j++){
       var decpt;
 
       str = j.toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
-      if(l > decpt){
+      if (l > decpt){
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_x(j * inc);
@@ -1132,25 +1175,62 @@ JSGraph.prototype = {
     }
   },
 
-  get_x: function (x) {
-    if (this.scale_x.type == 0) {
-      return this.frame.width * (x - this.min_x)/(this.max_x - this.min_x);
+  gauge_date_x: function () {
+    var inc, d, j, start, span, style, l, len, n, m, date_conv;
+    var str, text;
+    var frame = this.frame;
+    var width  = parseInt(frame.style.width);
+
+    if (this.min_x == this.max_x){
+      this.min_x -= 1;
+      this.max_x += 1;
+    }else if (this.min_x > this.max_x){
+      d = this.min_x;
+      this.min_x = this.max_x;
+      this.max_x = d;
+    }
+
+    switch (this.scale_x_type) {
+      case this.SCALE_TYPE_UNIX:
+      date_conv = 86400;
+      break;
+      case this.SCALE_TYPE_UNIX:
+      date_conv = 1;
+      break;
+    }
+
+    span = (this.max_x - this.min_x) / date_conv;
+    if (span > 400) {
+      style = "year";
+    } else if (span > 60) {
+      style = "month";
+    } else if (span > 15) {
+      style = "day";
     } else {
+      style = "all";
+    }
+
+  },
+
+  get_x: function (x) {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       if (this.max_x <= 0 || this.min_x <= 0 || x <= 0) {
 	return -1;
       }
       return this.frame.width * (Math.log10(x) - Math.log10(this.min_x))
       /(Math.log10(this.max_x) - Math.log10(this.min_x));
+    } else {
+      return this.frame.width * (x - this.min_x)/(this.max_x - this.min_x);
     }
   },
 
   get_data_x: function (x) {
-    if (this.scale_x.type == 0) {
-      return this.min_x + (this.max_x - this.min_x) * x / this.frame.width;
-    } else {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       return Math.pow(10,
 		      x / this.frame.width * (Math.log10(this.max_x) - Math.log10(this.min_x))
 		      + Math.log10(this.min_x));
+    } else {
+      return this.min_x + (this.max_x - this.min_x) * x / this.frame.width;
     }
   },
 
@@ -1159,10 +1239,10 @@ JSGraph.prototype = {
     var str, text;
     var frame = this.frame;
 
-    if(this.min_y == this.max_y){
+    if (this.min_y == this.max_y){
       this.min_y -= 1;
       this.max_y += 1;
-    }else if(this.min_y > this.max_y){
+    }else if (this.min_y > this.max_y){
       d = this.min_y;
       this.min_y = this.max_y;
       this.max_y = d;
@@ -1175,14 +1255,14 @@ JSGraph.prototype = {
     str = Math.abs(start).toFixed(0);
     len = str.length;
 
-    for(j = start; j <= this.max_y / inc; j++){
+    for (j = start; j <= this.max_y / inc; j++){
       var decpt;
 
       str = j.toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
-      if(l > decpt){
+      if (l > decpt){
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_y(j * inc);
@@ -1247,13 +1327,13 @@ JSGraph.prototype = {
   gauge_log_x: function () {
     var max, min, i, m, width, height, x, n;
 
-    if(this.max_x <= 0 || this.min_x <= 0) {
+    if (this.max_x <= 0 || this.min_x <= 0) {
       return;
     }
 
     max = Math.log10(this.max_x);
     min = Math.log10(this.min_x);
-    if(max - min < 1){
+    if (max - min < 1){
       this.gauge_x();
       return;
     } else if (max - min > 20) {
@@ -1262,7 +1342,7 @@ JSGraph.prototype = {
       inc = 1;
     }
 
-    for(i = Math.ceil(min); i < max; i += inc){
+    for (i = Math.ceil(min); i < max; i += inc){
       x = Math.pow(10, i);
 
       if (x > this.max_x) {
@@ -1277,12 +1357,12 @@ JSGraph.prototype = {
       this.draw_gauge1_x(n);
     }
 
-    for(i = Math.floor(min); i < max; i += inc){
+    for (i = Math.floor(min); i < max; i += inc){
       x = Math.pow(10, i);
 
       n = this.get_x(x);
       if (inc == 1) {
-	for(m = 2; m < 10; ++m){
+	for (m = 2; m < 10; ++m){
 	  n = this.get_x(x * m);
 	  if (m == 5) {
 	    this.draw_gauge2_x(n);
@@ -1302,13 +1382,13 @@ JSGraph.prototype = {
   gauge_log_y: function () {
     var max, min, i, m, width, height, n, y, inc;
 
-    if(this.max_y <= 0 || this.min_y <= 0) {
+    if (this.max_y <= 0 || this.min_y <= 0) {
       return;
     }
 
     max = Math.log10(this.max_y);
     min = Math.log10(this.min_y);
-    if(max - min < 1){
+    if (max - min < 1){
       this.gauge_y();
       return;
     } else if (max - min > 20) {
@@ -1317,7 +1397,7 @@ JSGraph.prototype = {
       inc = 1;
     }
 
-    for(i = Math.ceil(min); i < max; i += inc){
+    for (i = Math.ceil(min); i < max; i += inc){
       y = Math.pow(10, i);
 
       if (y > this.max_y) {
@@ -1333,12 +1413,12 @@ JSGraph.prototype = {
       this.draw_gauge1_y(n);
     }
 
-    for(i = Math.floor(min); i < max; i += inc){
+    for (i = Math.floor(min); i < max; i += inc){
       y = Math.pow(10, i);
 
       n = this.get_y(y);
       if (inc == 1) {
-	for(m = 2; m < 10; ++m){
+	for (m = 2; m < 10; ++m){
 	  n = this.get_y(y * m);
 	  if (m == 5) {
 	    this.draw_gauge2_y(n);
@@ -1419,15 +1499,22 @@ JSGraph.prototype = {
     document.body.style.cursor='wait';
     this.clear();
     this.update_position();
-    if (this.scale_x.type == 0) {
+    switch (this.scale_x.type) {
+    case this.SCALE_TYPE_LINEAR:
       this.gauge_x();
-    } else {
+      break;
+    case this.SCALE_TYPE_LOG:
       this.gauge_log_x();
+      break;
+    case this.SCALE_TYPE_UNIX:
+    case this.SCALE_TYPE_MJD:
+      this.gauge_date_x();
+      break;
     }
-    if (this.scale_y.type == 0) {
-      this.gauge_y();
-    } else {
+    if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.gauge_log_y();
+    } else {
+      this.gauge_y();
     }
     this.draw_data();
     document.body.style.cursor='auto';
@@ -1441,58 +1528,69 @@ JSGraph.prototype = {
   },
 
   scale_x_type: function (type) {
-    if (type == "linear") {
-      this.scale_x.type = 0;
-    } else {
-      this.scale_x.type = 1;
+    switch (type) {
+      case "linear":
+      this.scale_x.type = this.SCALE_TYPE_LINEAR;
+      break;
+      case "log":
+      this.scale_x.type = this.SCALE_TYPE_LOG;
+      break;
+      case "unix":
+      this.scale_x.type = this.SCALE_TYPE_UNIX;
+      break;
+      case "mjd":
+      this.scale_x.type = this.SCALE_TYPE_MJD;
+      break;
+      default:
+      this.scale_x.type = this.SCALE_TYPE_LINEAR;
     }
   },
 
   scale_y_type: function (type) {
-    if (type == "linear") {
-      this.scale_y.type = 0;
+    if (type == "log") {
+      this.scale_y.type = this.SCALE_TYPE_LOG;
     } else {
-      this.scale_y.type = 1;
+      this.scale_y.type = this.SCALE_TYPE_LINEAR;
     }
   },
 
   zoom_out: function () {
     var w, h;
-    if (this.scale_x.type == 0) {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
+      this.min_x /= this.zoom_ratio;
+      this.max_x *= this.zoom_ratio;
+    } else {
       w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
       this.min_x -= w;
       this.max_x += w;
-    } else {
-      this.min_x /= this.zoom_ratio;
-      this.max_x *= this.zoom_ratio;
     }
-    if (this.scale_y.type == 0) {
+    if (this.scale_y.type == this.SCALE_TYPE_LOG) {
+      this.min_y /= this.zoom_ratio;
+      this.max_y *= this.zoom_ratio;
+    } else {
       h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
       this.min_y -= h;
       this.max_y += h;
-    } else {
-      this.min_y /= this.zoom_ratio;
-      this.max_y *= this.zoom_ratio;
     }
   },
 
   zoom_in: function () {
     var w, h;
-    if (this.scale_x.type == 0) {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
+      this.min_x *= this.zoom_ratio;
+      this.max_x /= this.zoom_ratio;
+    } else {
       w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
       this.min_x += w;
       this.max_x -= w;
-    } else {
-      this.min_x *= this.zoom_ratio;
-      this.max_x /= this.zoom_ratio;
     }
-    if (this.scale_y.type == 0) {
+    if (this.scale_y.type == this.SCALE_TYPE_LOG) {
+      this.min_y *= this.zoom_ratio;
+      this.max_y /= this.zoom_ratio;
+    } else {
       h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
       this.min_y += h;
       this.max_y -= h;
-    } else {
-      this.min_y *= this.zoom_ratio;
-      this.max_y /= this.zoom_ratio;
     }
   },
 
@@ -1513,27 +1611,49 @@ JSGraph.prototype = {
 
   centering: function (x, y) {
     var w, h, minx, maxx, miny, maxy;
-    if (this.scale_x.type == 0) {
-      w = this.max_x - this.min_x;
-      minx = x - w / 2;
-      maxx = x + w / 2;
-    } else {
+    if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       w = Math.sqrt(this.max_x / this.min_x);
       minx = x / w;
       maxx = x * w;
-    }
-    if (this.scale_y.type == 0) {
-      h = this.max_y - this.min_y;
-      miny = y - h / 2;
-      maxy = y + h / 2;
     } else {
+      w = this.max_x - this.min_x;
+      minx = x - w / 2;
+      maxx = x + w / 2;
+    }
+    if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       h = Math.sqrt(this.max_y / this.min_y);
       miny = y / h;
       maxy = y * h;
+    } else {
+      h = this.max_y - this.min_y;
+      miny = y - h / 2;
+      maxy = y + h / 2;
     }
     this.set_scale(minx, miny, maxx, maxy);
-  }
+  },
 
+  load: function() {
+    var self = this, title = this.title.get_text();
+    var recursive_load = function(files, i) {
+      var data = new Data();
+      self.title.set_text("Data loading... [" + i + "/" + files.length + "]");
+      self.add_data(data);
+      data.set_color(self.Colors[i % self.Colors.length]);
+      data.set_style(self.Style);
+      data.load(files[i], self.X, self.Y, self.FS, self.RS);
+      data.set_text(files[i]);
+      data.wait(function() {
+	if (i < files.length - 1) {
+	  recursive_load(files, i + 1);
+	} else {
+	  self.title.set_text(title);
+	  self.autoscale();
+	  self.draw();
+	}
+      });
+    }
+    recursive_load(arguments, 0);
+  }
 };
 
 /**********************************************************************
@@ -1580,13 +1700,13 @@ Data.prototype = {
     } else {
       if (x < this.min_x) {
 	this.min_x = x;
-      } else if(x > this.max_x) {
+      } else if (x > this.max_x) {
 	this.max_x = x;
       }
     
       if (y < this.min_y) {
 	this.min_y = y;
-      } else if(y > this.max_y) {
+      } else if (y > this.max_y) {
 	this.max_y = y;
       }
     }
@@ -1685,7 +1805,7 @@ Data.prototype = {
       if (this.data[i][0] < minx) {
 	minx = this.data[i][0];
       }
-      if(this.data[i][0] > maxx) {
+      if (this.data[i][0] > maxx) {
 	maxx = this.data[i][0];
       }
 
@@ -1730,58 +1850,4 @@ Data.prototype = {
   set_mark_size: function (s) {
     this.size = s;
   }
-};
-/**********************************************************************
-Definition of JSG Object.
-***********************************************************************/
-function JSG(id) {
-  this.init(id);
-  this.caption_x.set_text(null);
-  this.caption_y.set_text(null);
-  this.title.set_text(null);
-  this.Colors = [
-		'#9900cc',
-		'#669900',
-		'#6699cc',
-		'#ff99ff',
-		'#cccc99',
-		'#999999',
-		'#ffcc00',
-		'#ffffcc',
-		'#ccffff',
-		'#ffccff',
-		'#003366',
-		'#990066',
-		'#993300',
-		'#669900',
-		'#6699cc',
-		'#0066cc',
-		];
-  this.Style = "lc";
-  this.X = 1;
-  this.Y = 2;
-  this.FS = new RegExp("[ ,\t]+");
-  this.RS = "\n";
-}
-
-JSG.prototype = new JSGraph();
-JSG.prototype.load = function() {
-  var self = this;
-  var recursive_load = function(files, i) {
-    var data = new Data();
-    self.add_data(data);
-    data.set_color(self.Colors[i % self.Colors.length]);
-    data.set_style(self.Style);
-    data.load(files[i], self.X, self.Y, self.FS, self.RS);
-    data.set_text(files[i]);
-    data.wait(function() {
-      if (i < files.length - 1) {
-	recursive_load(files, i + 1);
-      } else {
-	self.autoscale();
-	self.draw();
-      }
-    });
-  }
-  recursive_load(arguments, 0);
 };
