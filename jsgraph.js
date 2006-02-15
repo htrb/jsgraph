@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.41 2006/02/15 09:27:27 hito Exp $ */
+/* $Id: jsgraph.js,v 1.42 2006/02/15 11:30:55 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -107,7 +107,7 @@ Date.prototype.setUnix = function (unix) {
   this.setTime(unix * 1000);
 }
 
-Date.prototype.setDate = function (y, m, d) {
+Date.prototype.set_ymd = function (y, m, d) {
   if (y) {
     this.setYear(y);
   }
@@ -117,10 +117,10 @@ Date.prototype.setDate = function (y, m, d) {
   if (d) {
     this.setDate(d);
   }
-  this.setHour(0);
+  this.setHours(0);
   this.setMinutes(0);
   this.setSeconds(0);
-  this.setMilliSeconds(0);
+  //  this.setMilliSeconds(0);
 }
 
 Date.prototype.nextMonth = function () {
@@ -134,7 +134,7 @@ Date.prototype.nextMonth = function () {
   }
 
   this.setMonth(m);
-  this.setYear(y);
+  this.setYear(y + 1900);
 }
 
 Date.prototype.nextDate = function () {
@@ -1247,12 +1247,12 @@ JSGraph.prototype = {
       this.max_x = d;
     }
 
-    switch (this.scale_x_type) {
+    switch (this.scale_x.type) {
       case this.SCALE_TYPE_UNIX:
       date_conv = 86400; 
-      date.setTime(this.min_x * 1000);
-      min_date.setTime(this.min_x * 1000);
-      max_date.setTime(this.max_x * 1000);
+      date.setUnix(this.min_x);
+      min_date.setUnix(this.min_x);
+      max_date.setUnix(this.max_x);
       break;
       case this.SCALE_TYPE_MJD:
       date_conv = 1;
@@ -1262,41 +1262,56 @@ JSGraph.prototype = {
       break;
     }
 
-
     span = (this.max_x - this.min_x) / date_conv;
     if (span > 400) {
       style = "year";
-      date.setDate(false, 0, 1);
+      date.set_ymd(false, 0, 1);
     } else if (span > 60) {
       style = "month";
-      date.setDate(false, false, 1);
+      date.set_ymd(false, false, 1);
     } else if (span > 15) {
       style = "day";
-      date.setDate(false, false, false);
+      date.set_ymd(false, false, false);
     } else {
       style = "all";
-      date.setDate(false, false, false);
+      date.set_ymd(false, false, false);
     }
 
+    l = "";
+    l += date.getYear() + " ";
     while (date.getTime() < max_date.getTime()) {
       switch (style) {
 	case "year":
 	date.nextMonth();
 	break;
 	case "month":
-	if (date.getDate() < 20) {
-	  date.nextDate(10);
-	} else {
-	  date.nextMonth();
-	  date.setDate(1);
-	}
-	break;
+	  switch (date.getDate()) {
+	  case 1:
+	    date.set_ymd(false, false, 10);
+	    break;
+	  case 10:
+	    date.set_ymd(false, false, 20);
+	    break;
+	  case 20:
+	    date.nextMonth();
+	    date.setDate(1);
+	    break;
+	  }
+	  l += date.getYear() + " ";
+	  break;
 	case "day":
-	date.nextDate(10);
+	  m = date.getMonth();
+	  date.nextDate(2);
+	  if (m != date.getMonth()) {
+	    date.setDate(1);
+	  }
+	  break;
+      default:
+	date.nextDate();
 	break;
       }
 
-      switch (this.scale_x_type) {
+      switch (this.scale_x.type) {
 	case this.SCALE_TYPE_UNIX:
 	d = date.getUnix();
 	break;
@@ -1308,22 +1323,45 @@ JSGraph.prototype = {
       n = this.get_x(d);
 
       switch (style) {
-	case "year":
+      case "year":
 	if (date.getMonth() == 0) {
-	this.draw_gauge1_x(n);
-	break;
-	case "month":
-	if (date.getDate() == 1) {
 	  this.draw_gauge1_x(n);
 	} else {
 	  this.draw_gauge3_x(n);
 	}
 	break;
-	case "day":
-	date.nextDate(1);
+      case "month":
+	if (date.getDate() == 1) {
+	  this.draw_gauge1_x(n);
+	  if (date.getMonth() == 0) {
+	    str = (date.getMonth() + 1) + "<br>" + (date.getYear() + 1900);
+	    len = 4;
+	  } else {
+	    str = String(date.getMonth() + 1);
+	    len = str.length;
+	  }
+	  text = new Text((str));
+	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	} else {
+	  this.draw_gauge3_x(n);
+	}
+	break;
+      case "day":
 	this.draw_gauge1_x(n);
-	for (i = 4; i < 24; i += 4) {
-	  switch (this.scale_x_type) {
+	if (date.getMonth() == 0 && date.getDate() == 1) {
+	  str = date.getDate() + "<br>" + (date.getMonth() + 1) + "/" + (date.getYear() + 1900);
+	  len = 6;
+	} else if ( date.getDate() == 1){
+	  str = date.getDate() + "<br>" + (date.getMonth() + 1);
+	  len = 2;
+	} else {
+	  str = String(date.getDate());
+	  len = str.length;
+	}
+	text = new Text((str));
+	text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	for (i = 6; i < 48; i += 6) {
+	  switch (this.scale_x.type) {
 	  case this.SCALE_TYPE_UNIX:
 	    n = this.get_x(d + 60 * 60 * i);
 	    break;
@@ -1331,7 +1369,7 @@ JSGraph.prototype = {
 	    n = this.get_x(d + i / 24.0);
 	    break;
 	  }
-	  if (i == 12) {
+	  if (i == 24) {
 	    this.draw_gauge2_x(n);
 	  } else {
 	    this.draw_gauge3_x(n);
