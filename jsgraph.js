@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.40 2006/02/11 23:55:42 hito Exp $ */
+/* $Id: jsgraph.js,v 1.41 2006/02/15 09:27:27 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -90,6 +90,62 @@ Math.log10 = function(x) {
 mjd2unix = function (mjd) {
   return (mjd - 40588) * 86400;
 }
+
+Date.prototype.getMJD = function () {
+  return 40587 + this.getTime()/86400000;
+}
+
+Date.prototype.setMJD = function (mjd) {
+  this.setTime((mjd - 40587) * 86400000);
+}
+
+Date.prototype.getUnix = function () {
+  return this.getTime() / 1000;
+}
+
+Date.prototype.setUnix = function (unix) {
+  this.setTime(unix * 1000);
+}
+
+Date.prototype.setDate = function (y, m, d) {
+  if (y) {
+    this.setYear(y);
+  }
+  if (m) {
+    this.setMonth(m);
+  }
+  if (d) {
+    this.setDate(d);
+  }
+  this.setHour(0);
+  this.setMinutes(0);
+  this.setSeconds(0);
+  this.setMilliSeconds(0);
+}
+
+Date.prototype.nextMonth = function () {
+  var m = this.getMonth(), y = this.getYear();
+
+  if (m == 11) {
+    y++;
+    m = 0;
+  } else {
+    m++;
+  }
+
+  this.setMonth(m);
+  this.setYear(y);
+}
+
+Date.prototype.nextDate = function () {
+  var t = this.getTime(), mul = 1;
+
+  if (arguments.length > 0) {
+    mul = arguments[0];
+  }
+  this.setTime(t + 86400000 * mul);
+}
+
 
 /**********************************************************************
 Definition of IE_Canvas Object.
@@ -1180,6 +1236,7 @@ JSGraph.prototype = {
     var str, text;
     var frame = this.frame;
     var width  = parseInt(frame.style.width);
+    var min_date = new Date(), date = new Date(), max_date = new Date();
 
     if (this.min_x == this.max_x){
       this.min_x -= 1;
@@ -1192,24 +1249,97 @@ JSGraph.prototype = {
 
     switch (this.scale_x_type) {
       case this.SCALE_TYPE_UNIX:
-      date_conv = 86400;
+      date_conv = 86400; 
+      date.setTime(this.min_x * 1000);
+      min_date.setTime(this.min_x * 1000);
+      max_date.setTime(this.max_x * 1000);
       break;
-      case this.SCALE_TYPE_UNIX:
+      case this.SCALE_TYPE_MJD:
       date_conv = 1;
+      date.setMJD(this.min_x);
+      min_date.setMJD(this.min_x);
+      max_date.setMJD(this.max_x);
       break;
     }
+
 
     span = (this.max_x - this.min_x) / date_conv;
     if (span > 400) {
       style = "year";
+      date.setDate(false, 0, 1);
     } else if (span > 60) {
       style = "month";
+      date.setDate(false, false, 1);
     } else if (span > 15) {
       style = "day";
+      date.setDate(false, false, false);
     } else {
       style = "all";
+      date.setDate(false, false, false);
     }
 
+    while (date.getTime() < max_date.getTime()) {
+      switch (style) {
+	case "year":
+	date.nextMonth();
+	break;
+	case "month":
+	if (date.getDate() < 20) {
+	  date.nextDate(10);
+	} else {
+	  date.nextMonth();
+	  date.setDate(1);
+	}
+	break;
+	case "day":
+	date.nextDate(10);
+	break;
+      }
+
+      switch (this.scale_x_type) {
+	case this.SCALE_TYPE_UNIX:
+	d = date.getUnix();
+	break;
+	case this.SCALE_TYPE_MJD:
+	d = date.getMJD();
+	break;
+      }
+
+      n = this.get_x(d);
+
+      switch (style) {
+	case "year":
+	if (date.getMonth() == 0) {
+	this.draw_gauge1_x(n);
+	break;
+	case "month":
+	if (date.getDate() == 1) {
+	  this.draw_gauge1_x(n);
+	} else {
+	  this.draw_gauge3_x(n);
+	}
+	break;
+	case "day":
+	date.nextDate(1);
+	this.draw_gauge1_x(n);
+	for (i = 4; i < 24; i += 4) {
+	  switch (this.scale_x_type) {
+	  case this.SCALE_TYPE_UNIX:
+	    n = this.get_x(d + 60 * 60 * i);
+	    break;
+	  case this.SCALE_TYPE_MJD:
+	    n = this.get_x(d + i / 24.0);
+	    break;
+	  }
+	  if (i == 12) {
+	    this.draw_gauge2_x(n);
+	  } else {
+	    this.draw_gauge3_x(n);
+	  }
+	}
+	break;
+      }
+    }
   },
 
   get_x: function (x) {
