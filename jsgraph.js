@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.42 2006/02/15 11:30:55 hito Exp $ */
+/* $Id: jsgraph.js,v 1.43 2006/02/15 12:40:55 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -87,10 +87,6 @@ Math.log10 = function(x) {
   return this.log(x) / this.LN10;
 }
 
-mjd2unix = function (mjd) {
-  return (mjd - 40588) * 86400;
-}
-
 Date.prototype.getMJD = function () {
   return 40587 + this.getTime()/86400000;
 }
@@ -109,22 +105,22 @@ Date.prototype.setUnix = function (unix) {
 
 Date.prototype.set_ymd = function (y, m, d) {
   if (y) {
-    this.setYear(y);
+    this.setUTCFullYear(y);
   }
   if (m) {
-    this.setMonth(m);
+    this.setUTCMonth(m);
   }
   if (d) {
-    this.setDate(d);
+    this.setUTCDate(d);
   }
-  this.setHours(0);
-  this.setMinutes(0);
-  this.setSeconds(0);
+  this.setUTCHours(0);
+  this.setUTCMinutes(0);
+  this.setUTCSeconds(0);
   //  this.setMilliSeconds(0);
 }
 
 Date.prototype.nextMonth = function () {
-  var m = this.getMonth(), y = this.getYear();
+  var m = this.getUTCMonth(), y = this.getUTCFullYear();
 
   if (m == 11) {
     y++;
@@ -133,8 +129,8 @@ Date.prototype.nextMonth = function () {
     m++;
   }
 
-  this.setMonth(m);
-  this.setYear(y + 1900);
+  this.setUTCMonth(m);
+  this.setUTCFullYear(y);
 }
 
 Date.prototype.nextDate = function () {
@@ -1278,39 +1274,8 @@ JSGraph.prototype = {
     }
 
     l = "";
-    l += date.getYear() + " ";
+    l += date.getUTCFullYear() + " ";
     while (date.getTime() < max_date.getTime()) {
-      switch (style) {
-	case "year":
-	date.nextMonth();
-	break;
-	case "month":
-	  switch (date.getDate()) {
-	  case 1:
-	    date.set_ymd(false, false, 10);
-	    break;
-	  case 10:
-	    date.set_ymd(false, false, 20);
-	    break;
-	  case 20:
-	    date.nextMonth();
-	    date.setDate(1);
-	    break;
-	  }
-	  l += date.getYear() + " ";
-	  break;
-	case "day":
-	  m = date.getMonth();
-	  date.nextDate(2);
-	  if (m != date.getMonth()) {
-	    date.setDate(1);
-	  }
-	  break;
-      default:
-	date.nextDate();
-	break;
-      }
-
       switch (this.scale_x.type) {
 	case this.SCALE_TYPE_UNIX:
 	d = date.getUnix();
@@ -1324,42 +1289,50 @@ JSGraph.prototype = {
 
       switch (style) {
       case "year":
-	if (date.getMonth() == 0) {
+	if (date.getUTCMonth() == 0) {
 	  this.draw_gauge1_x(n);
+	  str = String(date.getUTCFullYear());
+	  text = new Text((str));
+	  text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
 	} else {
 	  this.draw_gauge3_x(n);
 	}
 	break;
       case "month":
-	if (date.getDate() == 1) {
+	if (date.getUTCDate() == 1) {
+	  if (d < this.min_x) {
+	    break;
+	  }
 	  this.draw_gauge1_x(n);
-	  if (date.getMonth() == 0) {
-	    str = (date.getMonth() + 1) + "<br>" + (date.getYear() + 1900);
-	    len = 4;
+	  if (date.getUTCMonth() == 0) {
+	    str = (date.getUTCFullYear()) + "/1";
+	    len = 6;
 	  } else {
-	    str = String(date.getMonth() + 1);
+	    str = String(date.getUTCMonth() + 1);
 	    len = str.length;
 	  }
-	  text = new Text((str));
-	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	    text = new Text((str));
+	    text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
 	} else {
 	  this.draw_gauge3_x(n);
 	}
 	break;
       case "day":
 	this.draw_gauge1_x(n);
-	if (date.getMonth() == 0 && date.getDate() == 1) {
-	  str = date.getDate() + "<br>" + (date.getMonth() + 1) + "/" + (date.getYear() + 1900);
-	  len = 6;
-	} else if ( date.getDate() == 1){
-	  str = date.getDate() + "<br>" + (date.getMonth() + 1);
-	  len = 2;
+	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
+	  str = "1/1<br>" + (date.getUTCFullYear());
+	  len = 3;
+	} else if ( date.getUTCDate() == 1){
+	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
+	  len = str.length;
 	} else {
-	  str = String(date.getDate());
+	  str = String(date.getUTCDate());
 	  len = str.length;
 	}
-	text = new Text((str));
-	text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	if (d > this.min_x) {
+	  text = new Text((str));
+	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	}
 	for (i = 6; i < 48; i += 6) {
 	  switch (this.scale_x.type) {
 	  case this.SCALE_TYPE_UNIX:
@@ -1376,8 +1349,71 @@ JSGraph.prototype = {
 	  }
 	}
 	break;
+      default:
+	this.draw_gauge1_x(n);
+	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
+	  str = "1/1<br>" + (date.getUTCFullYear());
+	  len = 3;
+	} else if ( date.getUTCDate() == 1){
+	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
+	  len = str.length;
+	} else {
+	  str = String(date.getUTCDate());
+	  len = str.length;
+	}
+	if (d > this.min_x) {
+	  text = new Text((str));
+	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	}
+	for (i = 4; i < 24; i += 4) {
+	  switch (this.scale_x.type) {
+	  case this.SCALE_TYPE_UNIX:
+	    n = this.get_x(d + 60 * 60 * i);
+	    break;
+	  case this.SCALE_TYPE_MJD:
+	    n = this.get_x(d + i / 24.0);
+	    break;
+	  }
+	  if (i == 12) {
+	    this.draw_gauge2_x(n);
+	  } else {
+	    this.draw_gauge3_x(n);
+	  }
+	}
+	break;
+      }
+      switch (style) {
+	case "year":
+	date.nextMonth();
+	break;
+	case "month":
+	  switch (date.getUTCDate()) {
+	  case 1:
+	    date.set_ymd(false, false, 10);
+	    break;
+	  case 10:
+	    date.set_ymd(false, false, 20);
+	    break;
+	  case 20:
+	    date.nextMonth();
+	    date.setUTCDate(1);
+	    break;
+	  }
+	  l += date.getUTCFullYear() + " ";
+	  break;
+	case "day":
+	  m = date.getUTCMonth();
+	  date.nextDate(2);
+	  if (m != date.getUTCMonth()) {
+	    date.setUTCDate(1);
+	  }
+	  break;
+      default:
+	date.nextDate();
+	break;
       }
     }
+    d = new Date();
   },
 
   get_x: function (x) {
