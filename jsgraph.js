@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.44 2006/02/20 07:49:27 hito Exp $ */
+/* $Id: jsgraph.js,v 1.45 2006/02/20 08:11:29 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1837,7 +1837,7 @@ JSGraph.prototype = {
     var self = this, title = this.title.get_text();
     var recursive_load = function(files, i) {
       var data = new Data();
-      self.title.set_text("Data loading... [" + i + "/" + files.length + "]");
+      self.title.set_text("Data loading... [" + (i + 1) + "/" + files.length + "]");
       self.add_data(data);
       data.set_color(self.Colors[i % self.Colors.length]);
       data.set_style(self.Style);
