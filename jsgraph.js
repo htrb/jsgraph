@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.45 2006/02/20 08:11:29 hito Exp $ */
+/* $Id: jsgraph.js,v 1.46 2006/02/20 11:33:44 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1405,8 +1405,11 @@ JSGraph.prototype = {
       } else if (min_date.getUTCMonth() != max_date.getUTCMonth()) {
 	text = new Text(String(min_date.getUTCFullYear()));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
-      } else {
+      } else if (min_date.getUTCDate() != max_date.getUTCDate()) {
 	text = new Text(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1));
+	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+      } else {
+	text = new Text(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1))+ "/" + min_date.getUTCDate();
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
