@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.43 2006/02/15 12:40:55 hito Exp $ */
+/* $Id: jsgraph.js,v 1.44 2006/02/20 07:49:27 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1228,10 +1228,8 @@ JSGraph.prototype = {
   },
 
   gauge_date_x: function () {
-    var inc, d, j, start, span, style, l, len, n, m, date_conv;
-    var str, text;
+    var d, inc = 0, span, style, len, n, m, date_conv, str, text;
     var frame = this.frame;
-    var width  = parseInt(frame.style.width);
     var min_date = new Date(), date = new Date(), max_date = new Date();
 
     if (this.min_x == this.max_x){
@@ -1265,16 +1263,21 @@ JSGraph.prototype = {
     } else if (span > 60) {
       style = "month";
       date.set_ymd(false, false, 1);
-    } else if (span > 15) {
-      style = "day";
-      date.set_ymd(false, false, false);
     } else {
-      style = "all";
-      date.set_ymd(false, false, false);
+      d = date.getUTCDate();
+      if (span > 20) {
+	inc = 4;
+	d = Math.floor((d - 1) / inc) * inc + 1;
+      } else if (span > 12) {
+	inc = 2;
+	d = Math.floor((d - 1) / inc) * inc + 1;
+      } else {
+	inc = 1;
+      }
+      style = "day";
+      date.set_ymd(false, false, d);
     }
 
-    l = "";
-    l += date.getUTCFullYear() + " ";
     while (date.getTime() < max_date.getTime()) {
       switch (this.scale_x.type) {
 	case this.SCALE_TYPE_UNIX:
@@ -1291,8 +1294,7 @@ JSGraph.prototype = {
       case "year":
 	if (date.getUTCMonth() == 0) {
 	  this.draw_gauge1_x(n);
-	  str = String(date.getUTCFullYear());
-	  text = new Text((str));
+	  text = new Text(String(date.getUTCFullYear()));
 	  text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
 	} else {
 	  this.draw_gauge3_x(n);
@@ -1311,29 +1313,33 @@ JSGraph.prototype = {
 	    str = String(date.getUTCMonth() + 1);
 	    len = str.length;
 	  }
+	  if (d > this.min_x) {
 	    text = new Text((str));
 	    text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	  }
 	} else {
 	  this.draw_gauge3_x(n);
 	}
 	break;
       case "day":
-	this.draw_gauge1_x(n);
 	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
 	  str = "1/1<br>" + (date.getUTCFullYear());
 	  len = 3;
-	} else if ( date.getUTCDate() == 1){
+	} else if (date.getUTCDate() == 1){
 	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
 	  len = str.length;
 	} else {
 	  str = String(date.getUTCDate());
 	  len = str.length;
 	}
-	if (d > this.min_x) {
+	if (d > this.min_x && (inc != 4 || date.getUTCDate() < 28)) {
 	  text = new Text((str));
 	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	  this.draw_gauge1_x(n);
+	} else {
+	  this.draw_gauge2_x(n);
 	}
-	for (i = 6; i < 48; i += 6) {
+	for (i = 3 * inc; i < 24 * inc; i += 3 * inc) {
 	  switch (this.scale_x.type) {
 	  case this.SCALE_TYPE_UNIX:
 	    n = this.get_x(d + 60 * 60 * i);
@@ -1342,39 +1348,7 @@ JSGraph.prototype = {
 	    n = this.get_x(d + i / 24.0);
 	    break;
 	  }
-	  if (i == 24) {
-	    this.draw_gauge2_x(n);
-	  } else {
-	    this.draw_gauge3_x(n);
-	  }
-	}
-	break;
-      default:
-	this.draw_gauge1_x(n);
-	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
-	  str = "1/1<br>" + (date.getUTCFullYear());
-	  len = 3;
-	} else if ( date.getUTCDate() == 1){
-	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
-	  len = str.length;
-	} else {
-	  str = String(date.getUTCDate());
-	  len = str.length;
-	}
-	if (d > this.min_x) {
-	  text = new Text((str));
-	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
-	}
-	for (i = 4; i < 24; i += 4) {
-	  switch (this.scale_x.type) {
-	  case this.SCALE_TYPE_UNIX:
-	    n = this.get_x(d + 60 * 60 * i);
-	    break;
-	  case this.SCALE_TYPE_MJD:
-	    n = this.get_x(d + i / 24.0);
-	    break;
-	  }
-	  if (i == 12) {
+	  if (i % 24 == 0 || inc == 1 && i % 12 == 0) {
 	    this.draw_gauge2_x(n);
 	  } else {
 	    this.draw_gauge3_x(n);
@@ -1403,7 +1377,7 @@ JSGraph.prototype = {
 	  break;
 	case "day":
 	  m = date.getUTCMonth();
-	  date.nextDate(2);
+	  date.nextDate(inc);
 	  if (m != date.getUTCMonth()) {
 	    date.setUTCDate(1);
 	  }
@@ -1413,7 +1387,30 @@ JSGraph.prototype = {
 	break;
       }
     }
-    d = new Date();
+
+    switch (style) {
+      case "year":
+      break;
+      case "month":
+      if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
+	break;
+      } else {
+	text = new Text(String(min_date.getUTCFullYear()));
+	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+      }
+      break;
+      case "day":
+      if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
+	break;
+      } else if (min_date.getUTCMonth() != max_date.getUTCMonth()) {
+	text = new Text(String(min_date.getUTCFullYear()));
+	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+      } else {
+	text = new Text(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1));
+	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+      }
+      break;
+    }
   },
 
   get_x: function (x) {
