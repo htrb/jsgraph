@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.46 2006/02/20 11:33:44 hito Exp $ */
+/* $Id: jsgraph.js,v 1.47 2006/03/17 01:32:45 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -108,7 +108,8 @@ Date.prototype.set_ymd = function (y, m, d) {
     this.setUTCFullYear(y);
   }
   if (m) {
-    this.setUTCMonth(m);
+    // CAUTION!!  m = 1..12 because following code does not run when m == 0.
+    this.setUTCMonth(m - 1);
   }
   if (d) {
     this.setUTCDate(d);
@@ -790,6 +791,8 @@ JSGraph.prototype = {
 
     this.frame = frame;
     this.canvas = frame.getContext('2d');
+    this.canvas.lineCap  = "round";
+    this.canvas.lineJoin = "round";
     parent_frame.frame = frame;
     parent_frame.appendChild(frame);
     parent_frame.appendChild(scale_div);
@@ -1259,7 +1262,7 @@ JSGraph.prototype = {
     span = (this.max_x - this.min_x) / date_conv;
     if (span > 400) {
       style = "year";
-      date.set_ymd(false, 0, 1);
+      date.set_ymd(false, 1, 1);
     } else if (span > 60) {
       style = "month";
       date.set_ymd(false, false, 1);
