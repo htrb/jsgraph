@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.48 2006/11/02 02:02:57 hito Exp $ */
+/* $Id: jsgraph.js,v 1.49 2006/11/02 06:43:20 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -990,7 +990,7 @@ JSGraph.prototype = {
   },
 
   draw_each_data_l: function (data) {
-    var i, x, y;
+    var i, n, d, di;
 
     this.canvas.save();
 
@@ -998,37 +998,52 @@ JSGraph.prototype = {
     this.canvas.lineWidth = data.width;
     this.canvas.beginPath();
 
-    this.canvas.moveTo(this.get_x(data.data[0][0]),
-		       this.get_y(data.data[0][1]));
-    for (i = 1; i < data.length(); i++) {
-      this.canvas.lineTo(this.get_x(data.data[i][0]),
-			 this.get_y(data.data[i][1]));
+    n = data.length();
+    d = data.data;
+
+    this.canvas.moveTo(this.get_x(d[0][0]), this.get_y(d[0][1]));
+    for (i = 1; i < n; i++) {
+      di = d[i];
+      this.canvas.lineTo(this.get_x(di[0]), this.get_y(di[1]));
     }
     this.canvas.stroke();
     this.canvas.restore();
   },
 
   draw_each_data_c: function (data) {
-    var i, x, y;
+    var i, x, y, n, s, c, d, di;
 
-    for (i = 0; i < data.length(); i++) {
-      x = this.get_x(data.data[i][0]);
-      y = this.get_y(data.data[i][1]);
+    n = data.length();
+    s = data.size / 2.0;
+    c = data.color;
+    d = data.data;
 
-      this.fill_circle(x, y, data.size / 2.0, data.color);
+    for (i = 0; i < n; i++) {
+      di = d[i];
+      x = this.get_x(di[0]);
+      y = this.get_y(di[1]);
+
+      this.fill_circle(x, y, s, c);
     }
   },
 
   draw_each_data_r: function (data) {
-    var i, x, y;
+    var i, x, y, n, s1, s2, c, d, di;
 
-    for (i = 0; i < data.length(); i++) {
-      x = this.get_x(data.data[i][0]);
-      y = this.get_y(data.data[i][1]);
+    n = data.length();
+    s1 = data.size;
+    s2 = s1 / 2.0;
+    c = data.color;
+    d = data.data;
 
-      this.fill_rectangle(x - data.size / 2,
-			  y - data.size / 2,
-			  data.size, data.size, data.color);
+    for (i = 0; i < n; i++) {
+      di = d[i];
+      x = this.get_x(di[0]);
+      y = this.get_y(di[1]);
+
+      this.fill_rectangle(x - s2,
+		     y - s2,
+		     s1, s1, c);
     }
   },
 
@@ -1424,14 +1439,20 @@ JSGraph.prototype = {
   },
 
   get_x: function (x) {
+    var w, min, max;
+
+    w = this.frame.width;
+    min = this.min_x;
+    max = this.max_x;
+
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
-      if (this.max_x <= 0 || this.min_x <= 0 || x <= 0) {
+      if (max <= 0 || min <= 0 || x <= 0) {
 	return -1;
       }
-      return this.frame.width * (Math.log10(x) - Math.log10(this.min_x))
-      /(Math.log10(this.max_x) - Math.log10(this.min_x));
+      return w * (Math.log10(x) - Math.log10(min))
+      / (Math.log10(max) - Math.log10(min));
     } else {
-      return this.frame.width * (x - this.min_x)/(this.max_x - this.min_x);
+      return w * (x - min)/(max - min);
     }
   },
 
@@ -1514,14 +1535,20 @@ JSGraph.prototype = {
   },
 
   get_y: function (y) {
+    var h, min, max;
+
+    h = this.frame.height;
+    min = this.min_y;
+    max = this.max_y;
+
     if (this.scale_y.type == 0) {
-      return this.frame.height * (1 - (y - this.min_y)/(this.max_y - this.min_y));
+      return h * (1 - (y - min)/(max - min));
     } else {
-      if (this.max_y <= 0 || this.min_y <= 0 || y <= 0) {
+      if (max <= 0 || min <= 0 || y <= 0) {
 	return -1;
       }
-      return this.frame.height * (Math.log10(this.max_y) - Math.log10(y))
-      /(Math.log10(this.max_y) - Math.log10(this.min_y));
+      return h * (Math.log10(max) - Math.log10(y))
+      / (Math.log10(max) - Math.log10(min));
     }
   },
 
@@ -1926,11 +1953,12 @@ Data.prototype = {
 
   str2data: function (s, sep1, sep2) {
     /* this function is obsolete */
-    var i;
+    var i, n;
     var data = s.split(sep1);
     var xy_data;
 
-    for (i = 0; i < data.length; i++) {
+    n = data.length;
+    for (i = 0; i < n; i++) {
       xy_data = data[i].split(sep2);
       if (xy_data.length > 1) {
 	this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
@@ -1939,7 +1967,7 @@ Data.prototype = {
   },
 
   read_data: function (s) {
-    var i, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    var i, n, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
     var data, xy_data;
 
     switch (arguments.length) {
@@ -1953,7 +1981,8 @@ Data.prototype = {
       break;
     }
     data = s.split(rs);
-    for (i = 0; i < data.length; i++) {
+    n = data.length;
+    for (i = 0; i < n; i++) {
       xy_data = data[i].split(fs);
       if (xy_data.length > 1) {
 	this.add_data(parseFloat(xy_data[col_x]),
