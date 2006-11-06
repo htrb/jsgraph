@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.49 2006/11/02 06:43:20 hito Exp $ */
+/* $Id: jsgraph.js,v 1.50 2006/11/06 07:55:37 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -141,6 +141,15 @@ Date.prototype.nextDate = function () {
     mul = arguments[0];
   }
   this.setTime(t + 86400000 * mul);
+}
+
+Date.prototype.nextHour = function () {
+  var t = this.getTime(), mul = 1;
+
+  if (arguments.length > 0) {
+    mul = arguments[0];
+  }
+  this.setTime(t + 3600000 * mul);
 }
 
 
@@ -1042,8 +1051,8 @@ JSGraph.prototype = {
       y = this.get_y(di[1]);
 
       this.fill_rectangle(x - s2,
-		     y - s2,
-		     s1, s1, c);
+			  y - s2,
+			  s1, s1, c);
     }
   },
 
@@ -1246,7 +1255,7 @@ JSGraph.prototype = {
   },
 
   gauge_date_x: function () {
-    var d, inc = 0, span, style, len, n, m, date_conv, str, text;
+    var d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
     var frame = this.frame;
     var min_date = new Date(), date = new Date(), max_date = new Date();
 
@@ -1281,7 +1290,8 @@ JSGraph.prototype = {
     } else if (span > 60) {
       style = "month";
       date.set_ymd(false, false, 1);
-    } else {
+    } else if (span > 1) {
+      style = "day";
       d = date.getUTCDate();
       if (span > 20) {
 	inc = 4;
@@ -1292,7 +1302,14 @@ JSGraph.prototype = {
       } else {
 	inc = 1;
       }
-      style = "day";
+      date.set_ymd(false, false, d);
+    } else {
+      style = "hour";
+      if (span > 0.5) {
+	inc = 2;
+      } else {
+	inc = 1;
+      }
       date.set_ymd(false, false, d);
     }
 
@@ -1373,6 +1390,64 @@ JSGraph.prototype = {
 	  }
 	}
 	break;
+      case "hour":
+	var h, x;
+	h = date.getUTCHours();
+	for (i = 0; i < inc; i++, h++) {
+	  if (inc == 1 || h % 2 == 0) {
+	    this.draw_gauge1_x(n);
+	    if (d > this.min_x) {
+	      if (h == 0) {
+		str = "0<br>" + date.getUTCFullYear() + "/" + (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
+		len = 1;
+	      } else {
+		str = String(h);
+		len = str.length;
+	      }
+	      text = new Text(str);
+	      text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+	    }
+	  }
+	  x = d;
+	  if (inc == 2) {
+	    for (j = 0; j < 2; j++) {
+	      switch (this.scale_x.type) {
+	      case this.SCALE_TYPE_UNIX:
+		d += 30 * 60;
+		n = this.get_x(d);
+		break;
+	      case this.SCALE_TYPE_MJD:
+		d += 1 / 48.0;
+		n = this.get_x(d);
+		break;
+	      }
+	      if (j == 0) {
+		this.draw_gauge3_x(n);
+	      } else {
+		this.draw_gauge2_x(n);
+	      }
+	    }
+	  } else if (inc == 1) {
+	    for (j = 0; j < 6; j++) {
+	      switch (this.scale_x.type) {
+	      case this.SCALE_TYPE_UNIX:
+		d +=  10 * 60;
+		n = this.get_x(d);
+		break;
+	      case this.SCALE_TYPE_MJD:
+		d += 1 / 24.0 / 6;
+		n = this.get_x(d);
+		break;
+	      }
+	      if (j == 2) {
+		this.draw_gauge2_x(n);
+	      } else {
+		this.draw_gauge3_x(n);
+	      }
+	    }
+	  }
+	}
+	break;
       }
       switch (style) {
 	case "year":
@@ -1399,6 +1474,9 @@ JSGraph.prototype = {
 	  if (m != date.getUTCMonth()) {
 	    date.setUTCDate(1);
 	  }
+	  break;
+	case "hour":
+	  date.nextHour(inc);
 	  break;
       default:
 	date.nextDate();
@@ -1435,6 +1513,15 @@ JSGraph.prototype = {
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
+      case "hour":
+      if (min_date.getUTCDate() == max_date.getUTCDate()) {
+	text = new Text(min_date.getUTCFullYear()
+			+ "/"
+			+ (min_date.getUTCMonth() + 1)
+			+ "/"
+			+ (min_date.getUTCDate()));
+	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+      }
     }
   },
 
