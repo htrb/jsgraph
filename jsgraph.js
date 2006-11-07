@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.50 2006/11/06 07:55:37 hito Exp $ */
+/* $Id: jsgraph.js,v 1.51 2006/11/07 02:54:15 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -617,7 +617,7 @@ function Text() {
 
   text.style.position = 'absolute';
   text.style.fontSize = Font_size + 'px';
-  if (arguments.length > 0){
+  if (arguments.length > 0) {
     text.innerHTML = arguments[0];
   }
   this.text = text;
@@ -1193,10 +1193,10 @@ JSGraph.prototype = {
     var frame = this.frame;
     var width  = parseInt(frame.style.width);
 
-    if (this.min_x == this.max_x){
+    if (this.min_x == this.max_x) {
       this.min_x -= 1;
       this.max_x += 1;
-    }else if (this.min_x > this.max_x){
+    } else if (this.min_x > this.max_x) {
       d = this.min_x;
       this.min_x = this.max_x;
       this.max_x = d;
@@ -1209,14 +1209,14 @@ JSGraph.prototype = {
     str = Math.abs(start).toFixed(0);
     len = str.length;
 
-    for (j = start; j <= this.max_x / inc; j++){
+    for (j = start; j <= this.max_x / inc; j++) {
       var decpt;
 
       str = j.toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
-      if (l > decpt){
+      if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_x(j * inc);
@@ -1259,10 +1259,10 @@ JSGraph.prototype = {
     var frame = this.frame;
     var min_date = new Date(), date = new Date(), max_date = new Date();
 
-    if (this.min_x == this.max_x){
+    if (this.min_x == this.max_x) {
       this.min_x -= 1;
       this.max_x += 1;
-    }else if (this.min_x > this.max_x){
+    } else if (this.min_x > this.max_x) {
       d = this.min_x;
       this.min_x = this.max_x;
       this.max_x = d;
@@ -1284,7 +1284,32 @@ JSGraph.prototype = {
     }
 
     span = (this.max_x - this.min_x) / date_conv;
-    if (span > 400) {
+    if (span > 4000) {
+      var min, max;
+
+      min = this.min_x;
+      max = this.max_x;
+
+      switch (this.scale_x.type) {
+      case this.SCALE_TYPE_UNIX:
+	min_date.setUnix(this.min_x);
+	max_date.setUnix(this.max_x);
+	break;
+      case this.SCALE_TYPE_MJD:
+	min_date.setMJD(this.min_x);
+	max_date.setMJD(this.max_x);
+	break;
+      }
+      this.min_x = 1970 + min_date.getTime() / (365.2425 * 24 * 60 * 60 * 1000);
+      this.max_x = 1970 + max_date.getTime() / (365.2425 * 24 * 60 * 60 * 1000);
+
+      this.gauge_x();
+      
+      this.min_x = min;
+      this.max_x = max;
+
+      return;
+    } else if (span > 400) {
       style = "year";
       date.set_ymd(false, 1, 1);
     } else if (span > 60) {
@@ -1328,6 +1353,9 @@ JSGraph.prototype = {
       switch (style) {
       case "year":
 	if (date.getUTCMonth() == 0) {
+	  if (d < this.min_x) {
+	    break;
+	  }
 	  this.draw_gauge1_x(n);
 	  text = new Text(String(date.getUTCFullYear()));
 	  text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
@@ -1360,7 +1388,7 @@ JSGraph.prototype = {
 	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
 	  str = "1/1<br>" + (date.getUTCFullYear());
 	  len = 3;
-	} else if (date.getUTCDate() == 1){
+	} else if (date.getUTCDate() == 1) {
 	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
 	  len = str.length;
 	} else {
@@ -1558,10 +1586,10 @@ JSGraph.prototype = {
     var str, text;
     var frame = this.frame;
 
-    if (this.min_y == this.max_y){
+    if (this.min_y == this.max_y) {
       this.min_y -= 1;
       this.max_y += 1;
-    }else if (this.min_y > this.max_y){
+    } else if (this.min_y > this.max_y) {
       d = this.min_y;
       this.min_y = this.max_y;
       this.max_y = d;
@@ -1574,14 +1602,14 @@ JSGraph.prototype = {
     str = Math.abs(start).toFixed(0);
     len = str.length;
 
-    for (j = start; j <= this.max_y / inc; j++){
+    for (j = start; j <= this.max_y / inc; j++) {
       var decpt;
 
       str = j.toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
-      if (l > decpt){
+      if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_y(j * inc);
@@ -1658,7 +1686,7 @@ JSGraph.prototype = {
 
     max = Math.log10(this.max_x);
     min = Math.log10(this.min_x);
-    if (max - min < 1){
+    if (max - min < 1) {
       this.gauge_x();
       return;
     } else if (max - min > 20) {
@@ -1667,7 +1695,7 @@ JSGraph.prototype = {
       inc = 1;
     }
 
-    for (i = Math.ceil(min); i < max; i += inc){
+    for (i = Math.ceil(min); i < max; i += inc) {
       x = Math.pow(10, i);
 
       if (x > this.max_x) {
@@ -1682,12 +1710,12 @@ JSGraph.prototype = {
       this.draw_gauge1_x(n);
     }
 
-    for (i = Math.floor(min); i < max; i += inc){
+    for (i = Math.floor(min); i < max; i += inc) {
       x = Math.pow(10, i);
 
       n = this.get_x(x);
       if (inc == 1) {
-	for (m = 2; m < 10; ++m){
+	for (m = 2; m < 10; ++m) {
 	  n = this.get_x(x * m);
 	  if (m == 5) {
 	    this.draw_gauge2_x(n);
@@ -1713,7 +1741,7 @@ JSGraph.prototype = {
 
     max = Math.log10(this.max_y);
     min = Math.log10(this.min_y);
-    if (max - min < 1){
+    if (max - min < 1) {
       this.gauge_y();
       return;
     } else if (max - min > 20) {
@@ -1722,7 +1750,7 @@ JSGraph.prototype = {
       inc = 1;
     }
 
-    for (i = Math.ceil(min); i < max; i += inc){
+    for (i = Math.ceil(min); i < max; i += inc) {
       y = Math.pow(10, i);
 
       if (y > this.max_y) {
@@ -1738,12 +1766,12 @@ JSGraph.prototype = {
       this.draw_gauge1_y(n);
     }
 
-    for (i = Math.floor(min); i < max; i += inc){
+    for (i = Math.floor(min); i < max; i += inc) {
       y = Math.pow(10, i);
 
       n = this.get_y(y);
       if (inc == 1) {
-	for (m = 2; m < 10; ++m){
+	for (m = 2; m < 10; ++m) {
 	  n = this.get_y(y * m);
 	  if (m == 5) {
 	    this.draw_gauge2_y(n);
@@ -2016,7 +2044,7 @@ Data.prototype = {
     if (!isFinite(x) || !isFinite(y)) {
       return;
     }
-    if (this.data.length < 1){
+    if (this.data.length < 1) {
       this.min_x = x;
       this.max_x = x;
       this.min_y = y;
