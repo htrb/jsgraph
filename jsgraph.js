@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.51 2006/11/07 02:54:15 hito Exp $ */
+/* $Id: jsgraph.js,v 1.52 2006/11/07 03:53:57 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -160,6 +160,7 @@ function IE_Canvas(div) {
   this.lineWidth = 1.0;
   this.strokeStyle = "#000000";
   this.fillStyle = "#000000";
+  this.lineJoin = "round";
   this.restore_buf = new Array(0);
   this.path = new Array(0);
   this.parent = div;
@@ -233,6 +234,7 @@ IE_Canvas.prototype = {
       line.strokecolor = this.strokeStyle;
     }
     line.strokeweight = this.lineWidth;
+    line.joinstyle = this.lineJoin;
     line.points = ""
     for (i = 0; i < this.path.length; i++) {
       line.points += " " + this.path[i][0] + "," + this.path[i][1];
@@ -1005,6 +1007,7 @@ JSGraph.prototype = {
 
     this.canvas.strokeStyle = data.color;
     this.canvas.lineWidth = data.width;
+    this.canvas.lineJoin = "round";
     this.canvas.beginPath();
 
     n = data.length();
