@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.52 2006/11/07 03:53:57 hito Exp $ */
+/* $Id: jsgraph.js,v 1.53 2006/11/20 08:48:10 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1227,7 +1227,9 @@ JSGraph.prototype = {
       text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
     }
 
-    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)));
+    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
+    // "1 + 2E-16" exist for underflow
+
     if (m != 0) {
       text = new Text("&times;10<sup>" + m + "</sup>");
       text.init(this.scale_x, width, this.scale_x.offset + Font_size);
@@ -1622,7 +1624,9 @@ JSGraph.prototype = {
 		n - Font_size / 2);
     }
 
-    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)));
+    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
+    // "1 + 2E-16" exist for underflow
+
     if (m != 0) {
       text = new Text("&times;10<sup>" + m + "</sup>");
       text.init(this.scale_y, this.scale_y.offset - 40,  -30);
