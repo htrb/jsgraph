@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.53 2006/11/20 08:48:10 hito Exp $ */
+/* $Id: jsgraph.js,v 1.54 2006/11/21 02:01:41 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1191,7 +1191,7 @@ JSGraph.prototype = {
   },
 
   gauge_x: function () {
-    var inc, d, j, start, l, len, n, m;
+    var inc, d, j, start, l, len, n, m, diff;
     var str, text;
     var frame = this.frame;
     var width  = parseInt(frame.style.width);
@@ -1208,14 +1208,21 @@ JSGraph.prototype = {
     m = Math.ceil(Math.log10(this.max_x - this.min_x));
     inc = Math.pow(10, m - 1);
 
+    if ((this.max_x - this.min_x) / inc < 2) {
+      inc /= 5;
+      diff = 2;
+    } else {
+      diff = 1;
+    }
+
     start = Math.ceil(this.min_x / inc);
-    str = Math.abs(start).toFixed(0);
+    str = Math.abs(start * diff).toFixed(0);
     len = str.length;
 
     for (j = start; j <= this.max_x / inc; j++) {
       var decpt;
 
-      str = j.toFixed(0);
+      str = (j * diff).toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
@@ -1236,7 +1243,7 @@ JSGraph.prototype = {
     }
 
     
-    for (m = 1, d = start - 0.1; m < 10; ++m, d -= 0.1) {
+    for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_x(d * inc);
       if (m == 5) {
 	this.draw_gauge2_x(n);
@@ -1248,8 +1255,8 @@ JSGraph.prototype = {
     for (; start <= this.max_x / inc; start++) {
       n = this.get_x(start * inc);
       this.draw_gauge1_x(n);
-      for (m = 1, d = start + 0.1; m < 10; ++m, d += 0.1) {
-	n = this.get_x(d*inc);
+      for (m = 1, d = start + 0.1; m < 10; m++, d += 0.1) {
+	n = this.get_x(d * inc);
 	if (m == 5) {
 	  this.draw_gauge2_x(n);
 	} else {
@@ -1587,7 +1594,7 @@ JSGraph.prototype = {
   },
 
   gauge_y: function () {
-    var inc, d, j, start, l, len, n, m;
+    var inc, d, j, start, l, len, n, m, diff;
     var str, text;
     var frame = this.frame;
 
@@ -1603,14 +1610,21 @@ JSGraph.prototype = {
     m = Math.ceil(Math.log10(this.max_y - this.min_y));
     inc = Math.pow(10, m - 1);
 
+    if ((this.max_y - this.min_y) / inc < 2) {
+      inc /= 5;
+      diff = 2;
+    } else {
+      diff = 1;
+    }
+
     start = Math.ceil(this.min_y / inc);
-    str = Math.abs(start).toFixed(0);
+    str = Math.abs(start * diff).toFixed(0);
     len = str.length;
 
     for (j = start; j <= this.max_y / inc; j++) {
       var decpt;
 
-      str = j.toFixed(0);
+      str = (j * diff).toFixed(0);
       l = str.length;
       decpt = 1 + (l - len);
 
@@ -1633,7 +1647,7 @@ JSGraph.prototype = {
     }
 
     
-    for (m = 1, d = start - 0.1; m < 10; ++m, d -= 0.1) {
+    for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_y(d * inc);
       if (m == 5) {
 	this.draw_gauge2_y(n);
@@ -1645,7 +1659,7 @@ JSGraph.prototype = {
     for (; start <= this.max_y / inc; start++) {
       n = this.get_y(start * inc);
       this.draw_gauge1_y(n);
-      for (m = 1, d = start + 0.1; m < 10; ++m, d += 0.1) {
+      for (m = 1, d = start + 0.1; m < 10; m++, d += 0.1) {
 	n = this.get_y(d*inc);
 	if (m == 5) {
 	  this.draw_gauge2_y(n);
@@ -1722,7 +1736,7 @@ JSGraph.prototype = {
 
       n = this.get_x(x);
       if (inc == 1) {
-	for (m = 2; m < 10; ++m) {
+	for (m = 2; m < 10; m++) {
 	  n = this.get_x(x * m);
 	  if (m == 5) {
 	    this.draw_gauge2_x(n);
@@ -1778,7 +1792,7 @@ JSGraph.prototype = {
 
       n = this.get_y(y);
       if (inc == 1) {
-	for (m = 2; m < 10; ++m) {
+	for (m = 2; m < 10; m++) {
 	  n = this.get_y(y * m);
 	  if (m == 5) {
 	    this.draw_gauge2_y(n);
