@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.54 2006/11/21 02:01:41 hito Exp $ */
+/* $Id: jsgraph.js,v 1.55 2007/05/23 05:16:51 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1928,8 +1928,8 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_out: function () {
-    var w, h;
+  zoom_out_x: function () {
+    var w;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x /= this.zoom_ratio;
       this.max_x *= this.zoom_ratio;
@@ -1938,6 +1938,10 @@ JSGraph.prototype = {
       this.min_x -= w;
       this.max_x += w;
     }
+  },
+
+  zoom_out_y: function () {
+    var h;
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y /= this.zoom_ratio;
       this.max_y *= this.zoom_ratio;
@@ -1948,8 +1952,13 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_in: function () {
-    var w, h;
+  zoom_out: function () {
+    zoom_out_x();
+    zoom_out_y();
+  },
+
+  zoom_in_x: function () {
+    var w;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x *= this.zoom_ratio;
       this.max_x /= this.zoom_ratio;
@@ -1958,6 +1967,10 @@ JSGraph.prototype = {
       this.min_x += w;
       this.max_x -= w;
     }
+  },
+
+  zoom_in_y: function () {
+    var h;
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y *= this.zoom_ratio;
       this.max_y /= this.zoom_ratio;
@@ -1966,6 +1979,11 @@ JSGraph.prototype = {
       this.min_y += h;
       this.max_y -= h;
     }
+  },
+
+  zoom_in: function () {
+    zoom_in_x();
+    zoom_in_y();
   },
 
   set_scale: function (minx, miny, maxx, maxy) {
