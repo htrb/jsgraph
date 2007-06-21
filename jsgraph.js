@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.55 2007/05/23 05:16:51 hito Exp $ */
+/* $Id: jsgraph.js,v 1.56 2007/06/21 00:54:59 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1953,8 +1953,8 @@ JSGraph.prototype = {
   },
 
   zoom_out: function () {
-    zoom_out_x();
-    zoom_out_y();
+    this.zoom_out_x();
+    this.zoom_out_y();
   },
 
   zoom_in_x: function () {
@@ -1982,8 +1982,8 @@ JSGraph.prototype = {
   },
 
   zoom_in: function () {
-    zoom_in_x();
-    zoom_in_y();
+    this.zoom_in_x();
+    this.zoom_in_y();
   },
 
   set_scale: function (minx, miny, maxx, maxy) {
