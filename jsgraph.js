@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.56 2007/06/21 00:54:59 hito Exp $ */
+/* $Id: jsgraph.js,v 1.57 2008/10/01 05:10:56 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -220,7 +220,7 @@ IE_Canvas.prototype = {
   },
 
   end_path: function (fill) {
-    var line, i;
+    var line, i, n, path;
     if (this.current_shape != 'line') {
       return;
     }
@@ -236,8 +236,10 @@ IE_Canvas.prototype = {
     line.strokeweight = this.lineWidth;
     line.joinstyle = this.lineJoin;
     line.points = ""
-    for (i = 0; i < this.path.length; i++) {
-      line.points += " " + this.path[i][0] + "," + this.path[i][1];
+    n = this.path.length;
+    path = this.path;
+    for (i = 0; i < n; i++) {
+      line.points += " " + path[i][0] + "," + path[i][1];
     }
     this.current_shape = null;
     this.parent.appendChild(line);
@@ -368,8 +370,9 @@ function mouse_resize_move_dom () {
     Mouse_y = e.clientY;
     if (this.frame) {
       if (this.firstChild) {
-	var i;
-	for (i = 0; i < this.childNodes.length; i++) {
+	var i, n;
+	n = this.childNodes.length;
+	for (i = 0; i < n; i++) {
 	  this.removeChild(this.firstChild);
 	}
       }
@@ -936,7 +939,7 @@ JSGraph.prototype = {
   },
 
   autoscale: function () {
-    var i;
+    var i, n;
     var minx = Infinity;
     var maxx = -Infinity;
     var miny = Infinity;
@@ -947,7 +950,8 @@ JSGraph.prototype = {
       return;
     }
 
-    for (i = 0; i < data.length; i++) {
+    n = data.length;
+    for (i = 0; i < n; i++) {
       data[i].autoscale();
 
       if (! data[i].draw) {
@@ -2064,6 +2068,7 @@ function Data() {
   this.width = 2;
   this.style = "c";
   this.loaded = false;
+  this.maxDataNum = -1;
 }
 
 Data.prototype = {
@@ -2103,6 +2108,9 @@ Data.prototype = {
       }
     }
     this.data.push([x, y]);
+    if (this.maxDataNum > 0 && this.data.length > this.maxDataNum) {
+      this.data.shift();
+    }
   },
 
   str2data: function (s, sep1, sep2) {
@@ -2136,6 +2144,15 @@ Data.prototype = {
     }
     data = s.split(rs);
     n = data.length;
+
+    if (col_x < 0) {
+      col_x += n + 1;
+    }
+
+    if (col_y < 0) {
+      col_y += n + 1;
+    }
+
     for (i = 0; i < n; i++) {
       xy_data = data[i].split(fs);
       if (xy_data.length > 1) {
