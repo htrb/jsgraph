@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.57 2008/10/01 05:10:56 hito Exp $ */
+/* $Id: jsgraph.js,v 1.58 2009/03/05 10:30:34 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -410,6 +410,9 @@ function mouse_move_dom () {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
     Mouse_y = e.clientY;
+    if (this.moved) {
+      this.moved();
+    }
   }
 }
 
@@ -622,6 +625,7 @@ function Text() {
 
   text.style.position = 'absolute';
   text.style.fontSize = Font_size + 'px';
+  text.style.whiteSpace = 'nowrap';
   if (arguments.length > 0) {
     text.innerHTML = arguments[0];
   }
@@ -671,6 +675,22 @@ Text.prototype = {
 
   offset_y: function (y) {
     this.text.offset_y = y;
+  },
+
+  get_width: function () {
+    return this.text.clientWidth;
+  },
+
+  get_height: function () {
+    return this.text.clientHeight;
+  },
+
+  get_x: function (x) {
+    return this.text.offsetLeft;
+  },
+
+  get_y: function (y) {
+    return this.text.offsetTop;
   }
 };
 
@@ -681,6 +701,7 @@ function Caption(s) {
   var text = document.create_element('span');
 
   text.style.position = 'absolute';
+  text.style.whiteSpace = 'nowrap';
   text.style.fontSize = Font_size + 'px';
   text.appendChild(document.createTextNode(s));
 
@@ -693,6 +714,12 @@ function Caption(s) {
   text.offset_x = 0;
   text.offset_y = 0;
   this.text = text;
+
+  this.moved = false;
+  text.obj = this;
+  text.moved = function () {
+    this.obj.moved = true;
+  }
 }
 
 Caption.prototype = new Text("");
@@ -855,7 +882,7 @@ JSGraph.prototype = {
     scale_y.style.position = 'absolute';
     scale_y.style.overflow = 'visible';
     scale_y.style.backgroundColor = '#c0c0c0';
-    scale_y.offset = -10;
+    scale_y.offset = -2;
     scale_y.graph = this;
     scale_y.type = this.SCALE_TYPE_LINEAR;
     this.scale_y = scale_y;
@@ -1064,10 +1091,11 @@ JSGraph.prototype = {
   },
 
   draw_data: function () {
-    var i, x, y;
+    var i, n, x, y;
     var data = this.data;
 
-    for (i = 0; i < data.length; i++) {
+    n = data.length;
+    for (i = 0; i < n; i++) {
       if (data[i].draw && data[i].length() > 0) {
 	switch (data[i].style) {
 	case "c":
@@ -1223,7 +1251,8 @@ JSGraph.prototype = {
     str = Math.abs(start * diff).toFixed(0);
     len = str.length;
 
-    for (j = start; j <= this.max_x / inc; j++) {
+    m = this.max_x / inc;
+    for (j = start; j <= m; j++) {
       var decpt;
 
       str = (j * diff).toFixed(0);
@@ -1232,20 +1261,21 @@ JSGraph.prototype = {
 
       if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
+	l++;
       }
       n = this.get_x(j * inc);
       text = new Text(String(str));
-      text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+      text.init(this.scale_x, n, this.scale_x.offset);
+      text.x(n - text.get_width() / 2);
     }
 
     m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new Text("&times;10<sup>" + m + "</sup>");
+      text = new Text('&times;10<sup>' + m + '</sup>');
       text.init(this.scale_x, width, this.scale_x.offset + Font_size);
     }
-
     
     for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_x(d * inc);
@@ -1597,8 +1627,20 @@ JSGraph.prototype = {
     }
   },
 
+  caption_y_auto_set_position: function (x) {
+    if (! this.caption_y.moved) {
+      var x0, x1;
+
+      x0 = this.caption_y.get_x() + this.caption_y.get_width();
+      x1 = this.scale_y.offsetLeft + x;
+      if (x1 < x0) {
+	this.caption_y.x(this.caption_y.get_x() - (x0 - x1) - 10);
+      }
+    }
+  },
+
   gauge_y: function () {
-    var inc, d, j, start, l, len, n, m, diff;
+    var inc, d, j, start, l, len, n, m, diff, x, x0;
     var str, text;
     var frame = this.frame;
 
@@ -1625,6 +1667,7 @@ JSGraph.prototype = {
     str = Math.abs(start * diff).toFixed(0);
     len = str.length;
 
+    x = this.scale_y.offset;
     for (j = start; j <= this.max_y / inc; j++) {
       var decpt;
 
@@ -1634,23 +1677,26 @@ JSGraph.prototype = {
 
       if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
+	l++;
       }
       n = this.get_y(j * inc);
       text = new Text(String(str));
-      text.init(this.scale_y,
-		this.scale_y.offset - (len - 1) * Font_size / 2,
-		n - Font_size / 2);
+      text.init(this.scale_y, this.scale_y.offset, n - Font_size / 2);
+      x0 = this.scale_y.offset - text.get_width();
+      text.x(x0);
+      x = (x0 < x) ? x0 : x;
     }
+
+    this.caption_y_auto_set_position(x);
 
     m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new Text("&times;10<sup>" + m + "</sup>");
+      text = new Text('&times;10<sup>' + m + '</sup>');
       text.init(this.scale_y, this.scale_y.offset - 40,  -30);
     }
 
-    
     for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_y(d * inc);
       if (m == 5) {
@@ -1731,7 +1777,8 @@ JSGraph.prototype = {
       n = this.get_x(x);
       len = str.length;
       text = new Text("10<sup>" + str + "</sup>");
-      text.init(this.scale_x, n - (len + 1) * Font_size / 4, this.scale_x.offset);
+      text.init(this.scale_x, n, this.scale_x.offset);
+      text.x(n - text.get_width() / 2);
       this.draw_gauge1_x(n);
     }
 
@@ -1758,7 +1805,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_y: function () {
-    var max, min, i, m, width, height, n, y, inc;
+    var max, min, i, m, width, height, n, y, inc, x, x0;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
@@ -1775,6 +1822,7 @@ JSGraph.prototype = {
       inc = 1;
     }
 
+    x = this.scale_y.offset;
     for (i = Math.ceil(min); i < max; i += inc) {
       y = Math.pow(10, i);
 
@@ -1786,10 +1834,14 @@ JSGraph.prototype = {
       n = this.get_y(y);
       len = str.length;
       text = new Text("10<sup>" + str + "</sup>");
-      text.init(this.scale_y,
-		this.scale_y.offset - len * Font_size / 2, n - Font_size);
+      text.init(this.scale_y, this.scale_y.offset, n - Font_size);
+      x0 = this.scale_y.offset - text.get_width();
+      text.x(x0);
       this.draw_gauge1_y(n);
+      x = (x0 < x) ? x0 : x;
     }
+
+    this.caption_y_auto_set_position(x);
 
     for (i = Math.floor(min); i < max; i += inc) {
       y = Math.pow(10, i);
@@ -1820,6 +1872,16 @@ JSGraph.prototype = {
     update_position();
   },
 
+  move_to_center: function(obj, left, width) {
+    if (! obj.moved) {
+      var w;
+      w = obj.get_width();
+      obj.x(left + (width - w) / 2);
+    } else {
+      obj.x(left + obj.text.offset_x);
+    }
+  },
+
   update_position: function () {
     var parent_frame = this.parent_frame;
     var frame = this.frame;
@@ -1833,13 +1895,13 @@ JSGraph.prototype = {
     frame.width = width;
     frame.height = height;
 
-    this.title.x(left + this.title.text.offset_x);
-    this.title.y(top  + this.title.text.offset_y);
+    this.move_to_center(this.title, left, width);
+    this.title.y(top + this.title.text.offset_y);
 
     this.caption_y.x(left + this.caption_y.text.offset_x);
     this.caption_y.y(top  + this.caption_y.text.offset_y);
 
-    this.caption_x.x(left + this.caption_x.text.offset_x);
+    this.move_to_center(this.caption_x, left, width);
     this.caption_x.y(top + height + this.caption_x.text.offset_y);
 
     this.scale_x.style.left = left + 'px';
@@ -2129,7 +2191,7 @@ Data.prototype = {
   },
 
   read_data: function (s) {
-    var i, n, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    var i, n, m, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
     var data, xy_data;
 
     switch (arguments.length) {
@@ -2145,16 +2207,18 @@ Data.prototype = {
     data = s.split(rs);
     n = data.length;
 
-    if (col_x < 0) {
-      col_x += n + 1;
-    }
-
-    if (col_y < 0) {
-      col_y += n + 1;
-    }
-
     for (i = 0; i < n; i++) {
       xy_data = data[i].split(fs);
+      m = xy_data.length;
+
+      if (col_x < 0) {
+	col_x += m + 1;
+      }
+
+      if (col_y < 0) {
+	col_y += m + 1;
+      }
+
       if (xy_data.length > 1) {
 	this.add_data(parseFloat(xy_data[col_x]),
 		      parseFloat(xy_data[col_y]));
@@ -2202,14 +2266,15 @@ Data.prototype = {
     var maxx = -Infinity;
     var miny = Infinity;
     var maxy = -Infinity;
-    var i;
+    var i, n;
 
     if (this.data.length < 1) {
       this.draw = false;
       return;
     }
 
-    for (i = 0; i < this.data.length; i++) {
+    n = this.data.length;
+    for (i = 0; i < n; i++) {
       if (! isFinite(this.data[i][0]) || ! isFinite(this.data[i][1])) {
 	continue;
       }
