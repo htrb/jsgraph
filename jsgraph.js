@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.59 2009/03/05 10:39:25 hito Exp $ */
+/* $Id: jsgraph.js,v 1.60 2009/03/05 10:42:29 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1678,8 +1678,9 @@ JSGraph.prototype = {
     str = Math.abs(start * diff).toFixed(0);
     len = str.length;
 
+    m = this.max_y / inc;
     x = this.scale_y.offset;
-    for (j = start; j <= this.max_y / inc; j++) {
+    for (j = start; j <= m; j++) {
       var decpt;
 
       str = (j * diff).toFixed(0);
