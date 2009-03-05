@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.60 2009/03/05 10:42:29 hito Exp $ */
+/* $Id: jsgraph.js,v 1.61 2009/03/05 14:47:14 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1272,7 +1272,6 @@ JSGraph.prototype = {
 
       if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
-	l++;
       }
       n = this.get_x(j * inc);
       text = new Text(String(str));
@@ -1651,7 +1650,7 @@ JSGraph.prototype = {
   },
 
   gauge_y: function () {
-    var inc, d, j, start, l, len, n, m, diff, x, x0;
+    var inc, d, j, start, l, len, n, m, diff, x;
     var str, text;
     var frame = this.frame;
 
@@ -1681,7 +1680,7 @@ JSGraph.prototype = {
     m = this.max_y / inc;
     x = this.scale_y.offset;
     for (j = start; j <= m; j++) {
-      var decpt;
+      var decpt, x0;
 
       str = (j * diff).toFixed(0);
       l = str.length;
@@ -1689,7 +1688,6 @@ JSGraph.prototype = {
 
       if (l > decpt) {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
-	l++;
       }
       n = this.get_y(j * inc);
       text = new Text(String(str));
@@ -1817,7 +1815,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_y: function () {
-    var max, min, i, m, width, height, n, y, inc, x, x0;
+    var max, min, i, m, width, height, n, y, inc, x;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
@@ -1836,6 +1834,8 @@ JSGraph.prototype = {
 
     x = this.scale_y.offset;
     for (i = Math.ceil(min); i < max; i += inc) {
+      var x0;
+
       y = Math.pow(10, i);
 
       if (y > this.max_y) {
