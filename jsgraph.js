@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.61 2009/03/05 14:47:14 hito Exp $ */
+/* $Id: jsgraph.js,v 1.62 2009/03/05 14:48:07 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1778,7 +1778,6 @@ JSGraph.prototype = {
 
     for (i = Math.ceil(min); i < max; i += inc) {
       x = Math.pow(10, i);
-
       if (x > this.max_x) {
 	break;
       }
@@ -1837,7 +1836,6 @@ JSGraph.prototype = {
       var x0;
 
       y = Math.pow(10, i);
-
       if (y > this.max_y) {
 	break;
       }
