@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.58 2009/03/05 10:30:34 hito Exp $ */
+/* $Id: jsgraph.js,v 1.59 2009/03/05 10:39:25 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -1032,25 +1032,26 @@ JSGraph.prototype = {
   },
 
   draw_each_data_l: function (data) {
-    var i, n, d, di;
+    var i, n, d, di, canvas;
 
-    this.canvas.save();
+    canvas = this.canvas;
+    canvas.save();
 
-    this.canvas.strokeStyle = data.color;
-    this.canvas.lineWidth = data.width;
-    this.canvas.lineJoin = "round";
-    this.canvas.beginPath();
+    canvas.strokeStyle = data.color;
+    canvas.lineWidth = data.width;
+    canvas.lineJoin = "round";
+    canvas.beginPath();
 
     n = data.length();
     d = data.data;
 
-    this.canvas.moveTo(this.get_x(d[0][0]), this.get_y(d[0][1]));
+    canvas.moveTo(this.get_x(d[0][0]), this.get_y(d[0][1]));
     for (i = 1; i < n; i++) {
       di = d[i];
-      this.canvas.lineTo(this.get_x(di[0]), this.get_y(di[1]));
+      canvas.lineTo(this.get_x(di[0]), this.get_y(di[1]));
     }
-    this.canvas.stroke();
-    this.canvas.restore();
+    canvas.stroke();
+    canvas.restore();
   },
 
   draw_each_data_c: function (data) {
@@ -1130,8 +1131,11 @@ JSGraph.prototype = {
     }
 
     if (this.frame) {
-      this.canvas.fillStyle = color;
-      this.canvas.fillRect (x, y, width, height);
+      var canvas;
+
+      canvas = this.canvas;
+      canvas.fillStyle = color;
+      canvas.fillRect (x, y, width, height);
     }
   },
 
@@ -1142,28 +1146,35 @@ JSGraph.prototype = {
     }
 
     if (this.frame) {
-      this.canvas.save();
+      var canvas;
 
-      this.canvas.fillStyle = color;
-      this.canvas.beginPath();
-      this.canvas.arc(x, y, r, 0, 360, false);
-      this.canvas.fill();
+      canvas = this.canvas;
+      canvas.save();
 
-      this.canvas.restore();
+      canvas.fillStyle = color;
+      canvas.beginPath();
+      canvas.arc(x, y, r, 0, 360, false);
+      canvas.fill();
+
+      canvas.restore();
     }
   },
 
   line: function (x1, y1, x2, y2, color) {
-    this.canvas.save();
+    var canvas;
 
-    this.canvas.strokeStyle = color;
-    this.canvas.beginPath();
-    this.canvas.lineWidth = 1.0;
-    this.canvas.moveTo(x1, y1);
-    this.canvas.lineTo(x2, y2);
-    this.canvas.stroke();
+    canvas = this.canvas;
 
-    this.canvas.restore();
+    canvas.save();
+
+    canvas.strokeStyle = color;
+    canvas.beginPath();
+    canvas.lineWidth = 1.0;
+    canvas.moveTo(x1, y1);
+    canvas.lineTo(x2, y2);
+    canvas.stroke();
+
+    canvas.restore();
   },
 
   create_gauge_x: function (x, y, len) {
