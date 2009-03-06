@@ -17,21 +17,22 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.63 2009/03/06 02:43:09 hito Exp $ */
+/* $Id: jsgraph.js,v 1.64 2009/03/06 02:49:17 hito Exp $ */
 
 /**********************************************************************
 Global variables.
 ***********************************************************************/
-Is_mouse_down = false;
-Is_mouse_down_scale = false;
-Is_mouse_move_scale = false;
-Scale_region_size_min = 6;
-Mouse_x = 0;
-Mouse_y = 0;
-Mouse_position = 'C';
-Edge_width = 30;
-Font_size = 16; /* px */
-XMLHttp = null;
+var Is_mouse_down = false;
+var Is_mouse_down_scale = false;
+var Is_mouse_move_scale = false;
+var Scale_region_size_min = 6;
+var Mouse_x = 0;
+var Mouse_y = 0;
+var Mouse_position = 'C';
+var Edge_width = 30;
+var Font_size = 16; /* px */
+var XMLHttp = null;
+var IE = false;
 
 if (window.addEventListener) {
   document.create_element = function (e) {
