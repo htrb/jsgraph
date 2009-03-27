@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.64 2009/03/06 02:49:17 hito Exp $ */
+/* $Id: jsgraph.js,v 1.65 2009/03/27 10:36:01 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -2203,7 +2203,7 @@ Data.prototype = {
   },
 
   read_data: function (s) {
-    var i, n, m, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    var i, n, m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
     var data, xy_data;
 
     switch (arguments.length) {
@@ -2219,21 +2219,24 @@ Data.prototype = {
     data = s.split(rs);
     n = data.length;
 
+    x = col_x;
+    y = col_y;
+
     for (i = 0; i < n; i++) {
       xy_data = data[i].split(fs);
       m = xy_data.length;
 
       if (col_x < 0) {
-	col_x += m + 1;
+	x = col_x + m + 1;
       }
 
       if (col_y < 0) {
-	col_y += m + 1;
+	y = col_y + m + 1;
       }
 
       if (xy_data.length > 1) {
-	this.add_data(parseFloat(xy_data[col_x]),
-		      parseFloat(xy_data[col_y]));
+	this.add_data(parseFloat(xy_data[x]),
+		      parseFloat(xy_data[y]));
       }
     }
   },
