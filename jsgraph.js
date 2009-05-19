@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.65 2009/03/27 10:36:01 hito Exp $ */
+/* $Id: jsgraph.js,v 1.66 2009/05/19 09:15:49 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -54,7 +54,7 @@ if (window.addEventListener) {
   }
   if (!document.namespaces.v) {
     document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-    document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML);");
+    document.createStyleSheet().cssText = "v\\:polyline, v\\:rect, v\\:oval { behavior: url(#default#VML); display:inline-block; }";
   }
   IE = true;
 }
@@ -157,6 +157,7 @@ Date.prototype.nextHour = function () {
 /**********************************************************************
 Definition of IE_Canvas Object.
 ***********************************************************************/
+
 function IE_Canvas(div) {
   this.lineWidth = 1.0;
   this.strokeStyle = "#000000";
@@ -226,7 +227,8 @@ IE_Canvas.prototype = {
       return;
     }
 
-    line = document.create_element("v:polyline");
+    line = document.createElement("v:polyline");
+    line.style.position = "absolute";
     line.filled = fill;
     line.fillcolor = this.fillStyle;
     if (fill) {
@@ -234,13 +236,13 @@ IE_Canvas.prototype = {
     } else {
       line.strokecolor = this.strokeStyle;
     }
-    line.strokeweight = this.lineWidth;
+    line.strokeweight = this.lineWidth + "px";
     line.joinstyle = this.lineJoin;
     line.points = ""
     n = this.path.length;
     path = this.path;
     for (i = 0; i < n; i++) {
-      line.points += " " + path[i][0] + "," + path[i][1];
+      line.points += " " + path[i][0] + "," + path[i][1] + "px";
     }
     this.current_shape = null;
     this.parent.appendChild(line);
@@ -2253,6 +2255,7 @@ Data.prototype = {
       var text, a;
       if (XMLHttp.readyState == 4) {
 	if (XMLHttp.status != 200) {
+	  self.loaded = true;
 	  return;
 	}
 	arg[0] = XMLHttp.responseText;
