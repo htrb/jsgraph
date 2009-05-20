@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.66 2009/05/19 09:15:49 hito Exp $ */
+/* $Id: jsgraph.js,v 1.67 2009/05/20 05:15:55 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -491,11 +491,17 @@ function mouse_down_scale_dom () {
 
   if (IE) {
     e = window.event;
-    x = e.offsetX;
-    y = e.offsetY;
     if (e.button != 1) {
       return;
     }
+    if (e.srcElement.tagName != "DIV") {
+      x = e.offsetX + e.srcElement.offsetLeft;
+      y = e.offsetY + e.srcElement.offsetTop;
+    } else {
+      x = e.offsetX;
+      y = e.offsetY;
+    }
+    e.cancelBubble = true;
   } else {
     e = arguments[0];
     x = e.layerX;
@@ -564,8 +570,13 @@ function mouse_move_scale_dom () {
 
   if (IE) {
     e = window.event;
-    x = e.offsetX;
-    y = e.offsetY;
+    if (e.srcElement.tagName != "DIV") {
+      x = e.offsetX + e.srcElement.offsetLeft;
+      y = e.offsetY + e.srcElement.offsetTop;
+    } else {
+      x = e.offsetX;
+      y = e.offsetY;
+    }
   } else {
     e = arguments[0];
     x = e.layerX;
