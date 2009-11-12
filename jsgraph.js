@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.67 2009/05/20 05:15:55 hito Exp $ */
+/* $Id: jsgraph.js,v 1.68 2009/11/12 06:46:17 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -28,11 +28,14 @@ var Is_mouse_move_scale = false;
 var Scale_region_size_min = 6;
 var Mouse_x = 0;
 var Mouse_y = 0;
+var Mouse_client_x = 0;
+var Mouse_client_y = 0;
 var Mouse_position = 'C';
 var Edge_width = 30;
 var Font_size = 16; /* px */
 var XMLHttp = null;
 var IE = false;
+
 
 if (window.addEventListener) {
   document.create_element = function (e) {
@@ -63,7 +66,7 @@ if (window.addEventListener) {
 /**********************************************************************
 Utility functions
 ***********************************************************************/
-create_http_request = function () {
+var create_http_request = function () {
   var xmlhttp = false;
 
   try {
@@ -267,8 +270,8 @@ IE_Canvas.prototype = {
 Event Handlers.
 ***********************************************************************/
 function change_curser (node, x, y) {
-  var width  = parseInt(node.style.width);
-  var height = parseInt(node.style.height);
+  var width  = parseInt(node.style.width, 10);
+  var height = parseInt(node.style.height, 10);
   var cursor = node.style.cursor;
   if (node.frame) {
     node = node.frame;
@@ -302,10 +305,10 @@ function change_curser (node, x, y) {
 }
 
 function resize_move (node, x, y) {
-  var width  = parseInt(node.style.width);
-  var height = parseInt(node.style.height);
-  var left   = parseInt(node.style.left);
-  var top    = parseInt(node.style.top);
+  var width  = parseInt(node.style.width, 10);
+  var height = parseInt(node.style.height, 10);
+  var left   = parseInt(node.style.left, 10);
+  var top    = parseInt(node.style.top, 10);
 
   switch (Mouse_position) {
   case 'NW':
@@ -349,8 +352,8 @@ function resize_move (node, x, y) {
 }
 
 function move (node, x, y) {
-  var left = parseInt(node.style.left);
-  var top  = parseInt(node.style.top);
+  var left = parseInt(node.style.left, 10);
+  var top  = parseInt(node.style.top, 10);
 
   node.style.left  = (left + x) + 'px';
   node.style.top = (top + y) + 'px';
@@ -421,8 +424,8 @@ function mouse_move_dom () {
 
 function mouse_down_dom () {
   var e, x, y;
-  var width  = parseInt(this.style.width);
-  var height = parseInt(this.style.height);
+  var width  = parseInt(this.style.width, 10);
+  var height = parseInt(this.style.height, 10);
 
   if (IE) {
     e = window.event;
@@ -539,10 +542,10 @@ function mouse_up_scale_dom () {
   if (Is_mouse_down_scale) {
     var x, y, w, h;
     if (Is_mouse_move_scale) {
-      x = parseInt(scale.style.left);
-      y = parseInt(scale.style.top);
-      w = parseInt(scale.style.width);
-      h = parseInt(scale.style.height);
+      x = parseInt(scale.style.left, 10);
+      y = parseInt(scale.style.top, 10);
+      w = parseInt(scale.style.width, 10);
+      h = parseInt(scale.style.height, 10);
       if (w > Scale_region_size_min && h > Scale_region_size_min) {
 	scale.graph.set_scale(scale.graph.get_data_x(x),
 			      scale.graph.get_data_y(y),
@@ -600,14 +603,14 @@ function mouse_move_scale_dom () {
       w = x;
       h = y;
       if (Mouse_client_x > e.clientX) {
-	x = parseInt(scale.style.left) + w;
-	w = parseInt(scale.style.width) - w;
+	x = parseInt(scale.style.left, 10) + w;
+	w = parseInt(scale.style.width, 10) - w;
 	x--;
 	scale.style.left = x + 'px';
       }
       if (Mouse_client_y > e.clientY) {
-	y = parseInt(scale.style.top) + h;
-	h = parseInt(scale.style.height) - h;
+	y = parseInt(scale.style.top, 10) + h;
+	h = parseInt(scale.style.height, 10) - h;
 	y--;
 	scale.style.top = y + 'px';
       }
@@ -634,7 +637,7 @@ function event_none_dom () {
 Definition of Text Object.
 ***********************************************************************/
 
-function Text() {
+function GraphText() {
   var text = document.createElement('span');
 
   text.style.position = 'absolute';
@@ -646,7 +649,7 @@ function Text() {
   this.text = text;
 }
 
-Text.prototype = {
+GraphText.prototype = {
   init: function (node, x, y) {
     this.text.style.left = x + 'px';
     this.text.style.top = y + 'px';
@@ -736,7 +739,7 @@ function Caption(s) {
   }
 }
 
-Caption.prototype = new Text("");
+Caption.prototype = new GraphText("");
 
 /**********************************************************************
 Definition of JSGraph Object.
@@ -761,7 +764,7 @@ function JSGraph() {
 		'#993300',
 		'#669900',
 		'#6699cc',
-		'#0066cc',
+		'#0066cc'
 		];
   this.Style = "lc";
   this.X = 1;
@@ -791,8 +794,8 @@ JSGraph.prototype = {
 
     offset_x = 140;
     offset_y = 60;
-    w = parseInt(graph.style.width) - offset_x - 200;
-    h = parseInt(graph.style.height) - offset_y - 80;
+    w = parseInt(graph.style.width, 10) - offset_x - 200;
+    h = parseInt(graph.style.height, 10) - offset_y - 80;
 
     parent_frame.style.position = 'absolute';
     parent_frame.style.overflow = 'hidden';
@@ -871,17 +874,17 @@ JSGraph.prototype = {
 
     this.title = new Caption("Graph");
     this.title.init(graph, 0, 0);
-    this.title.text.offset_x = parseInt(frame.style.width) / 2 - 25;
+    this.title.text.offset_x = parseInt(frame.style.width, 10) / 2 - 25;
     this.title.text.offset_y = -25;
 
     this.caption_y = new Caption("Y-Axis");
     this.caption_y.init(graph, 0, 0);
     this.caption_y.text.offset_x = -100;
-    this.caption_y.text.offset_y = (parseInt(frame.style.height) - Font_size) / 2;
+    this.caption_y.text.offset_y = (parseInt(frame.style.height, 10) - Font_size) / 2;
 
     this.caption_x = new Caption("X-Axis");
     this.caption_x.init(graph, 0, 0);
-    this.caption_x.text.offset_x = parseInt(frame.style.width) / 2 - 25;
+    this.caption_x.text.offset_x = parseInt(frame.style.width, 10) / 2 - 25;
     this.caption_x.text.offset_y = 40;
 
     scale_x.style.position = 'absolute';
@@ -1213,7 +1216,7 @@ JSGraph.prototype = {
     var y;
 
     this.create_gauge_x(x, 0, len);
-    y = parseInt(frame.style.height) - len;
+    y = parseInt(frame.style.height, 10) - len;
     this.create_gauge_x(x, y, len);
   },
 
@@ -1223,7 +1226,7 @@ JSGraph.prototype = {
     var x;
 
     this.create_gauge_y(0, y, len);
-    x = parseInt(frame.style.width) - len;
+    x = parseInt(frame.style.width, 10) - len;
     this.create_gauge_y(x, y, len);
   },
 
@@ -1233,7 +1236,7 @@ JSGraph.prototype = {
     var y;
 
     this.create_gauge_x(x, 0, len);
-    y = parseInt(frame.style.height) - len;
+    y = parseInt(frame.style.height, 10) - len;
     this.create_gauge_x(x, y, len);
   },
 
@@ -1243,7 +1246,7 @@ JSGraph.prototype = {
     var x;
 
     this.create_gauge_y(0, y, len); 
-    x = parseInt(frame.style.width) - len;
+    x = parseInt(frame.style.width, 10) - len;
     this.create_gauge_y(x, y, len);
   },
 
@@ -1251,7 +1254,7 @@ JSGraph.prototype = {
     var inc, d, j, start, l, len, n, m, diff;
     var str, text;
     var frame = this.frame;
-    var width  = parseInt(frame.style.width);
+    var width  = parseInt(frame.style.width, 10);
 
     if (this.min_x == this.max_x) {
       this.min_x -= 1;
@@ -1288,7 +1291,7 @@ JSGraph.prototype = {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_x(j * inc);
-      text = new Text(String(str));
+      text = new GraphText(String(str));
       text.init(this.scale_x, n, this.scale_x.offset);
       text.x(n - text.get_width() / 2);
     }
@@ -1297,7 +1300,7 @@ JSGraph.prototype = {
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new Text('&times;10<sup>' + m + '</sup>');
+      text = new GraphText('&times;10<sup>' + m + '</sup>');
       text.init(this.scale_x, width, this.scale_x.offset + Font_size);
     }
     
@@ -1427,7 +1430,7 @@ JSGraph.prototype = {
 	    break;
 	  }
 	  this.draw_gauge1_x(n);
-	  text = new Text(String(date.getUTCFullYear()));
+	  text = new GraphText(String(date.getUTCFullYear()));
 	  text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
 	} else {
 	  this.draw_gauge3_x(n);
@@ -1447,7 +1450,7 @@ JSGraph.prototype = {
 	    len = str.length;
 	  }
 	  if (d > this.min_x) {
-	    text = new Text((str));
+	    text = new GraphText((str));
 	    text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
 	  }
 	} else {
@@ -1466,7 +1469,7 @@ JSGraph.prototype = {
 	  len = str.length;
 	}
 	if (d > this.min_x && (inc != 4 || date.getUTCDate() < 28)) {
-	  text = new Text((str));
+	  text = new GraphText((str));
 	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
 	  this.draw_gauge1_x(n);
 	} else {
@@ -1502,7 +1505,7 @@ JSGraph.prototype = {
 		str = String(h);
 		len = str.length;
 	      }
-	      text = new Text(str);
+	      text = new GraphText(str);
 	      text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
 	    }
 	  }
@@ -1589,7 +1592,7 @@ JSGraph.prototype = {
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
 	break;
       } else {
-	text = new Text(String(min_date.getUTCFullYear()));
+	text = new GraphText(String(min_date.getUTCFullYear()));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
@@ -1597,13 +1600,13 @@ JSGraph.prototype = {
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
 	break;
       } else if (min_date.getUTCMonth() != max_date.getUTCMonth()) {
-	text = new Text(String(min_date.getUTCFullYear()));
+	text = new GraphText(String(min_date.getUTCFullYear()));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else if (min_date.getUTCDate() != max_date.getUTCDate()) {
-	text = new Text(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1));
+	text = new GraphText(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else {
-	text = new Text(min_date.getUTCFullYear()
+	text = new GraphText(min_date.getUTCFullYear()
 			+ "/"
 			+ (min_date.getUTCMonth() + 1)
 			+ "/"
@@ -1613,7 +1616,7 @@ JSGraph.prototype = {
       break;
       case "hour":
       if (min_date.getUTCDate() == max_date.getUTCDate()) {
-	text = new Text(min_date.getUTCFullYear()
+	text = new GraphText(min_date.getUTCFullYear()
 			+ "/"
 			+ (min_date.getUTCMonth() + 1)
 			+ "/"
@@ -1704,7 +1707,7 @@ JSGraph.prototype = {
 	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
       }
       n = this.get_y(j * inc);
-      text = new Text(String(str));
+      text = new GraphText(String(str));
       text.init(this.scale_y, this.scale_y.offset, n);
       x0 = this.scale_y.offset - text.get_width();
       text.x(x0);
@@ -1718,7 +1721,7 @@ JSGraph.prototype = {
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new Text('&times;10<sup>' + m + '</sup>');
+      text = new GraphText('&times;10<sup>' + m + '</sup>');
       text.init(this.scale_y, this.scale_y.offset - 40,  -30);
     }
 
@@ -1774,7 +1777,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_x: function () {
-    var max, min, i, m, width, height, x, n;
+    var max, min, i, m, width, height, x, n, inc, str, len, text;
 
     if (this.max_x <= 0 || this.min_x <= 0) {
       return;
@@ -1800,7 +1803,7 @@ JSGraph.prototype = {
       str = i.toFixed(0); 
       n = this.get_x(x);
       len = str.length;
-      text = new Text("10<sup>" + str + "</sup>");
+      text = new GraphText("10<sup>" + str + "</sup>");
       text.init(this.scale_x, n, this.scale_x.offset);
       text.x(n - text.get_width() / 2);
       this.draw_gauge1_x(n);
@@ -1829,7 +1832,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_y: function () {
-    var max, min, i, m, width, height, n, y, inc, x;
+    var max, min, i, m, width, height, n, y, inc, x, str, len, text;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
@@ -1858,7 +1861,7 @@ JSGraph.prototype = {
       str = i.toFixed(0); 
       n = this.get_y(y);
       len = str.length;
-      text = new Text("10<sup>" + str + "</sup>");
+      text = new GraphText("10<sup>" + str + "</sup>");
       text.init(this.scale_y, this.scale_y.offset, n - Font_size);
       x0 = this.scale_y.offset - text.get_width();
       text.x(x0);
@@ -1891,29 +1894,13 @@ JSGraph.prototype = {
     return;
   },
 
-  set_size: function (w, h) {
-    this.parent_frame.style.width = w + "px";
-    this.parent_frame.style.height = h + "px";
-    update_position();
-  },
-
-  move_to_center: function(obj, left, width) {
-    if (! obj.moved) {
-      var w;
-      w = obj.get_width();
-      obj.x(left + (width - w) / 2);
-    } else {
-      obj.x(left + obj.text.offset_x);
-    }
-  },
-
   update_position: function () {
     var parent_frame = this.parent_frame;
     var frame = this.frame;
-    var width  = parseInt(parent_frame.style.width);
-    var height = parseInt(parent_frame.style.height);
-    var left   = parseInt(parent_frame.style.left);
-    var top    = parseInt(parent_frame.style.top);
+    var width  = parseInt(parent_frame.style.width, 10);
+    var height = parseInt(parent_frame.style.height, 10);
+    var left   = parseInt(parent_frame.style.left, 10);
+    var top    = parseInt(parent_frame.style.top, 10);
 
     frame.style.width = parent_frame.style.width;
     frame.style.height = parent_frame.style.height;
@@ -1937,6 +1924,22 @@ JSGraph.prototype = {
 
     this.legend.style.left = (left + width + this.legend.offset_x) + 'px';
     this.legend.style.top = (top + this.legend.offset_y) + 'px';
+  },
+
+  set_size: function (w, h) {
+    this.parent_frame.style.width = w + "px";
+    this.parent_frame.style.height = h + "px";
+    this.update_position();
+  },
+
+  move_to_center: function(obj, left, width) {
+    if (! obj.moved) {
+      var w;
+      w = obj.get_width();
+      obj.x(left + (width - w) / 2);
+    } else {
+      obj.x(left + obj.text.offset_x);
+    }
   },
 
   clear: function () {
@@ -2225,8 +2228,8 @@ Data.prototype = {
     case 4:
       fs = arguments[3];
     case 3:
-      col_y = parseInt(arguments[2]) - 1;
-      col_x = parseInt(arguments[1]) - 1;
+      col_y = parseInt(arguments[2], 10) - 1;
+      col_x = parseInt(arguments[1], 10) - 1;
       break;
     }
     data = s.split(rs);
@@ -2278,7 +2281,7 @@ Data.prototype = {
   },
 
   wait: function(cb) {
-    var data = this;
+    var data = this, wait_until_data_loaded;
     wait_until_data_loaded = function () {
       if (data.loaded) {
 	cb();
