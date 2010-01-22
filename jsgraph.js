@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.68 2009/11/12 06:46:17 hito Exp $ */
+/* $Id: jsgraph.js,v 1.69 2010/01/22 15:56:35 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -2281,7 +2281,7 @@ Data.prototype = {
   },
 
   wait: function(cb) {
-    var data = this, wait_until_data_loaded;
+    var data = this;
     wait_until_data_loaded = function () {
       if (data.loaded) {
 	cb();
