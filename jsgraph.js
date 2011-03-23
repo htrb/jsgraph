@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.69 2010/01/22 15:56:35 hito Exp $ */
+/* $Id: jsgraph.js,v 1.70 2011/03/23 01:34:11 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -69,13 +69,15 @@ Utility functions
 var create_http_request = function () {
   var xmlhttp = false;
 
-  try {
-    xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-  } catch (e) {
+  if (IE) {
     try {
-      xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    } catch (E) {
-      xmlhttp = false;
+      xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+      try {
+	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (E) {
+	xmlhttp = false;
+      }
     }
   }
 
@@ -1296,7 +1298,7 @@ JSGraph.prototype = {
       text.x(n - text.get_width() / 2);
     }
 
-    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
+    m = Math.floor(Math.log10(inc * (0.5 + Math.abs((start == 0)? 1: start))) * (1 + 2E-16));
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
@@ -1717,7 +1719,7 @@ JSGraph.prototype = {
 
     this.caption_y_auto_set_position(x);
 
-    m = Math.floor(Math.log10(inc * Math.abs((start == 0)? 1: start)) * (1 + 2E-16));
+    m = Math.floor(Math.log10(inc * (0.5 + Math.abs((start == 0)? 1: start))) * (1 + 2E-16));
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
@@ -2218,7 +2220,7 @@ Data.prototype = {
     }
   },
 
-  read_data: function (s) {
+  read_data: function () {
     var i, n, m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
     var data, xy_data;
 
@@ -2232,7 +2234,7 @@ Data.prototype = {
       col_x = parseInt(arguments[1], 10) - 1;
       break;
     }
-    data = s.split(rs);
+    data = arguments[0].split(rs);
     n = data.length;
 
     x = col_x;
@@ -2272,8 +2274,8 @@ Data.prototype = {
 	  self.loaded = true;
 	  return;
 	}
-	arg[0] = XMLHttp.responseText;
-	self.read_data.apply(self, arg);
+	arguments[0] = XMLHttp.responseText;
+	self.read_data.apply(self, arguments);
 	self.loaded = true;
       }
     }
