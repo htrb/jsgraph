@@ -17,7 +17,7 @@
  * 
  */
 
-/* $Id: jsgraph.js,v 1.70 2011/03/23 01:34:11 hito Exp $ */
+/* $Id: jsgraph.js,v 1.71 2011/04/05 02:37:13 hito Exp $ */
 
 /**********************************************************************
 Global variables.
@@ -2264,7 +2264,7 @@ Data.prototype = {
 
     self = this;
     this.loaded = false;
-    arg = arguments;
+    arg = [].slice.apply(arguments);
 
     XMLHttp.open('GET', path, true);
     XMLHttp.onreadystatechange = function() {
@@ -2274,8 +2274,8 @@ Data.prototype = {
 	  self.loaded = true;
 	  return;
 	}
-	arguments[0] = XMLHttp.responseText;
-	self.read_data.apply(self, arguments);
+	arg[0] = XMLHttp.responseText;
+	self.read_data.apply(self, arg);
 	self.loaded = true;
       }
     }
