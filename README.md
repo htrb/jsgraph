@@ -1,4 +1,4 @@
-#JSGraph
+# JSGraph
 
 ## 特徴
 
