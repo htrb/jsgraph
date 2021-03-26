@@ -83,6 +83,7 @@ var create_http_request = function () {
 
   if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
     xmlhttp = new XMLHttpRequest();
+    xmlhttp.overrideMimeType("text/plain");
   }
   return xmlhttp;
 }
