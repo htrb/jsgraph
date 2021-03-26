@@ -1,20 +1,20 @@
-/* 
+/*
  * Copyright (C) 2003-2006, Hiroyuki Ito. ZXB01226@nifty.com
- * 
+ *
  * "JSGraph" is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
  * by the Free Software Foundation; either version 2 of the License,
  * or (at your option) any later version.
- * 
+ *
  * "JSGraph" is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
+ *
  */
 
 /* $Id: jsgraph.js,v 1.71 2011/04/05 02:37:13 hito Exp $ */
@@ -1247,7 +1247,7 @@ JSGraph.prototype = {
     var len = frame.gauge.length;
     var x;
 
-    this.create_gauge_y(0, y, len); 
+    this.create_gauge_y(0, y, len);
     x = parseInt(frame.style.width, 10) - len;
     this.create_gauge_y(x, y, len);
   },
@@ -1290,7 +1290,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
+	str = str.substring(0, decpt) + "." + str.substring(decpt, l);
       }
       n = this.get_x(j * inc);
       text = new GraphText(String(str));
@@ -1305,7 +1305,7 @@ JSGraph.prototype = {
       text = new GraphText('&times;10<sup>' + m + '</sup>');
       text.init(this.scale_x, width, this.scale_x.offset + Font_size);
     }
-    
+
     for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_x(d * inc);
       if (m == 5) {
@@ -1345,7 +1345,7 @@ JSGraph.prototype = {
 
     switch (this.scale_x.type) {
       case this.SCALE_TYPE_UNIX:
-      date_conv = 86400; 
+      date_conv = 86400;
       date.setUnix(this.min_x);
       min_date.setUnix(this.min_x);
       max_date.setUnix(this.max_x);
@@ -1379,7 +1379,7 @@ JSGraph.prototype = {
       this.max_x = 1970 + max_date.getTime() / (365.2425 * 24 * 60 * 60 * 1000);
 
       this.gauge_x();
-      
+
       this.min_x = min;
       this.max_x = max;
 
@@ -1706,7 +1706,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = str.substring(0, decpt) + "." + str.substring(decpt, l); 
+	str = str.substring(0, decpt) + "." + str.substring(decpt, l);
       }
       n = this.get_y(j * inc);
       text = new GraphText(String(str));
@@ -1802,7 +1802,7 @@ JSGraph.prototype = {
 	break;
       }
 
-      str = i.toFixed(0); 
+      str = i.toFixed(0);
       n = this.get_x(x);
       len = str.length;
       text = new GraphText("10<sup>" + str + "</sup>");
@@ -1860,7 +1860,7 @@ JSGraph.prototype = {
 	break;
       }
 
-      str = i.toFixed(0); 
+      str = i.toFixed(0);
       n = this.get_y(y);
       len = str.length;
       text = new GraphText("10<sup>" + str + "</sup>");
@@ -2192,7 +2192,7 @@ Data.prototype = {
       } else if (x > this.max_x) {
 	this.max_x = x;
       }
-    
+
       if (y < this.min_y) {
 	this.min_y = y;
       } else if (y > this.max_y) {
