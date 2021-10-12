@@ -2254,8 +2254,12 @@ Data.prototype = {
       }
 
       if (xy_data.length > 1) {
-	this.add_data(parseFloat(xy_data[x]),
-		      parseFloat(xy_data[y]));
+	var fx, fy;
+	fx = parseFloat(xy_data[x]);
+	fy = parseFloat(xy_data[y]);
+	if (! Number.isNaN(fx) && ! Number.isNaN(fy)) {
+	  this.add_data(fx, fy);
+	}
       }
     }
   },
