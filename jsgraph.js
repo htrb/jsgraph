@@ -36,9 +36,9 @@ var Font_size = 16; /* px */
 var XMLHttp = null;
 
 
-  document.create_element = function (e) {
-    return this.createElement(e);
-  }
+document.create_element = function (e) {
+  return this.createElement(e);
+}
 
 /**********************************************************************
 Utility functions
@@ -222,7 +222,7 @@ function move (node, x, y) {
 function mouse_resize_move_dom () {
   var e, x, y, is_frame = false;
 
-    e = arguments[0];
+  e = arguments[0];
 
   if (Is_mouse_down) {
     resize_move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
@@ -242,11 +242,11 @@ function mouse_resize_move_dom () {
     return;
   }
 
-    x = e.layerX;
-    y = e.layerY;
-    if (e.currentTarget == e.target && this.parent_frame) {
-      is_frame = true;
-    }
+  x = e.layerX;
+  y = e.layerY;
+  if (e.currentTarget == e.target && this.parent_frame) {
+    is_frame = true;
+  }
 
   if (is_frame) {
     change_curser(this, x, y);
@@ -255,7 +255,7 @@ function mouse_resize_move_dom () {
 
 function mouse_move_dom () {
   var e;
-    e = arguments[0];
+  e = arguments[0];
   if (Is_mouse_down) {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
@@ -271,12 +271,12 @@ function mouse_down_dom () {
   var width  = parseInt(this.style.width, 10);
   var height = parseInt(this.style.height, 10);
 
-    e = arguments[0];
-    x = e.layerX;
-    y = e.layerY;
-    if (e.button != 0) {
-      return;
-    }
+  e = arguments[0];
+  x = e.layerX;
+  y = e.layerY;
+  if (e.button != 0) {
+    return;
+  }
 
   Mouse_x = e.clientX;
   Mouse_y = e.clientY;
@@ -327,12 +327,12 @@ function mouse_over_dom () {
 function mouse_down_scale_dom () {
   var e, x, y;
 
-    e = arguments[0];
-    x = e.layerX;
-    y = e.layerY;
-    if (e.button != 0) {
-      return;
-    }
+  e = arguments[0];
+  x = e.layerX;
+  y = e.layerY;
+  if (e.button != 0) {
+    return;
+  }
 
   if (! this.scale_div) {
     return false;
@@ -391,9 +391,9 @@ function mouse_up_scale_dom () {
 function mouse_move_scale_dom () {
   var e, x, y;
 
-    e = arguments[0];
-    x = e.layerX;
-    y = e.layerY;
+  e = arguments[0];
+  x = e.layerX;
+  y = e.layerY;
 
   if (Is_mouse_down_scale) {
     var w, h, scale;
@@ -558,23 +558,23 @@ function JSGraph() {
     this.init(arguments[0]);
   }
   this.Colors = [
-		'#9900cc',
-		'#669900',
-		'#6699cc',
-		'#ff99ff',
-		'#cccc99',
-		'#999999',
-		'#ffcc00',
-		'#ffffcc',
-		'#ccffff',
-		'#ffccff',
-		'#003366',
-		'#990066',
-		'#993300',
-		'#669900',
-		'#6699cc',
-		'#0066cc'
-		];
+    '#9900cc',
+    '#669900',
+    '#6699cc',
+    '#ff99ff',
+    '#cccc99',
+    '#999999',
+    '#ffcc00',
+    '#ffffcc',
+    '#ccffff',
+    '#ffccff',
+    '#003366',
+    '#990066',
+    '#993300',
+    '#669900',
+    '#6699cc',
+    '#0066cc'
+  ];
   this.Style = "lc";
   this.X = 1;
   this.Y = 2;
@@ -727,7 +727,7 @@ JSGraph.prototype = {
   },
 
   create_canvas: function() {
-      return document.create_element('canvas');
+    return document.create_element('canvas');
   },
 
   resize_mode: function () {
@@ -1140,13 +1140,13 @@ JSGraph.prototype = {
     }
 
     switch (this.scale_x.type) {
-      case this.SCALE_TYPE_UNIX:
+    case this.SCALE_TYPE_UNIX:
       date_conv = 86400;
       date.setUnix(this.min_x);
       min_date.setUnix(this.min_x);
       max_date.setUnix(this.max_x);
       break;
-      case this.SCALE_TYPE_MJD:
+    case this.SCALE_TYPE_MJD:
       date_conv = 1;
       date.setMJD(this.min_x);
       min_date.setMJD(this.min_x);
@@ -1211,10 +1211,10 @@ JSGraph.prototype = {
 
     while (date.getTime() < max_date.getTime()) {
       switch (this.scale_x.type) {
-	case this.SCALE_TYPE_UNIX:
+      case this.SCALE_TYPE_UNIX:
 	d = date.getUnix();
 	break;
-	case this.SCALE_TYPE_MJD:
+      case this.SCALE_TYPE_MJD:
 	d = date.getMJD();
 	break;
       }
@@ -1349,34 +1349,34 @@ JSGraph.prototype = {
 	break;
       }
       switch (style) {
-	case "year":
+      case "year":
 	date.nextMonth();
 	break;
-	case "month":
-	  switch (date.getUTCDate()) {
-	  case 1:
-	    date.set_ymd(false, false, 10);
-	    break;
-	  case 10:
-	    date.set_ymd(false, false, 20);
-	    break;
-	  case 20:
-	    date.nextMonth();
-	    date.setUTCDate(1);
-	    break;
-	  }
+      case "month":
+	switch (date.getUTCDate()) {
+	case 1:
+	  date.set_ymd(false, false, 10);
+	  break;
+	case 10:
+	  date.set_ymd(false, false, 20);
+	  break;
+	case 20:
+	  date.nextMonth();
+	  date.setUTCDate(1);
+	  break;
+	}
 	//	  l += date.getUTCFullYear() + " ";
-	  break;
-	case "day":
-	  m = date.getUTCMonth();
-	  date.nextDate(inc);
-	  if (m != date.getUTCMonth()) {
-	    date.setUTCDate(1);
-	  }
-	  break;
-	case "hour":
-	  date.nextHour(inc);
-	  break;
+	break;
+      case "day":
+	m = date.getUTCMonth();
+	date.nextDate(inc);
+	if (m != date.getUTCMonth()) {
+	  date.setUTCDate(1);
+	}
+	break;
+      case "hour":
+	date.nextHour(inc);
+	break;
       default:
 	date.nextDate();
 	break;
@@ -1384,9 +1384,9 @@ JSGraph.prototype = {
     }
 
     switch (style) {
-      case "year":
+    case "year":
       break;
-      case "month":
+    case "month":
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
 	break;
       } else {
@@ -1394,7 +1394,7 @@ JSGraph.prototype = {
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
-      case "day":
+    case "day":
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
 	break;
       } else if (min_date.getUTCMonth() != max_date.getUTCMonth()) {
@@ -1405,20 +1405,20 @@ JSGraph.prototype = {
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else {
 	text = new GraphText(min_date.getUTCFullYear()
-			+ "/"
-			+ (min_date.getUTCMonth() + 1)
-			+ "/"
-			+ min_date.getUTCDate());
+			     + "/"
+			     + (min_date.getUTCMonth() + 1)
+			     + "/"
+			     + min_date.getUTCDate());
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
-      case "hour":
+    case "hour":
       if (min_date.getUTCDate() == max_date.getUTCDate()) {
 	text = new GraphText(min_date.getUTCFullYear()
-			+ "/"
-			+ (min_date.getUTCMonth() + 1)
-			+ "/"
-			+ (min_date.getUTCDate()));
+			     + "/"
+			     + (min_date.getUTCMonth() + 1)
+			     + "/"
+			     + (min_date.getUTCDate()));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
     }
@@ -1436,7 +1436,7 @@ JSGraph.prototype = {
 	return -1;
       }
       return w * (Math.log10(x) - Math.log10(min))
-      / (Math.log10(max) - Math.log10(min));
+	/ (Math.log10(max) - Math.log10(min));
     } else {
       return w * (x - min)/(max - min);
     }
@@ -1560,7 +1560,7 @@ JSGraph.prototype = {
 	return -1;
       }
       return h * (Math.log10(max) - Math.log10(y))
-      / (Math.log10(max) - Math.log10(min));
+	/ (Math.log10(max) - Math.log10(min));
     }
   },
 
@@ -1795,19 +1795,19 @@ JSGraph.prototype = {
 
   scale_x_type: function (type) {
     switch (type) {
-      case "linear":
+    case "linear":
       this.scale_x.type = this.SCALE_TYPE_LINEAR;
       break;
-      case "log":
+    case "log":
       this.scale_x.type = this.SCALE_TYPE_LOG;
       break;
-      case "unix":
+    case "unix":
       this.scale_x.type = this.SCALE_TYPE_UNIX;
       break;
-      case "mjd":
+    case "mjd":
       this.scale_x.type = this.SCALE_TYPE_MJD;
       break;
-      default:
+    default:
       this.scale_x.type = this.SCALE_TYPE_LINEAR;
     }
   },
