@@ -34,52 +34,17 @@ var Mouse_position = 'C';
 var Edge_width = 30;
 var Font_size = 16; /* px */
 var XMLHttp = null;
-var IE = false;
 
 
-if (window.addEventListener) {
   document.create_element = function (e) {
     return this.createElement(e);
   }
-  IE = false;
-} else {
-  document.create_element = function (e) {
-    var element;
-    element = this.createElement(e);
-    element.addEventListener = function (ev, fun) {
-      this["on" + ev] = fun;
-    }
-    element.removeEventListener = function (ev, fun) {
-      this["on" + ev] = event_none_dom;
-    }
-    element.addEventListener("selectstart", event_none_dom);
-    return element;
-  }
-  if (!document.namespaces.v) {
-    document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-    document.createStyleSheet().cssText = "v\\:polyline, v\\:rect, v\\:oval { behavior: url(#default#VML); display:inline-block; }";
-  }
-  IE = true;
-}
-
 
 /**********************************************************************
 Utility functions
 ***********************************************************************/
 var create_http_request = function () {
   var xmlhttp = false;
-
-  if (IE) {
-    try {
-      xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-    } catch (e) {
-      try {
-	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-      } catch (E) {
-	xmlhttp = false;
-      }
-    }
-  }
 
   if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
     xmlhttp = new XMLHttpRequest();
@@ -158,116 +123,6 @@ Date.prototype.nextHour = function () {
   }
   this.setTime(t + 3600000 * mul);
 }
-
-
-/**********************************************************************
-Definition of IE_Canvas Object.
-***********************************************************************/
-
-function IE_Canvas(div) {
-  this.lineWidth = 1.0;
-  this.strokeStyle = "#000000";
-  this.fillStyle = "#000000";
-  this.lineJoin = "round";
-  this.restore_buf = new Array(0);
-  this.path = new Array(0);
-  this.parent = div;
-  this.current_shape = null;
-}
-
-IE_Canvas.prototype = {
-
-  create_vml_element: function(shape, x, y, w, h) {
-    var e = document.createElement(shape);
-    e.fillcolor = this.fillStyle;
-    e.strokecolor = this.fillStyle;
-    e.style.position = "absolute";
-    e.style.left = x + "px";
-    e.style.top = y + "px";
-    e.style.width = w + "px";
-    e.style.height = h + "px";
-    this.parent.appendChild(e);
-    return e;
-  },
-
-  arc: function (x, y, r, sa, ea, dir) {
-    this.create_vml_element("v:oval", x - r, y - r, r * 2, r * 2);
-    this.current_shape = 'arc';
-  },
-
-  fillRect: function (x, y, w, h) {
-    this.create_vml_element("v:rect", x, y, w, h);
-    this.current_shape = 'rect';
-  },
-
-  restore: function () {
-    var style;
-    style = this.restore_buf.pop;
-    if (style) {
-      this.strokeStyle = style[0];
-      this.fillStyle = style[1];
-      this.lineWidth = style[2];
-    }
-  },
-
-  save: function () {
-    this.restore_buf.push([this.strokeStyle, this.fillStyle, this.lineWidth]);
-  },
-
-  beginPath: function () {
-    this.path.length = 0;
-  },
-
-  lineTo: function (x, y) {
-    this.path.push([x, y]);
-    this.current_shape = 'line';
-  },
-
-  moveTo: function (x, y) {
-    this.path.push([x, y]);
-  },
-
-  end_path: function (fill) {
-    var line, i, n, path;
-    if (this.current_shape != 'line') {
-      return;
-    }
-
-    line = document.createElement("v:polyline");
-    line.style.position = "absolute";
-    line.filled = fill;
-    line.fillcolor = this.fillStyle;
-    if (fill) {
-      line.strokecolor = this.fillStyle;
-    } else {
-      line.strokecolor = this.strokeStyle;
-    }
-    line.strokeweight = this.lineWidth + "px";
-    line.joinstyle = this.lineJoin;
-    line.points = ""
-    n = this.path.length;
-    path = this.path;
-    for (i = 0; i < n; i++) {
-      line.points += " " + path[i][0] + "," + path[i][1] + "px";
-    }
-    this.current_shape = null;
-    this.parent.appendChild(line);
-  },
-
-  stroke: function () {
-    this.end_path(false);
-  },
-
-  fill: function () {
-    this.end_path(true);
-  },
-
-  clearRect: function () {
-    while (this.parent.childNodes.length > 0) {
-      this.parent.removeChild(this.parent.firstChild);
-    }
-  }
-};
 
 /**********************************************************************
 Event Handlers.
@@ -367,11 +222,7 @@ function move (node, x, y) {
 function mouse_resize_move_dom () {
   var e, x, y, is_frame = false;
 
-  if (IE) {
-    e = window.event;
-  } else {
     e = arguments[0];
-  }
 
   if (Is_mouse_down) {
     resize_move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
@@ -391,17 +242,11 @@ function mouse_resize_move_dom () {
     return;
   }
 
-  if (IE) {
-    x = e.offsetX;
-    y = e.offsetY;
-    is_frame = true;
-  } else {
     x = e.layerX;
     y = e.layerY;
     if (e.currentTarget == e.target && this.parent_frame) {
       is_frame = true;
     }
-  }
 
   if (is_frame) {
     change_curser(this, x, y);
@@ -410,11 +255,7 @@ function mouse_resize_move_dom () {
 
 function mouse_move_dom () {
   var e;
-  if (IE) {
-    e = window.event;
-  } else {
     e = arguments[0];
-  }
   if (Is_mouse_down) {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
@@ -430,21 +271,12 @@ function mouse_down_dom () {
   var width  = parseInt(this.style.width, 10);
   var height = parseInt(this.style.height, 10);
 
-  if (IE) {
-    e = window.event;
-    x = e.offsetX;
-    y = e.offsetY;
-    if (e.button != 1) {
-      return;
-    }
-  } else {
     e = arguments[0];
     x = e.layerX;
     y = e.layerY;
     if (e.button != 0) {
       return;
     }
-  }
 
   Mouse_x = e.clientX;
   Mouse_y = e.clientY;
@@ -495,27 +327,12 @@ function mouse_over_dom () {
 function mouse_down_scale_dom () {
   var e, x, y;
 
-  if (IE) {
-    e = window.event;
-    if (e.button != 1) {
-      return;
-    }
-    if (e.srcElement.tagName != "DIV") {
-      x = e.offsetX + e.srcElement.offsetLeft;
-      y = e.offsetY + e.srcElement.offsetTop;
-    } else {
-      x = e.offsetX;
-      y = e.offsetY;
-    }
-    e.cancelBubble = true;
-  } else {
     e = arguments[0];
     x = e.layerX;
     y = e.layerY;
     if (e.button != 0) {
       return;
     }
-  }
 
   if (! this.scale_div) {
     return false;
@@ -574,20 +391,9 @@ function mouse_up_scale_dom () {
 function mouse_move_scale_dom () {
   var e, x, y;
 
-  if (IE) {
-    e = window.event;
-    if (e.srcElement.tagName != "DIV") {
-      x = e.offsetX + e.srcElement.offsetLeft;
-      y = e.offsetY + e.srcElement.offsetTop;
-    } else {
-      x = e.offsetX;
-      y = e.offsetY;
-    }
-  } else {
     e = arguments[0];
     x = e.layerX;
     y = e.layerY;
-  }
 
   if (Is_mouse_down_scale) {
     var w, h, scale;
@@ -921,18 +727,7 @@ JSGraph.prototype = {
   },
 
   create_canvas: function() {
-    if (IE) {
-      var div;
-      div = document.create_element('div');
-      div.getContext = function (s) {
-	var canvas;
-	canvas = new IE_Canvas(this);
-	return canvas;
-      }
-      return div;
-    } else {
       return document.create_element('canvas');
-    }
   },
 
   resize_mode: function () {
