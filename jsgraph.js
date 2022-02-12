@@ -35,11 +35,6 @@ var Edge_width = 30;
 var Font_size = 16; /* px */
 var XMLHttp = null;
 
-
-document.create_element = function (e) {
-  return this.createElement(e);
-}
-
 /**********************************************************************
 Utility functions
 ***********************************************************************/
@@ -524,7 +519,7 @@ GraphText.prototype = {
 Definition of Caption Object.
 ***********************************************************************/
 function Caption(s) {
-  var text = document.create_element('span');
+  var text = document.createElement('span');
 
   text.style.position = 'absolute';
   text.style.whiteSpace = 'nowrap';
@@ -585,11 +580,11 @@ function JSGraph() {
 JSGraph.prototype = {
   init: function(id) {
     var w, h;
-    var parent_frame = document.create_element('div');
-    var legend    = document.create_element('table');
+    var parent_frame = document.createElement('div');
+    var legend    = document.createElement('table');
     var scale_x   = document.createElement('div');
     var scale_y   = document.createElement('div');
-    var scale_div = document.create_element('div');
+    var scale_div = document.createElement('div');
     var graph     = document.getElementById(id);
     var frame     = this.create_canvas();
     var offset_x, offset_y;
@@ -727,7 +722,7 @@ JSGraph.prototype = {
   },
 
   create_canvas: function() {
-    return document.create_element('canvas');
+    return document.createElement('canvas');
   },
 
   resize_mode: function () {
