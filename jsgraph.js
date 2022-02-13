@@ -125,7 +125,6 @@ Event Handlers.
 function change_curser (node, x, y) {
   var width  = parseInt(node.style.width, 10);
   var height = parseInt(node.style.height, 10);
-  var cursor = node.style.cursor;
   if (node.frame) {
     node = node.frame;
   }
