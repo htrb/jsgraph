@@ -1712,6 +1712,10 @@ JSGraph.prototype = {
     return;
   },
 
+  save_position: function(l, t, w, h) {
+    document.cookie = `${this.position_cookie}=${l}:${t}:${w}:${h};max-age=31536000;SameSite=Strict;`;
+  },
+
   update_position: function () {
     var parent_frame = this.parent_frame;
     var frame = this.frame;
