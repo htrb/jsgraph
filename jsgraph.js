@@ -597,6 +597,8 @@ JSGraph.prototype = {
     this.SCALE_TYPE_MJD    = 3;
 
     this.graph = graph;
+    this.position_cookie = position_cookie;
+
     document.addEventListener('keydown', this.event_key_down.bind(this));
     document.addEventListener('keyup', this.event_key_up.bind(this));
 
