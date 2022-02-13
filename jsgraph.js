@@ -731,6 +731,12 @@ JSGraph.prototype = {
     this.update_position();
   },
 
+  event_key_down: function(e) {
+    if (event.keyCode == 17) {
+      this.resize_mode();
+    }
+  },
+
   create_canvas: function() {
     return document.createElement('canvas');
   },
