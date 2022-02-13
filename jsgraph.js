@@ -1762,6 +1762,9 @@ JSGraph.prototype = {
 
     this.legend.style.left = (left + width + this.legend.offset_x) + 'px';
     this.legend.style.top = (top + this.legend.offset_y) + 'px';
+
+    this.graph.style.width = (width + this.offset_x + this.margin_x) + 'px';
+    this.graph.style.height = (height + this.offset_y + this.margin_y) + 'px';
   },
 
   set_size: function (w, h) {
