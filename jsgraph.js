@@ -737,6 +737,13 @@ JSGraph.prototype = {
     }
   },
 
+  event_key_up: function(e) {
+    if (event.keyCode == 17) {
+      mouse_up_dom.call(this.parent_frame);
+      this.scale_mode();
+    }
+  },
+
   create_canvas: function() {
     return document.createElement('canvas');
   },
