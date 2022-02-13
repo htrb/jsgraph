@@ -1729,6 +1729,7 @@ JSGraph.prototype = {
     this.title.y(top + this.title.text.offset_y);
 
     this.caption_y.x(left + this.caption_y.text.offset_x);
+    this.caption_y.text.offset_y = (parseInt(frame.style.height, 10) - Font_size) / 2;
     this.caption_y.y(top  + this.caption_y.text.offset_y);
 
     this.move_to_center(this.caption_x, left, width);
