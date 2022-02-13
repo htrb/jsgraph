@@ -732,6 +732,7 @@ JSGraph.prototype = {
 
     this.data = new Array(0);
     this.scale_mode();
+    this.restore_position();
     this.update_position();
   },
 
