@@ -609,11 +609,13 @@ JSGraph.prototype = {
     w = parseInt(graph.style.width, 10) - offset_x - margin_x;
     h = parseInt(graph.style.height, 10) - offset_y - margin_y;
 
+    graph.style.position = 'relative';
+
     parent_frame.style.position = 'absolute';
     parent_frame.style.overflow = 'hidden';
     parent_frame.style.backgroundColor = '#c0c0c0';
-    parent_frame.style.top = (graph.offsetTop + offset_y) + 'px';
-    parent_frame.style.left = (graph.offsetLeft + offset_x) + 'px';
+    parent_frame.style.top = offset_y + 'px';
+    parent_frame.style.left = offset_x + 'px';
     parent_frame.style.width = w + 'px';
     parent_frame.style.height = h + 'px';
     parent_frame.style.borderColor = '#000000';
