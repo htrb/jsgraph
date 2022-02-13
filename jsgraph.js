@@ -1712,6 +1712,19 @@ JSGraph.prototype = {
     return;
   },
 
+  restore_position: function() {
+    let pos, str;
+    str = document.cookie.split(';').find(row => row.trim().startsWith(this.position_cookie));
+    if (str === undefined) {
+      return;
+    }
+    pos = str.split(/[=:]/);
+    this.parent_frame.style.left = pos[1] + 'px';
+    this.parent_frame.style.top = pos[2] + 'px';
+    this.parent_frame.style.width = pos[3] + 'px';
+    this.parent_frame.style.height = pos[4] + 'px';
+  },
+
   save_position: function(l, t, w, h) {
     document.cookie = `${this.position_cookie}=${l}:${t}:${w}:${h};max-age=31536000;SameSite=Strict;`;
   },
