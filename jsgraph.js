@@ -597,6 +597,8 @@ JSGraph.prototype = {
     this.SCALE_TYPE_MJD    = 3;
 
     this.graph = graph;
+    document.addEventListener('keydown', this.event_key_down.bind(this));
+    document.addEventListener('keyup', this.event_key_up.bind(this));
 
     offset_x = 140;
     offset_y = 60;
