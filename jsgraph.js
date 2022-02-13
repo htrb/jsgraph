@@ -1765,6 +1765,8 @@ JSGraph.prototype = {
 
     this.graph.style.width = (width + this.offset_x + this.margin_x) + 'px';
     this.graph.style.height = (height + this.offset_y + this.margin_y) + 'px';
+
+    this.save_position(left, top, width, height);
   },
 
   set_size: function (w, h) {
