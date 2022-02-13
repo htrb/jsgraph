@@ -588,6 +588,8 @@ JSGraph.prototype = {
     var graph     = document.getElementById(id);
     var frame     = this.create_canvas();
     var offset_x, offset_y;
+    var margin_x, margin_y
+    var position_cookie = `${id}_position`;
 
     this.SCALE_TYPE_LINEAR = 0;
     this.SCALE_TYPE_LOG    = 1;
@@ -598,8 +600,14 @@ JSGraph.prototype = {
 
     offset_x = 140;
     offset_y = 60;
-    w = parseInt(graph.style.width, 10) - offset_x - 200;
-    h = parseInt(graph.style.height, 10) - offset_y - 80;
+    this.offset_x = offset_x;
+    this.offset_y = offset_y;
+    margin_x = 200;
+    margin_y = 80;
+    this.margin_x = margin_x;
+    this.margin_y = margin_y;
+    w = parseInt(graph.style.width, 10) - offset_x - margin_x;
+    h = parseInt(graph.style.height, 10) - offset_y - margin_y;
 
     parent_frame.style.position = 'absolute';
     parent_frame.style.overflow = 'hidden';
