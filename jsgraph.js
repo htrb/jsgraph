@@ -570,7 +570,6 @@ function JSGraph() {
 
 JSGraph.prototype = {
   init: function(id) {
-    var w, h;
     const parent_frame = document.createElement('div');
     const legend    = document.createElement('table');
     const scale_x   = document.createElement('div');
@@ -578,9 +577,11 @@ JSGraph.prototype = {
     const scale_div = document.createElement('div');
     const graph     = document.getElementById(id);
     const frame     = this.create_canvas();
-    var offset_x, offset_y;
-    var margin_x, margin_y
     const position_cookie = `${id}_position`;
+    const offset_x = 140;
+    const offset_y = 60;
+    const margin_x = 200;
+    const margin_y = 80;
 
     this.SCALE_TYPE_LINEAR = 0;
     this.SCALE_TYPE_LOG    = 1;
@@ -593,16 +594,12 @@ JSGraph.prototype = {
     document.addEventListener('keydown', this.event_key_down.bind(this));
     document.addEventListener('keyup', this.event_key_up.bind(this));
 
-    offset_x = 140;
-    offset_y = 60;
     this.offset_x = offset_x;
     this.offset_y = offset_y;
-    margin_x = 200;
-    margin_y = 80;
     this.margin_x = margin_x;
     this.margin_y = margin_y;
-    w = parseInt(graph.style.width, 10) - offset_x - margin_x;
-    h = parseInt(graph.style.height, 10) - offset_y - margin_y;
+    const w = parseInt(graph.style.width, 10) - offset_x - margin_x;
+    const h = parseInt(graph.style.height, 10) - offset_y - margin_y;
 
     graph.style.position = 'relative';
 
