@@ -123,8 +123,8 @@ Date.prototype.nextHour = function () {
 Event Handlers.
 ***********************************************************************/
 function change_curser (node, x, y) {
-  var width  = parseInt(node.style.width, 10);
-  var height = parseInt(node.style.height, 10);
+  const width  = parseInt(node.style.width, 10);
+  const height = parseInt(node.style.height, 10);
   if (node.frame) {
     node = node.frame;
   }
@@ -157,10 +157,10 @@ function change_curser (node, x, y) {
 }
 
 function resize_move (node, x, y) {
-  var width  = parseInt(node.style.width, 10);
-  var height = parseInt(node.style.height, 10);
-  var left   = parseInt(node.style.left, 10);
-  var top    = parseInt(node.style.top, 10);
+  const width  = parseInt(node.style.width, 10);
+  const height = parseInt(node.style.height, 10);
+  const left   = parseInt(node.style.left, 10);
+  const top    = parseInt(node.style.top, 10);
 
   switch (Mouse_position) {
   case 'NW':
@@ -204,8 +204,8 @@ function resize_move (node, x, y) {
 }
 
 function move (node, x, y) {
-  var left = parseInt(node.style.left, 10);
-  var top  = parseInt(node.style.top, 10);
+  const left = parseInt(node.style.left, 10);
+  const top  = parseInt(node.style.top, 10);
 
   node.style.left  = (left + x) + 'px';
   node.style.top = (top + y) + 'px';
@@ -224,9 +224,8 @@ function mouse_resize_move_dom () {
     Mouse_y = e.clientY;
     if (this.frame) {
       if (this.firstChild) {
-	var i, n;
-	n = this.childNodes.length;
-	for (i = 0; i < n; i++) {
+	const n = this.childNodes.length;
+	for (let i = 0; i < n; i++) {
 	  this.removeChild(this.firstChild);
 	}
       }
@@ -248,8 +247,7 @@ function mouse_resize_move_dom () {
 }
 
 function mouse_move_dom () {
-  var e;
-  e = arguments[0];
+  const e = arguments[0];
   if (Is_mouse_down) {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
@@ -261,13 +259,12 @@ function mouse_move_dom () {
 }
 
 function mouse_down_dom () {
-  var e, x, y;
-  var width  = parseInt(this.style.width, 10);
-  var height = parseInt(this.style.height, 10);
+  const e = arguments[0];
+  const x = e.layerX;
+  const y = e.layerY;
+  const width  = parseInt(this.style.width, 10);
+  const height = parseInt(this.style.height, 10);
 
-  e = arguments[0];
-  x = e.layerX;
-  y = e.layerY;
   if (e.button != 0) {
     return;
   }
@@ -319,11 +316,9 @@ function mouse_over_dom () {
 }
 
 function mouse_down_scale_dom () {
-  var e, x, y;
-
-  e = arguments[0];
-  x = e.layerX;
-  y = e.layerY;
+  const e = arguments[0];
+  const x = e.layerX;
+  const y = e.layerY;
   if (e.button != 0) {
     return;
   }
@@ -383,9 +378,8 @@ function mouse_up_scale_dom () {
 }
 
 function mouse_move_scale_dom () {
-  var e, x, y;
-
-  e = arguments[0];
+  let x, y;
+  const e = arguments[0];
   x = e.layerX;
   y = e.layerY;
 
@@ -441,7 +435,7 @@ Definition of Text Object.
 ***********************************************************************/
 
 function GraphText() {
-  var text = document.createElement('span');
+  const text = document.createElement('span');
 
   text.style.position = 'absolute';
   text.style.fontSize = Font_size + 'px';
@@ -518,7 +512,7 @@ GraphText.prototype = {
 Definition of Caption Object.
 ***********************************************************************/
 function Caption(s) {
-  var text = document.createElement('span');
+  const text = document.createElement('span');
 
   text.style.position = 'absolute';
   text.style.whiteSpace = 'nowrap';
@@ -579,16 +573,16 @@ function JSGraph() {
 JSGraph.prototype = {
   init: function(id) {
     var w, h;
-    var parent_frame = document.createElement('div');
-    var legend    = document.createElement('table');
-    var scale_x   = document.createElement('div');
-    var scale_y   = document.createElement('div');
-    var scale_div = document.createElement('div');
-    var graph     = document.getElementById(id);
-    var frame     = this.create_canvas();
+    const parent_frame = document.createElement('div');
+    const legend    = document.createElement('table');
+    const scale_x   = document.createElement('div');
+    const scale_y   = document.createElement('div');
+    const scale_div = document.createElement('div');
+    const graph     = document.getElementById(id);
+    const frame     = this.create_canvas();
     var offset_x, offset_y;
     var margin_x, margin_y
-    var position_cookie = `${id}_position`;
+    const position_cookie = `${id}_position`;
 
     this.SCALE_TYPE_LINEAR = 0;
     this.SCALE_TYPE_LOG    = 1;
@@ -789,8 +783,8 @@ JSGraph.prototype = {
   },
 
   add_legend: function (str, color) {
-    var table = this.legend;
-    var row = table.rows.length;
+    const table = this.legend;
+    const row = table.rows.length;
 
     if (str == null) {
       return;
@@ -983,9 +977,7 @@ JSGraph.prototype = {
     }
 
     if (this.frame) {
-      var canvas;
-
-      canvas = this.canvas;
+      const canvas = this.canvas;
       canvas.save();
 
       canvas.fillStyle = color;
@@ -998,9 +990,7 @@ JSGraph.prototype = {
   },
 
   line: function (x1, y1, x2, y2, color) {
-    var canvas;
-
-    canvas = this.canvas;
+    const canvas = this.canvas;
 
     canvas.save();
 
@@ -1031,8 +1021,8 @@ JSGraph.prototype = {
   },
 
   draw_gauge2_x: function (x) {
-    var frame = this.frame;
-    var len = frame.gauge.length * 2;
+    const frame = this.frame;
+    const len = frame.gauge.length * 2;
     var y;
 
     this.create_gauge_x(x, 0, len);
@@ -1041,8 +1031,8 @@ JSGraph.prototype = {
   },
 
   draw_gauge2_y: function (y) {
-    var frame = this.frame;
-    var len = frame.gauge.length * 2;
+    const frame = this.frame;
+    const len = frame.gauge.length * 2;
     var x;
 
     this.create_gauge_y(0, y, len);
@@ -1051,8 +1041,8 @@ JSGraph.prototype = {
   },
 
   draw_gauge3_x: function (x) {
-    var frame = this.frame;
-    var len = frame.gauge.length;
+    const frame = this.frame;
+    const len = frame.gauge.length;
     var y;
 
     this.create_gauge_x(x, 0, len);
@@ -1061,8 +1051,8 @@ JSGraph.prototype = {
   },
 
   draw_gauge3_y: function (y) {
-    var frame = this.frame;
-    var len = frame.gauge.length;
+    const frame = this.frame;
+    const len = frame.gauge.length;
     var x;
 
     this.create_gauge_y(0, y, len);
@@ -1073,8 +1063,8 @@ JSGraph.prototype = {
   gauge_x: function () {
     var inc, d, j, start, l, len, n, m, diff;
     var str, text;
-    var frame = this.frame;
-    var width  = parseInt(frame.style.width, 10);
+    const frame = this.frame;
+    const width = parseInt(frame.style.width, 10);
 
     if (this.min_x == this.max_x) {
       this.min_x -= 1;
@@ -1149,8 +1139,8 @@ JSGraph.prototype = {
 
   gauge_date_x: function () {
     var d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
-    var frame = this.frame;
-    var min_date = new Date(), date = new Date(), max_date = new Date();
+    const frame = this.frame;
+    const min_date = new Date(), date = new Date(), max_date = new Date();
 
     if (this.min_x == this.max_x) {
       this.min_x -= 1;
@@ -1447,11 +1437,9 @@ JSGraph.prototype = {
   },
 
   get_x: function (x) {
-    var w, min, max;
-
-    w = this.frame.width;
-    min = this.min_x;
-    max = this.max_x;
+    const w = this.frame.width;
+    const min = this.min_x;
+    const max = this.max_x;
 
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       if (max <= 0 || min <= 0 || x <= 0) {
@@ -1489,7 +1477,7 @@ JSGraph.prototype = {
   gauge_y: function () {
     var inc, d, j, start, l, len, n, m, diff, x;
     var str, text;
-    var frame = this.frame;
+    const frame = this.frame;
 
     if (this.min_y == this.max_y) {
       this.min_y -= 1;
@@ -1569,11 +1557,9 @@ JSGraph.prototype = {
   },
 
   get_y: function (y) {
-    var h, min, max;
-
-    h = this.frame.height;
-    min = this.min_y;
-    max = this.max_y;
+    const h = this.frame.height;
+    const min = this.min_y;
+    const max = this.max_y;
 
     if (this.scale_y.type == 0) {
       return h * (1 - (y - min)/(max - min));
@@ -1732,12 +1718,12 @@ JSGraph.prototype = {
   },
 
   update_position: function () {
-    var parent_frame = this.parent_frame;
-    var frame = this.frame;
-    var width  = parseInt(parent_frame.style.width, 10);
-    var height = parseInt(parent_frame.style.height, 10);
-    var left   = parseInt(parent_frame.style.left, 10);
-    var top    = parseInt(parent_frame.style.top, 10);
+    const parent_frame = this.parent_frame;
+    const frame = this.frame;
+    const width  = parseInt(parent_frame.style.width, 10);
+    const height = parseInt(parent_frame.style.height, 10);
+    const left   = parseInt(parent_frame.style.left, 10);
+    const top    = parseInt(parent_frame.style.top, 10);
 
     frame.style.width = parent_frame.style.width;
     frame.style.height = parent_frame.style.height;
@@ -1777,8 +1763,7 @@ JSGraph.prototype = {
 
   move_to_center: function(obj, left, width) {
     if (! obj.moved) {
-      var w;
-      w = obj.get_width();
+      const w = obj.get_width();
       obj.x(left + (width - w) / 2);
     } else {
       obj.x(left + obj.text.offset_x);
@@ -1962,9 +1947,9 @@ JSGraph.prototype = {
   },
 
   load: function() {
-    var self = this, title = this.title.get_text();
-    var recursive_load = function(files, i) {
-      var data = new Data();
+    const self = this, title = this.title.get_text();
+    const recursive_load = function(files, i) {
+      const data = new Data();
       self.title.set_text("Data loading... [" + (i + 1) + "/" + files.length + "]");
       self.add_data(data);
       data.set_color(self.Colors[i % self.Colors.length]);
