@@ -26,7 +26,10 @@
 で JSGraph オブジェクトを生成。
 
 	graph.load(file1, file2, ....)
-でサーバにあるデータファイル file1, file2, ... を読み込んでグラフを表示します。<body onload="graph.load(file1, file2)">の様に html ファイルの読み込みが完了してから実行するようにしてください。
+でサーバにあるデータファイル file1, file2, ... を読み込んでグラフを表示します。
+
+    <body onload="graph.load(file1, file2)">
+の様に html ファイルの読み込みが完了してから実行するようにしてください。
 
 ### 詳細な使い方
 
