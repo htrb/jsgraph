@@ -214,9 +214,8 @@ function move (node, x, y) {
 }
 
 function mouse_resize_move_dom () {
-  var e, x, y, is_frame = false;
-
-  e = arguments[0];
+  var x, y, is_frame = false;
+  const e = arguments[0];
 
   if (Is_mouse_down) {
     resize_move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
@@ -349,12 +348,11 @@ function mouse_up_scale_dom () {
     return false;
   }
   if (Is_mouse_down_scale) {
-    var x, y, w, h;
     if (Is_mouse_move_scale) {
-      x = parseInt(scale.style.left, 10);
-      y = parseInt(scale.style.top, 10);
-      w = parseInt(scale.style.width, 10);
-      h = parseInt(scale.style.height, 10);
+      const x = parseInt(scale.style.left, 10);
+      const y = parseInt(scale.style.top, 10);
+      const w = parseInt(scale.style.width, 10);
+      const h = parseInt(scale.style.height, 10);
       if (w > Scale_region_size_min && h > Scale_region_size_min) {
 	scale.graph.set_scale(scale.graph.get_data_x(x),
 			      scale.graph.get_data_y(y),
@@ -362,8 +360,8 @@ function mouse_up_scale_dom () {
 			      scale.graph.get_data_y(y + h));
       }
     } else {
-      x = scale.graph.get_data_x(Mouse_x);
-      y = scale.graph.get_data_y(Mouse_y);
+      const x = scale.graph.get_data_x(Mouse_x);
+      const y = scale.graph.get_data_y(Mouse_y);
       scale.graph.centering(x, y);
     }
   }
@@ -863,9 +861,9 @@ JSGraph.prototype = {
   },
 
   draw_each_data_l: function (data) {
-    var i, n, d, di, canvas;
+    var i, n, d, di;
+    const canvas = this.canvas;
 
-    canvas = this.canvas;
     canvas.save();
 
     canvas.strokeStyle = data.color;
@@ -886,12 +884,11 @@ JSGraph.prototype = {
   },
 
   draw_each_data_c: function (data) {
-    var i, x, y, n, s, c, d, di;
-
-    n = data.length();
-    s = data.size / 2.0;
-    c = data.color;
-    d = data.data;
+    var i, x, y, di;
+    const n = data.length();
+    const s = data.size / 2.0;
+    const c = data.color;
+    const d = data.data;
 
     for (i = 0; i < n; i++) {
       di = d[i];
@@ -903,13 +900,12 @@ JSGraph.prototype = {
   },
 
   draw_each_data_r: function (data) {
-    var i, x, y, n, s1, s2, c, d, di;
-
-    n = data.length();
-    s1 = data.size;
-    s2 = s1 / 2.0;
-    c = data.color;
-    d = data.data;
+    var i, x, y, di;
+    const n = data.length();
+    const s1 = data.size;
+    const s2 = s1 / 2.0;
+    const c = data.color;
+    const d = data.data;
 
     for (i = 0; i < n; i++) {
       di = d[i];
@@ -962,9 +958,7 @@ JSGraph.prototype = {
     }
 
     if (this.frame) {
-      var canvas;
-
-      canvas = this.canvas;
+      const canvas = this.canvas;
       canvas.fillStyle = color;
       canvas.fillRect (x, y, width, height);
     }
@@ -1168,10 +1162,8 @@ JSGraph.prototype = {
 
     span = (this.max_x - this.min_x) / date_conv;
     if (span > 4000) {
-      var min, max;
-
-      min = this.min_x;
-      max = this.max_x;
+      const min = this.min_x;
+      const max = this.max_x;
 
       switch (this.scale_x.type) {
       case this.SCALE_TYPE_UNIX:
@@ -1302,8 +1294,8 @@ JSGraph.prototype = {
 	}
 	break;
       case "hour":
-	var h, x;
-	h = date.getUTCHours();
+	var x;
+	const h = date.getUTCHours();
 	for (i = 0; i < inc; i++, h++) {
 	  if (inc == 1 || h % 2 == 0) {
 	    this.draw_gauge1_x(n);
@@ -1464,10 +1456,8 @@ JSGraph.prototype = {
 
   caption_y_auto_set_position: function (x) {
     if (! this.caption_y.moved) {
-      var x0, x1;
-
-      x0 = this.caption_y.get_x() + this.caption_y.get_width();
-      x1 = this.scale_y.offsetLeft + x;
+      const x0 = this.caption_y.get_x() + this.caption_y.get_width();
+      const x1 = this.scale_y.offsetLeft + x;
       if (x1 < x0) {
 	this.caption_y.x(this.caption_y.get_x() - (x0 - x1) - 10);
       }
@@ -1851,24 +1841,22 @@ JSGraph.prototype = {
   },
 
   zoom_out_x: function () {
-    var w;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x /= this.zoom_ratio;
       this.max_x *= this.zoom_ratio;
     } else {
-      w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
+      const w = (this.max_x - this.min_x) * (this.zoom_ratio - 1) / 2;
       this.min_x -= w;
       this.max_x += w;
     }
   },
 
   zoom_out_y: function () {
-    var h;
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y /= this.zoom_ratio;
       this.max_y *= this.zoom_ratio;
     } else {
-      h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
+      const h = (this.max_y - this.min_y) * (this.zoom_ratio - 1) / 2;
       this.min_y -= h;
       this.max_y += h;
     }
@@ -1880,24 +1868,22 @@ JSGraph.prototype = {
   },
 
   zoom_in_x: function () {
-    var w;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x *= this.zoom_ratio;
       this.max_x /= this.zoom_ratio;
     } else {
-      w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
+      const w = (this.max_x - this.min_x) * (1 - 1 / this.zoom_ratio) / 2;
       this.min_x += w;
       this.max_x -= w;
     }
   },
 
   zoom_in_y: function () {
-    var h;
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y *= this.zoom_ratio;
       this.max_y /= this.zoom_ratio;
     } else {
-      h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
+      const h = (this.max_y - this.min_y) * (1 - 1 / this.zoom_ratio) / 2;
       this.min_y += h;
       this.max_y -= h;
     }
@@ -2079,9 +2065,8 @@ Data.prototype = {
       }
 
       if (xy_data.length > 1) {
-	var fx, fy;
-	fx = parseFloat(xy_data[x]);
-	fy = parseFloat(xy_data[y]);
+	const fx = parseFloat(xy_data[x]);
+	const fy = parseFloat(xy_data[y]);
 	if (! Number.isNaN(fx) && ! Number.isNaN(fy)) {
 	  this.add_data(fx, fy);
 	}
@@ -2113,7 +2098,7 @@ Data.prototype = {
   },
 
   wait: function(cb) {
-    var data = this;
+    const data = this;
     wait_until_data_loaded = function () {
       if (data.loaded) {
 	cb();
