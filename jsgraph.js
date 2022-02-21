@@ -1995,7 +1995,7 @@ Data.prototype = {
   },
 
   read_data: function () {
-    var i, n, m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    var m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
     var data, xy_data;
 
     switch (arguments.length) {
@@ -2009,13 +2009,12 @@ Data.prototype = {
       break;
     }
     data = arguments[0].split(rs);
-    n = data.length;
 
     x = col_x;
     y = col_y;
 
-    for (i = 0; i < n; i++) {
-      xy_data = data[i].split(fs);
+    data.forEach (di => {
+      xy_data = di.split(fs);
       m = xy_data.length;
 
       if (col_x < 0) {
@@ -2033,7 +2032,7 @@ Data.prototype = {
 	  this.add_data(fx, fy);
 	}
       }
-    }
+    });
   },
 
   load: function (path) {
