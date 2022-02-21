@@ -887,33 +887,29 @@ JSGraph.prototype = {
   },
 
   draw_data: function () {
-    var i, n, x, y;
-    var data = this.data;
-
-    n = data.length;
-    for (i = 0; i < n; i++) {
-      if (data[i].draw && data[i].length() > 0) {
-	switch (data[i].style) {
+    this.data.forEach(element => {
+      if (element.draw && element.length() > 0) {
+	switch (element.style) {
 	case "c":
-	  this.draw_each_data_c(data[i]);
+	  this.draw_each_data_c(element);
 	  break;
 	case "l":
-	  this.draw_each_data_l(data[i]);
+	  this.draw_each_data_l(element);
 	  break;
 	case "lc":
-	  this.draw_each_data_l(data[i]);
-	  this.draw_each_data_c(data[i]);
+	  this.draw_each_data_l(element);
+	  this.draw_each_data_c(element);
 	  break;
 	case "lr":
-	  this.draw_each_data_l(data[i]);
-	  this.draw_each_data_r(data[i]);
+	  this.draw_each_data_l(element);
+	  this.draw_each_data_r(element);
 	  break;
 	default:
-	  this.draw_each_data_r(data[i]);
+	  this.draw_each_data_r(element);
 	}
-	this.add_legend(data[i].caption, data[i].color);
+	this.add_legend(element.caption, element.color);
       }
-    }
+    });
   },
 
   add_data: function (data) {
