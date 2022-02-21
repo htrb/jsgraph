@@ -974,40 +974,36 @@ JSGraph.prototype = {
   draw_gauge2_x: function (x) {
     const frame = this.frame;
     const len = frame.gauge.length * 2;
-    var y;
 
     this.create_gauge_x(x, 0, len);
-    y = parseInt(frame.style.height, 10) - len;
+    const y = parseInt(frame.style.height, 10) - len;
     this.create_gauge_x(x, y, len);
   },
 
   draw_gauge2_y: function (y) {
     const frame = this.frame;
     const len = frame.gauge.length * 2;
-    var x;
 
     this.create_gauge_y(0, y, len);
-    x = parseInt(frame.style.width, 10) - len;
+    const x = parseInt(frame.style.width, 10) - len;
     this.create_gauge_y(x, y, len);
   },
 
   draw_gauge3_x: function (x) {
     const frame = this.frame;
     const len = frame.gauge.length;
-    var y;
 
     this.create_gauge_x(x, 0, len);
-    y = parseInt(frame.style.height, 10) - len;
+    const y = parseInt(frame.style.height, 10) - len;
     this.create_gauge_x(x, y, len);
   },
 
   draw_gauge3_y: function (y) {
     const frame = this.frame;
     const len = frame.gauge.length;
-    var x;
 
     this.create_gauge_y(0, y, len);
-    x = parseInt(frame.style.width, 10) - len;
+    const x = parseInt(frame.style.width, 10) - len;
     this.create_gauge_y(x, y, len);
   },
 
@@ -1976,7 +1972,7 @@ Data.prototype = {
 
   str2data: function (s, sep1, sep2) {
     /* this function is obsolete */
-    var data = s.split(sep1);
+    const data = s.split(sep1);
     var xy_data;
 
     data.forEach(di => {
@@ -2029,11 +2025,9 @@ Data.prototype = {
   },
 
   load: function (path) {
-    var i, self, arg;
-
-    self = this;
+    const self = this;
+    const arg = [].slice.apply(arguments);
     this.loaded = false;
-    arg = [].slice.apply(arguments);
 
     XMLHttp.open('GET', path, true);
     XMLHttp.onreadystatechange = function() {
