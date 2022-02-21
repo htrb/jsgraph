@@ -223,8 +223,7 @@ function mouse_resize_move_dom () {
     Mouse_y = e.clientY;
     if (this.frame) {
       if (this.firstChild) {
-	const n = this.childNodes.length;
-	for (let i = 0; i < n; i++) {
+	while (this.firstChild) {
 	  this.removeChild(this.firstChild);
 	}
       }
