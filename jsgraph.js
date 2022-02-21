@@ -872,19 +872,9 @@ JSGraph.prototype = {
   },
 
   draw_each_data_c: function (data) {
-    var i, x, y, di;
-    const n = data.length();
     const s = data.size / 2.0;
     const c = data.color;
-    const d = data.data;
-
-    for (i = 0; i < n; i++) {
-      di = d[i];
-      x = this.get_x(di[0]);
-      y = this.get_y(di[1]);
-
-      this.fill_circle(x, y, s, c);
-    }
+    data.data.forEach(di => this.fill_circle(this.get_x(di[0]), this.get_y(di[1]), s, c));
   },
 
   draw_each_data_r: function (data) {
