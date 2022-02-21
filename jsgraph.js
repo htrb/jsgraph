@@ -878,22 +878,12 @@ JSGraph.prototype = {
   },
 
   draw_each_data_r: function (data) {
-    var i, x, y, di;
-    const n = data.length();
     const s1 = data.size;
     const s2 = s1 / 2.0;
     const c = data.color;
-    const d = data.data;
-
-    for (i = 0; i < n; i++) {
-      di = d[i];
-      x = this.get_x(di[0]);
-      y = this.get_y(di[1]);
-
-      this.fill_rectangle(x - s2,
-			  y - s2,
-			  s1, s1, c);
-    }
+    data.data.forEach(di => this.fill_rectangle(this.get_x(di[0]) - s2,
+						this.get_y(di[1]) - s2,
+						s1, s1, c));
   },
 
   draw_data: function () {
