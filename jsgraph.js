@@ -22,24 +22,24 @@
 /**********************************************************************
 Global variables.
 ***********************************************************************/
-var Is_mouse_down = false;
-var Is_mouse_down_scale = false;
-var Is_mouse_move_scale = false;
-var Scale_region_size_min = 6;
-var Mouse_x = 0;
-var Mouse_y = 0;
-var Mouse_client_x = 0;
-var Mouse_client_y = 0;
-var Mouse_position = 'C';
-var Edge_width = 30;
-var Font_size = 16; /* px */
-var XMLHttp = null;
+let Is_mouse_down = false;
+let Is_mouse_down_scale = false;
+let Is_mouse_move_scale = false;
+let Scale_region_size_min = 6;
+let Mouse_x = 0;
+let Mouse_y = 0;
+let Mouse_client_x = 0;
+let Mouse_client_y = 0;
+let Mouse_position = 'C';
+let Edge_width = 30;
+let Font_size = 16; /* px */
+let XMLHttp = null;
 
 /**********************************************************************
 Utility functions
 ***********************************************************************/
 const create_http_request = function () {
-  var xmlhttp = false;
+  let xmlhttp = false;
 
   if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
     xmlhttp = new XMLHttpRequest();
@@ -88,7 +88,7 @@ Date.prototype.set_ymd = function (y, m, d) {
 }
 
 Date.prototype.nextMonth = function () {
-  var m = this.getUTCMonth(), y = this.getUTCFullYear();
+  let m = this.getUTCMonth(), y = this.getUTCFullYear();
 
   if (m == 11) {
     y++;
@@ -330,7 +330,7 @@ function mouse_down_scale_dom () {
 }
 
 function mouse_up_scale_dom () {
-  var scale;
+  let scale;
 
   if (this.scale_div) {
     scale = this.scale_div;
@@ -376,7 +376,7 @@ function mouse_move_scale_dom () {
   y = e.layerY;
 
   if (Is_mouse_down_scale) {
-    var w, h, scale;
+    let w, h, scale;
 
     Is_mouse_move_scale = true;
     if (this.scale_div) {
@@ -1010,8 +1010,8 @@ JSGraph.prototype = {
   },
 
   gauge_x: function () {
-    var inc, d, j, start, l, len, n, m, diff;
-    var str, text;
+    let inc, d, j, start, l, len, n, m, diff;
+    let str, text;
     const frame = this.frame;
     const width = parseInt(frame.style.width, 10);
 
@@ -1040,7 +1040,7 @@ JSGraph.prototype = {
 
     m = this.max_x / inc;
     for (j = start; j <= m; j++) {
-      var decpt;
+      let decpt;
 
       str = (j * diff).toFixed(0);
       l = str.length;
@@ -1087,7 +1087,7 @@ JSGraph.prototype = {
   },
 
   gauge_date_x: function () {
-    var d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
+    let d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
     const frame = this.frame;
     const min_date = new Date(), date = new Date(), max_date = new Date();
 
@@ -1249,7 +1249,7 @@ JSGraph.prototype = {
 	}
 	break;
       case "hour":
-	var x;
+	let x;
 	const h = date.getUTCHours();
 	for (i = 0; i < inc; i++, h++) {
 	  if (inc == 1 || h % 2 == 0) {
@@ -1420,8 +1420,8 @@ JSGraph.prototype = {
   },
 
   gauge_y: function () {
-    var inc, d, j, start, l, len, n, m, diff, x;
-    var str, text;
+    let inc, d, j, start, l, len, n, m, diff, x;
+    let str, text;
     const frame = this.frame;
 
     if (this.min_y == this.max_y) {
@@ -1450,7 +1450,7 @@ JSGraph.prototype = {
     m = this.max_y / inc;
     x = this.scale_y.offset;
     for (j = start; j <= m; j++) {
-      var decpt, x0;
+      let decpt, x0;
 
       str = (j * diff).toFixed(0);
       l = str.length;
@@ -1528,7 +1528,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_x: function () {
-    var max, min, i, m, width, height, x, n, inc, str, len, text;
+    let max, min, i, m, width, height, x, n, inc, str, len, text;
 
     if (this.max_x <= 0 || this.min_x <= 0) {
       return;
@@ -1583,7 +1583,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_y: function () {
-    var max, min, i, m, width, height, n, y, inc, x, str, len, text;
+    let max, min, i, m, width, height, n, y, inc, x, str, len, text;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
@@ -1602,7 +1602,7 @@ JSGraph.prototype = {
 
     x = this.scale_y.offset;
     for (i = Math.ceil(min); i < max; i += inc) {
-      var x0;
+      let x0;
 
       y = Math.pow(10, i);
       if (y > this.max_y) {
@@ -1716,7 +1716,7 @@ JSGraph.prototype = {
   },
 
   clear: function () {
-    var node;
+    let node;
 
     node = this.scale_x.childNodes;
     while (node.length > 0) {
@@ -1865,7 +1865,7 @@ JSGraph.prototype = {
   },
 
   centering: function (x, y) {
-    var w, h, minx, maxx, miny, maxy;
+    let w, h, minx, maxx, miny, maxy;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       w = Math.sqrt(this.max_x / this.min_x);
       minx = x / w;
@@ -1985,7 +1985,7 @@ Data.prototype = {
   },
 
   read_data: function () {
-    var m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    let m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
 
     switch (arguments.length) {
     case 5:
