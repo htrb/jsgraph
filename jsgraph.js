@@ -102,7 +102,8 @@ Date.prototype.nextMonth = function () {
 }
 
 Date.prototype.nextDate = function () {
-  var t = this.getTime(), mul = 1;
+  const t = this.getTime();
+  let mul = 1;
 
   if (arguments.length > 0) {
     mul = arguments[0];
@@ -111,7 +112,8 @@ Date.prototype.nextDate = function () {
 }
 
 Date.prototype.nextHour = function () {
-  var t = this.getTime(), mul = 1;
+  const t = this.getTime();
+  let mul = 1;
 
   if (arguments.length > 0) {
     mul = arguments[0];
@@ -1973,10 +1975,9 @@ Data.prototype = {
   str2data: function (s, sep1, sep2) {
     /* this function is obsolete */
     const data = s.split(sep1);
-    var xy_data;
 
     data.forEach(di => {
-      xy_data = di.split(sep2);
+      const xy_data = di.split(sep2);
       if (xy_data.length > 1) {
 	this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
       }
@@ -1985,7 +1986,6 @@ Data.prototype = {
 
   read_data: function () {
     var m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
-    var data, xy_data;
 
     switch (arguments.length) {
     case 5:
@@ -1997,13 +1997,13 @@ Data.prototype = {
       col_x = parseInt(arguments[1], 10) - 1;
       break;
     }
-    data = arguments[0].split(rs);
+    const data = arguments[0].split(rs);
 
     x = col_x;
     y = col_y;
 
     data.forEach (di => {
-      xy_data = di.split(fs);
+      const xy_data = di.split(fs);
       m = xy_data.length;
 
       if (col_x < 0) {
