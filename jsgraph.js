@@ -2031,7 +2031,6 @@ Data.prototype = {
 
     XMLHttp.open('GET', path, true);
     XMLHttp.onreadystatechange = function() {
-      var text, a;
       if (XMLHttp.readyState == 4) {
 	if (XMLHttp.status != 200) {
 	  self.loaded = true;
