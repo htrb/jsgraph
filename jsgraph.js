@@ -2146,4 +2146,7 @@ Data.prototype = {
     this.data.forEach(cb);
   },
 
+  reduce: function (cb, initialValue) {
+    return this.data.reduce(cb, initialValue);
+  },
 };
