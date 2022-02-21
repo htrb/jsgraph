@@ -2136,5 +2136,10 @@ Data.prototype = {
 
   set_mark_size: function (s) {
     this.size = s;
-  }
+  },
+
+  map: function (cb) {
+    return this.data.map(cb);
+  },
+
 };
