@@ -2072,49 +2072,50 @@ Data.prototype = {
   },
 
   autoscale: function () {
-    var minx = Infinity;
-    var maxx = -Infinity;
-    var miny = Infinity;
-    var maxy = -Infinity;
-    var i, n;
+    const minmax = {
+      minx: Infinity,
+      maxx: -Infinity,
+      miny: Infinity,
+      maxy: -Infinity,
+    };
 
     if (this.data.length < 1) {
       this.draw = false;
       return;
     }
 
-    n = this.data.length;
-    for (i = 0; i < n; i++) {
-      if (! isFinite(this.data[i][0]) || ! isFinite(this.data[i][1])) {
-	continue;
+    this.data.reduce((mm, element) => {
+      if (! isFinite(element[0]) || ! isFinite(element[1])) {
+	return mm;
       }
-      if (this.data[i][0] < minx) {
-	minx = this.data[i][0];
+      if (element[0] < mm.minx) {
+	mm.minx = element[0];
       }
-      if (this.data[i][0] > maxx) {
-	maxx = this.data[i][0];
+      if (element[0] > mm.maxx) {
+	mm.maxx = element[0];
       }
 
-      if (this.data[i][1] < miny) {
-	miny = this.data[i][1];
+      if (element[1] < mm.miny) {
+	mm.miny = element[1];
       }
-      if (this.data[i][1] > maxy) {
-	maxy = this.data[i][1];
+      if (element[1] > mm.maxy) {
+	mm.maxy = element[1];
       }
-    }
+      return mm;
+    }, minmax);
 
-    if (! isFinite(minx) || ! isFinite(maxx) || ! isFinite(miny) || ! isFinite(maxy)) {
-      minx = 0;
-      maxx = 0;
-      miny = 0;
-      maxy = 0;
+    if (! isFinite(minmax.minx) || ! isFinite(minmax.maxx) || ! isFinite(minmax.miny) || ! isFinite(minmax.maxy)) {
+      minmax.minx = 0;
+      minmax.maxx = 0;
+      minmax.miny = 0;
+      minmax.maxy = 0;
       this.draw = false;
     }
 
-    this.min_x = minx;
-    this.max_x = maxx;
-    this.min_y = miny;
-    this.max_y = maxy;
+    this.min_x = minmax.minx;
+    this.max_x = minmax.maxx;
+    this.min_y = minmax.miny;
+    this.max_y = minmax.maxy;
   },
 
   set_text: function (s) {
