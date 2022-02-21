@@ -2142,4 +2142,8 @@ Data.prototype = {
     return this.data.map(cb);
   },
 
+  forEach: function (cb) {
+    this.data.forEach(cb);
+  },
+
 };
