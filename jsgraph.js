@@ -1250,7 +1250,7 @@ JSGraph.prototype = {
 	break;
       case "hour":
 	let x;
-	const h = date.getUTCHours();
+	let h = date.getUTCHours();
 	for (i = 0; i < inc; i++, h++) {
 	  if (inc == 1 || h % 2 == 0) {
 	    this.draw_gauge1_x(n);
