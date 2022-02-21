@@ -1983,17 +1983,15 @@ Data.prototype = {
 
   str2data: function (s, sep1, sep2) {
     /* this function is obsolete */
-    var i, n;
     var data = s.split(sep1);
     var xy_data;
 
-    n = data.length;
-    for (i = 0; i < n; i++) {
-      xy_data = data[i].split(sep2);
+    data.forEach(di => {
+      xy_data = di.split(sep2);
       if (xy_data.length > 1) {
 	this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
       }
-    }
+    });
   },
 
   read_data: function () {
