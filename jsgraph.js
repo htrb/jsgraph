@@ -214,7 +214,7 @@ function move (node, x, y) {
 }
 
 function mouse_resize_move_dom () {
-  var x, y, is_frame = false;
+  var x, y;
   const e = arguments[0];
 
   if (Is_mouse_down) {
@@ -236,10 +236,6 @@ function mouse_resize_move_dom () {
   x = e.layerX;
   y = e.layerY;
   if (e.currentTarget == e.target && this.parent_frame) {
-    is_frame = true;
-  }
-
-  if (is_frame) {
     change_curser(this, x, y);
   }
 }
