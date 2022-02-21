@@ -853,7 +853,6 @@ JSGraph.prototype = {
   },
 
   draw_each_data_l: function (data) {
-    var i, n, d, di;
     const canvas = this.canvas;
 
     canvas.save();
@@ -863,14 +862,11 @@ JSGraph.prototype = {
     canvas.lineJoin = "round";
     canvas.beginPath();
 
-    n = data.length();
-    d = data.data;
-
-    canvas.moveTo(this.get_x(d[0][0]), this.get_y(d[0][1]));
-    for (i = 1; i < n; i++) {
-      di = d[i];
-      canvas.lineTo(this.get_x(di[0]), this.get_y(di[1]));
-    }
+    const d = data.data;
+    const d0 = d.shift();
+    canvas.moveTo(this.get_x(d0[0]), this.get_y(d0[1]));
+    data.forEach(di => canvas.lineTo(this.get_x(di[0]), this.get_y(di[1])));
+    d.unshift(d0);
     canvas.stroke();
     canvas.restore();
   },
