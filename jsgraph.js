@@ -38,7 +38,7 @@ var XMLHttp = null;
 /**********************************************************************
 Utility functions
 ***********************************************************************/
-var create_http_request = function () {
+const create_http_request = function () {
   var xmlhttp = false;
 
   if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
