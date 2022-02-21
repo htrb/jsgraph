@@ -417,11 +417,6 @@ function mouse_move_scale_dom () {
     scale.style.visibility = 'visible';
     scale.style.width = w + 'px';
     scale.style.height = h + 'px';
-  } else {
-    if (e.currentTarget == e.target && this.parent_frame) {
-      window.status = "X: " + this.graph.get_data_x(x).toExponential(8) +
-	"  Y: " + this.graph.get_data_y(y).toExponential(8);
-    }
   }
 }
 
