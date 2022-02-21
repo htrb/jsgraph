@@ -786,68 +786,69 @@ JSGraph.prototype = {
   },
 
   autoscale: function () {
-    var i, n;
-    var minx = Infinity;
-    var maxx = -Infinity;
-    var miny = Infinity;
-    var maxy = -Infinity;
-    var data = this.data;
+    const data = this.data;
+    const minmax = {
+      minx: Infinity,
+      maxx: -Infinity,
+      miny: Infinity,
+      maxy: -Infinity,
+    };
 
     if (data.length < 1) {
       return;
     }
 
-    n = data.length;
-    for (i = 0; i < n; i++) {
-      data[i].autoscale();
-
-      if (! data[i].draw) {
-	continue;
+    data.reduce((mm, element) => {
+      if (! element.draw) {
+	return mm;
       }
 
-      if (data[i].min_x < minx) {
-	minx = data[i].min_x;
+      element.autoscale();
+
+      if (element.min_x < mm.minx) {
+	mm.minx = element.min_x;
       }
-      if (data[i].max_x > maxx) {
-	maxx = data[i].max_x
+      if (element.max_x > mm.maxx) {
+	mm.maxx = element.max_x
       }
 
-      if (data[i].min_y < miny) {
-	miny = data[i].min_y;
+      if (element.min_y < mm.miny) {
+	mm.miny = element.min_y;
       }
-      if (data[i].max_y > maxy) {
-	maxy = data[i].max_y
+      if (element.max_y > mm.maxy) {
+	mm.maxy = element.max_y
       }
-    }
+      return mm;
+    }, minmax);
 
-    if (! isFinite(minx) || ! isFinite(maxx) || ! isFinite(miny) || ! isFinite(maxy)) {
-      minx = -1;
-      maxx =  1;
-      miny = -1;
-      maxy =  1;
+    if (! isFinite(minmax.minx) || ! isFinite(minmax.maxx) || ! isFinite(minmax.miny) || ! isFinite(minmax.maxy)) {
+      minmax.minx = -1;
+      minmax.maxx =  1;
+      minmax.miny = -1;
+      minmax.maxy =  1;
     }
 
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
-      this.min_x = minx * 0.9;
-      this.max_x = maxx * 1.1;
+      this.min_x = minmax.minx * 0.9;
+      this.max_x = minmax.maxx * 1.1;
     } else {
-      if (maxx - minx < 1E-15) {
-	minx -= Math.abs(minx) * 0.1;
-	maxx += Math.abs(maxx) * 0.1;
+      if (minmax.maxx - minmax.minx < 1E-15) {
+	minmax.minx -= Math.abs(minmax.minx) * 0.1;
+	minmax.maxx += Math.abs(minmax.maxx) * 0.1;
       }
-      this.min_x = minx - (maxx - minx) * 0.05;
-      this.max_x = maxx + (maxx - minx) * 0.05;
+      this.min_x = minmax.minx - (minmax.maxx - minmax.minx) * 0.05;
+      this.max_x = minmax.maxx + (minmax.maxx - minmax.minx) * 0.05;
     }
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
-      this.min_y = miny * 0.9;
-      this.max_y = maxy * 1.1;
+      this.min_y = minmax.miny * 0.9;
+      this.max_y = minmax.maxy * 1.1;
     } else {
-      if (maxy - miny < 1E-15) {
-	miny -= Math.abs(miny) * 0.1;
-	maxy += Math.abs(maxy) * 0.1;
+      if (minmax.maxy - minmax.miny < 1E-15) {
+	minmax.miny -= Math.abs(minmax.miny) * 0.1;
+	minmax.maxy += Math.abs(minmax.maxy) * 0.1;
       }
-      this.min_y = miny - (maxy - miny) * 0.05;
-      this.max_y = maxy + (maxy - miny) * 0.05;
+      this.min_y = minmax.miny - (minmax.maxy - minmax.miny) * 0.05;
+      this.max_y = minmax.maxy + (minmax.maxy - minmax.miny) * 0.05;
     }
   },
 
