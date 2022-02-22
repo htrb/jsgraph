@@ -777,6 +777,7 @@ JSGraph.prototype = {
     table.insertRow(row);
     table.rows[row].insertCell(0);
     table.rows[row].cells[0].style.color = color;
+    table.rows[row].cells[0].style.whiteSpace = 'nowrap';
     table.rows[row].cells[0].appendChild(document.createTextNode(str));
   },
 
