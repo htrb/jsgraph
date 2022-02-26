@@ -1057,7 +1057,7 @@ JSGraph.prototype = {
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new GraphText('&times;10<sup>' + m + '</sup>');
+      text = new GraphText(`&times;10<sup>${m}</sup>`);
       text.init(this.scale_x, width, this.scale_x.offset + Font_size);
     }
 
@@ -1254,7 +1254,7 @@ JSGraph.prototype = {
 	    this.draw_gauge1_x(n);
 	    if (d > this.min_x) {
 	      if (h == 0) {
-		str = "0<br>" + date.getUTCFullYear() + "/" + (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
+		str = `0<br>${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
 		len = 1;
 	      } else {
 		str = String(h);
@@ -1472,7 +1472,7 @@ JSGraph.prototype = {
     // "1 + 2E-16" exist for underflow
 
     if (m != 0) {
-      text = new GraphText('&times;10<sup>' + m + '</sup>');
+      text = new GraphText(`&times;10<sup>${m}</sup>`);
       text.init(this.scale_y, this.scale_y.offset - 40,  -30);
     }
 
@@ -1552,7 +1552,7 @@ JSGraph.prototype = {
       str = i.toFixed(0);
       n = this.get_x(x);
       len = str.length;
-      text = new GraphText("10<sup>" + str + "</sup>");
+      text = new GraphText(`10<sup>${str}</sup>`);
       text.init(this.scale_x, n, this.scale_x.offset);
       text.x(n - text.get_width() / 2);
       this.draw_gauge1_x(n);
@@ -1610,7 +1610,7 @@ JSGraph.prototype = {
       str = i.toFixed(0);
       n = this.get_y(y);
       len = str.length;
-      text = new GraphText("10<sup>" + str + "</sup>");
+      text = new GraphText(`10<sup>${str}</sup>`);
       text.init(this.scale_y, this.scale_y.offset, n - Font_size);
       x0 = this.scale_y.offset - text.get_width();
       text.x(x0);
@@ -1889,7 +1889,7 @@ JSGraph.prototype = {
     const self = this, title = this.title.get_text();
     const recursive_load = function(files, i) {
       const data = new Data();
-      self.title.set_text("Data loading... [" + (i + 1) + "/" + files.length + "]");
+      self.title.set_text(`Data loading... [${i + 1}/${files.length}]`);
       self.add_data(data);
       data.set_color(self.Colors[i % self.Colors.length]);
       data.set_style(self.Style);
