@@ -795,11 +795,11 @@ JSGraph.prototype = {
     }
 
     data.reduce((mm, element) => {
+      element.autoscale();
+
       if (! element.draw) {
 	return mm;
       }
-
-      element.autoscale();
 
       if (element.min_x < mm.minx) {
 	mm.minx = element.min_x;
