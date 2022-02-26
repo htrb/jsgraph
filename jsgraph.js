@@ -818,10 +818,7 @@ JSGraph.prototype = {
     }, minmax);
 
     if (! isFinite(minmax.minx) || ! isFinite(minmax.maxx) || ! isFinite(minmax.miny) || ! isFinite(minmax.maxy)) {
-      minmax.minx = -1;
-      minmax.maxx =  1;
-      minmax.miny = -1;
-      minmax.maxy =  1;
+      return;
     }
 
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
