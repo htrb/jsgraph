@@ -25,13 +25,13 @@ Global variables.
 let Is_mouse_down = false;
 let Is_mouse_down_scale = false;
 let Is_mouse_move_scale = false;
-let Scale_region_size_min = 6;
+const Scale_region_size_min = 6;
 let Mouse_x = 0;
 let Mouse_y = 0;
 let Mouse_client_x = 0;
 let Mouse_client_y = 0;
 let Mouse_position = 'C';
-let Edge_width = 30;
+const Edge_width = 30;
 let Font_size = 16; /* px */
 let XMLHttp = null;
 
@@ -166,42 +166,42 @@ function resize_move (node, x, y) {
 
   switch (Mouse_position) {
   case 'NW':
-    node.style.left = (left + x) + 'px';
-    node.style.top = (top + y) + 'px';
-    node.style.width = (width - x) + 'px';
-    node.style.height = (height - y) + 'px';
+    node.style.left = `${left + x}px`;
+    node.style.top = `${top + y}px`;
+    node.style.width = `${width - x}px`;
+    node.style.height = `${height - y}px`;
     break;
   case 'NE':
-    node.style.top = (top + y) + 'px';
-    node.style.width = (width + x) + 'px';
-    node.style.height = (height - y) + 'px';
+    node.style.top = `${top + y}px`;
+    node.style.width = `${width + x}px`;
+    node.style.height = `${height - y}px`;
     break;
   case 'SE':
-    node.style.width = (width + x) + 'px';
-    node.style.height = (height + y) + 'px';
+    node.style.width = `${width + x}px`;
+    node.style.height = `${height + y}px`;
     break;
   case 'SW':
-    node.style.left = (left + x) + 'px';
-    node.style.width = (width - x) + 'px';
-    node.style.height = (height + y) + 'px';
+    node.style.left = `${left + x}px`;
+    node.style.width = `${width - x}px`;
+    node.style.height = `${height + y}px`;
     break;
   case 'N':
-    node.style.top = (top + y) + 'px';
-    node.style.height = (height - y) + 'px';
+    node.style.top = `${top + y}px`;
+    node.style.height = `${height - y}px`;
     break;
   case 'E':
-    node.style.width = (width + x) + 'px';
+    node.style.width = `${width + x}px`;
     break;
   case 'S':
-    node.style.height = (height + y) + 'px';
+    node.style.height = `${height + y}px`;
     break;
   case 'W':
-    node.style.left = (left + x) + 'px';
-    node.style.width = (width - x) + 'px';
+    node.style.left = `${left + x}px`;
+    node.style.width = `${width - x}px`;
     break;
   default:
-    node.style.left = (left + x) + 'px';
-    node.style.top = (top + y) + 'px';
+    node.style.left = `${left + x}px`;
+    node.style.top = `${top + y}px`;
   }
 }
 
@@ -209,8 +209,8 @@ function move (node, x, y) {
   const left = parseInt(node.style.left, 10);
   const top  = parseInt(node.style.top, 10);
 
-  node.style.left  = (left + x) + 'px';
-  node.style.top = (top + y) + 'px';
+  node.style.left  = `${left + x}px`;
+  node.style.top = `${top + y}px`;
   node.offset_x += x;
   node.offset_y += y;
 }
@@ -385,8 +385,8 @@ function mouse_move_scale_dom () {
       h = Math.abs(Mouse_y - y);
       x = Math.min(Mouse_x, x);
       y = Math.min(Mouse_y, y);
-      scale.style.left = x + 'px';
-      scale.style.top  = y + 'px';
+      scale.style.left = `${x}px`;
+      scale.style.top  = `${y}px`;
     } else if (this.graph) {
       scale = this;
       w = x;
@@ -395,13 +395,13 @@ function mouse_move_scale_dom () {
 	x = parseInt(scale.style.left, 10) + w;
 	w = parseInt(scale.style.width, 10) - w;
 	x--;
-	scale.style.left = x + 'px';
+	scale.style.left = `${x}px`;
       }
       if (Mouse_client_y > e.clientY) {
 	y = parseInt(scale.style.top, 10) + h;
 	h = parseInt(scale.style.height, 10) - h;
 	y--;
-	scale.style.top = y + 'px';
+	scale.style.top = `${y}px`;
       }
       w++;
       h++;
@@ -409,8 +409,8 @@ function mouse_move_scale_dom () {
       return false;
     }
     scale.style.visibility = 'visible';
-    scale.style.width = w + 'px';
-    scale.style.height = h + 'px';
+    scale.style.width = `${w}px`;
+    scale.style.height = `${h}px`;
   }
 }
 
@@ -425,7 +425,7 @@ function GraphText() {
   const text = document.createElement('span');
 
   text.style.position = 'absolute';
-  text.style.fontSize = Font_size + 'px';
+  text.style.fontSize = `${Font_size}px`;
   text.style.whiteSpace = 'nowrap';
   if (arguments.length > 0) {
     text.innerHTML = arguments[0];
@@ -434,14 +434,14 @@ function GraphText() {
 }
 
 GraphText.prototype = {
-  init: function (node, x, y) {
-    this.text.style.left = x + 'px';
-    this.text.style.top = y + 'px';
+  init (node, x, y) {
+    this.text.style.left = `${x}px`;
+    this.text.style.top = `${y}px`;
 
     node.appendChild(this.text);
   },
 
-  set_text: function (s) {
+  set_text (s) {
     if (s == null) {
       this.text.style.visibility = 'hidden';
     } else {
@@ -450,7 +450,7 @@ GraphText.prototype = {
     }
   },
 
-  get_text: function () {
+  get_text () {
     if (this.text.style.visibility == 'hidden') {
       return null;
     } else {
@@ -458,39 +458,39 @@ GraphText.prototype = {
     }
   },
 
-  size: function (size) {
-    this.text.style.fontSize = size + 'px';
+  size (size) {
+    this.text.style.fontSize = `${size}px`;
   },
 
-  x: function (x) {
-    this.text.style.left = x + 'px';
+  x (x) {
+    this.text.style.left = `${x}px`;
   },
 
-  y: function (y) {
-    this.text.style.top = y + 'px';
+  y (y) {
+    this.text.style.top = `${y}px`;
   },
 
-  offset_x: function (x) {
+  offset_x (x) {
     this.text.offset_x = x;
   },
 
-  offset_y: function (y) {
+  offset_y (y) {
     this.text.offset_y = y;
   },
 
-  get_width: function () {
+  get_width () {
     return this.text.clientWidth;
   },
 
-  get_height: function () {
+  get_height () {
     return this.text.clientHeight;
   },
 
-  get_x: function (x) {
+  get_x (x) {
     return this.text.offsetLeft;
   },
 
-  get_y: function (y) {
+  get_y (y) {
     return this.text.offsetTop;
   }
 };
@@ -503,7 +503,7 @@ function Caption(s) {
 
   text.style.position = 'absolute';
   text.style.whiteSpace = 'nowrap';
-  text.style.fontSize = Font_size + 'px';
+  text.style.fontSize = `${Font_size}px`;
   text.appendChild(document.createTextNode(s));
 
   text.addEventListener("mousemove", mouse_move_dom, true);
@@ -558,7 +558,7 @@ function JSGraph() {
 }
 
 JSGraph.prototype = {
-  init: function(id) {
+  init(id) {
     const parent_frame = document.createElement('div');
     const legend    = document.createElement('table');
     const scale_x   = document.createElement('div');
@@ -595,10 +595,10 @@ JSGraph.prototype = {
     parent_frame.style.position = 'absolute';
     parent_frame.style.overflow = 'hidden';
     parent_frame.style.backgroundColor = '#c0c0c0';
-    parent_frame.style.top = offset_y + 'px';
-    parent_frame.style.left = offset_x + 'px';
-    parent_frame.style.width = w + 'px';
-    parent_frame.style.height = h + 'px';
+    parent_frame.style.top = `${offset_y}px`;
+    parent_frame.style.left = `${offset_x}px`;
+    parent_frame.style.width = `${w}px`;
+    parent_frame.style.height = `${h}px`;
     parent_frame.style.borderColor = '#000000';
     parent_frame.style.borderWidth = '3px';
     parent_frame.style.borderStyle = 'ridge';
@@ -612,8 +612,8 @@ JSGraph.prototype = {
     frame.style.backgroundColor = '#c0c0c0';
     frame.style.top = '0px';
     frame.style.left = '0px';
-    frame.style.width = w + 'px';
-    frame.style.height = h + 'px';
+    frame.style.width = `${w}px`;
+    frame.style.height = `${h}px`;
     frame.width = w;
     frame.height = h;
     frame.style.borderColor = '#FF0000';
@@ -713,24 +713,24 @@ JSGraph.prototype = {
     this.update_position();
   },
 
-  event_key_down: function(e) {
+  event_key_down(e) {
     if (event.keyCode == 17) {
       this.resize_mode();
     }
   },
 
-  event_key_up: function(e) {
+  event_key_up(e) {
     if (event.keyCode == 17) {
       mouse_up_dom.call(this.parent_frame);
       this.scale_mode();
     }
   },
 
-  create_canvas: function() {
+  create_canvas() {
     return document.createElement('canvas');
   },
 
-  resize_mode: function () {
+  resize_mode () {
     this.frame.style.cursor='move';
     this.parent_frame.addEventListener("mousemove", mouse_resize_move_dom, true);
     this.parent_frame.addEventListener("mousedown", mouse_down_dom, true);
@@ -743,7 +743,7 @@ JSGraph.prototype = {
     this.frame.removeEventListener("mousemove", mouse_move_scale_dom, true);
   },
 
-  scale_mode: function () {
+  scale_mode () {
     this.frame.style.cursor='default';
     this.parent_frame.removeEventListener("mousemove", mouse_resize_move_dom, true);
     this.parent_frame.removeEventListener("mousedown", mouse_down_dom, true);
@@ -756,17 +756,17 @@ JSGraph.prototype = {
     this.frame.addEventListener("mousemove", mouse_move_scale_dom, true);
   },
 
-  set_color: function (color) {
+  set_color (color) {
     this.legend.style.backgroundColor = color;
     this.frame.style.backgroundColor = color;
   },
 
-  set_border_color: function (color) {
+  set_border_color (color) {
     this.legend.style.borderColor = color;
     this.frame.style.borderColor = color;
   },
 
-  add_legend: function (str, color) {
+  add_legend (str, color) {
     const table = this.legend;
     const row = table.rows.length;
 
@@ -781,7 +781,7 @@ JSGraph.prototype = {
     table.rows[row].cells[0].appendChild(document.createTextNode(str));
   },
 
-  autoscale: function () {
+  autoscale () {
     const data = this.data;
     const minmax = {
       minx: Infinity,
@@ -845,7 +845,7 @@ JSGraph.prototype = {
     }
   },
 
-  draw_each_data_l: function (data) {
+  draw_each_data_l (data) {
     const canvas = this.canvas;
 
     canvas.save();
@@ -864,13 +864,13 @@ JSGraph.prototype = {
     canvas.restore();
   },
 
-  draw_each_data_c: function (data) {
+  draw_each_data_c (data) {
     const s = data.size / 2.0;
     const c = data.color;
     data.data.forEach(di => this.fill_circle(this.get_x(di[0]), this.get_y(di[1]), s, c));
   },
 
-  draw_each_data_r: function (data) {
+  draw_each_data_r (data) {
     const s1 = data.size;
     const s2 = s1 / 2.0;
     const c = data.color;
@@ -879,7 +879,7 @@ JSGraph.prototype = {
 						s1, s1, c));
   },
 
-  draw_data: function () {
+  draw_data () {
     this.data.forEach(element => {
       if (element.draw && element.length() > 0) {
 	switch (element.style) {
@@ -905,11 +905,11 @@ JSGraph.prototype = {
     });
   },
 
-  add_data: function (data) {
+  add_data (data) {
     this.data.push(data);
   },
 
-  fill_rectangle: function (x, y, width, height, color) {
+  fill_rectangle (x, y, width, height, color) {
     if (!isFinite(x) || !isFinite(y)) {
       return;
     }
@@ -922,7 +922,7 @@ JSGraph.prototype = {
   },
 
 
-  fill_circle: function (x, y, r, color) {
+  fill_circle (x, y, r, color) {
     if (!isFinite(x) || !isFinite(y)) {
       return;
     }
@@ -940,7 +940,7 @@ JSGraph.prototype = {
     }
   },
 
-  line: function (x1, y1, x2, y2, color) {
+  line (x1, y1, x2, y2, color) {
     const canvas = this.canvas;
 
     canvas.save();
@@ -955,23 +955,23 @@ JSGraph.prototype = {
     canvas.restore();
   },
 
-  create_gauge_x: function (x, y, len) {
+  create_gauge_x (x, y, len) {
     this.line(x, y, x, y + len, '#000000');
   },
 
-  create_gauge_y: function (x, y, len) {
+  create_gauge_y (x, y, len) {
     this.line(x, y, x + len, y, '#000000');
   },
 
-  draw_gauge1_x: function (x) {
+  draw_gauge1_x (x) {
     this.create_gauge_x(x, 0, this.frame.height);
   },
 
-  draw_gauge1_y: function (y) {
+  draw_gauge1_y (y) {
     this.create_gauge_y(0, y, this.frame.width);
   },
 
-  draw_gauge2_x: function (x) {
+  draw_gauge2_x (x) {
     const frame = this.frame;
     const len = frame.gauge.length * 2;
 
@@ -980,7 +980,7 @@ JSGraph.prototype = {
     this.create_gauge_x(x, y, len);
   },
 
-  draw_gauge2_y: function (y) {
+  draw_gauge2_y (y) {
     const frame = this.frame;
     const len = frame.gauge.length * 2;
 
@@ -989,7 +989,7 @@ JSGraph.prototype = {
     this.create_gauge_y(x, y, len);
   },
 
-  draw_gauge3_x: function (x) {
+  draw_gauge3_x (x) {
     const frame = this.frame;
     const len = frame.gauge.length;
 
@@ -998,7 +998,7 @@ JSGraph.prototype = {
     this.create_gauge_x(x, y, len);
   },
 
-  draw_gauge3_y: function (y) {
+  draw_gauge3_y (y) {
     const frame = this.frame;
     const len = frame.gauge.length;
 
@@ -1007,7 +1007,7 @@ JSGraph.prototype = {
     this.create_gauge_y(x, y, len);
   },
 
-  gauge_x: function () {
+  gauge_x () {
     let inc, d, j, start, l, len, n, m, diff;
     let str, text;
     const frame = this.frame;
@@ -1045,7 +1045,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = str.substring(0, decpt) + "." + str.substring(decpt, l);
+	str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
       }
       n = this.get_x(j * inc);
       text = new GraphText(String(str));
@@ -1084,7 +1084,7 @@ JSGraph.prototype = {
     }
   },
 
-  gauge_date_x: function () {
+  gauge_date_x () {
     let d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
     const frame = this.frame;
     const min_date = new Date(), date = new Date(), max_date = new Date();
@@ -1198,7 +1198,7 @@ JSGraph.prototype = {
 	  }
 	  this.draw_gauge1_x(n);
 	  if (date.getUTCMonth() == 0) {
-	    str = (date.getUTCFullYear()) + "/1";
+	    str = `${date.getUTCFullYear()}/1`;
 	    len = 6;
 	  } else {
 	    str = String(date.getUTCMonth() + 1);
@@ -1214,10 +1214,10 @@ JSGraph.prototype = {
 	break;
       case "day":
 	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
-	  str = "1/1<br>" + (date.getUTCFullYear());
+	  str = `1/1<br>${date.getUTCFullYear()}`;
 	  len = 3;
 	} else if (date.getUTCDate() == 1) {
-	  str = (date.getUTCMonth() + 1) + "/" + date.getUTCDate();
+	  str = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
 	  len = str.length;
 	} else {
 	  str = String(date.getUTCDate());
@@ -1358,30 +1358,30 @@ JSGraph.prototype = {
 	text = new GraphText(String(min_date.getUTCFullYear()));
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else if (min_date.getUTCDate() != max_date.getUTCDate()) {
-	text = new GraphText(min_date.getUTCFullYear() + "/" + (min_date.getUTCMonth() + 1));
+	text = new GraphText(`${min_date.getUTCFullYear()}/${min_date.getUTCMonth() + 1}`);
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else {
-	text = new GraphText(min_date.getUTCFullYear()
-			     + "/"
-			     + (min_date.getUTCMonth() + 1)
-			     + "/"
-			     + min_date.getUTCDate());
+	text = new GraphText(`${min_date.getUTCFullYear()
+			      }/${
+			      min_date.getUTCMonth() + 1
+			      }/${
+			      min_date.getUTCDate()}`);
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
     case "hour":
       if (min_date.getUTCDate() == max_date.getUTCDate()) {
-	text = new GraphText(min_date.getUTCFullYear()
-			     + "/"
-			     + (min_date.getUTCMonth() + 1)
-			     + "/"
-			     + (min_date.getUTCDate()));
+	text = new GraphText(`${min_date.getUTCFullYear()
+			      }/${
+			      min_date.getUTCMonth() + 1
+			      }/${
+			      min_date.getUTCDate()}`);
 	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
     }
   },
 
-  get_x: function (x) {
+  get_x (x) {
     const w = this.frame.width;
     const min = this.min_x;
     const max = this.max_x;
@@ -1397,7 +1397,7 @@ JSGraph.prototype = {
     }
   },
 
-  get_data_x: function (x) {
+  get_data_x (x) {
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       return Math.pow(10,
 		      x / this.frame.width * (Math.log10(this.max_x) - Math.log10(this.min_x))
@@ -1407,7 +1407,7 @@ JSGraph.prototype = {
     }
   },
 
-  caption_y_auto_set_position: function (x) {
+  caption_y_auto_set_position (x) {
     if (! this.caption_y.moved) {
       const x0 = this.caption_y.get_x() + this.caption_y.get_width();
       const x1 = this.scale_y.offsetLeft + x;
@@ -1417,7 +1417,7 @@ JSGraph.prototype = {
     }
   },
 
-  gauge_y: function () {
+  gauge_y () {
     let inc, d, j, start, l, len, n, m, diff, x;
     let str, text;
     const frame = this.frame;
@@ -1455,7 +1455,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = str.substring(0, decpt) + "." + str.substring(decpt, l);
+	str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
       }
       n = this.get_y(j * inc);
       text = new GraphText(String(str));
@@ -1499,7 +1499,7 @@ JSGraph.prototype = {
     }
   },
 
-  get_y: function (y) {
+  get_y (y) {
     const h = this.frame.height;
     const min = this.min_y;
     const max = this.max_y;
@@ -1515,7 +1515,7 @@ JSGraph.prototype = {
     }
   },
 
-  get_data_y: function (y) {
+  get_data_y (y) {
     if (this.scale_y.type == 0) {
       return this.min_y + (this.max_y - this.min_y)* (1 - y / this.frame.height);
     } else {
@@ -1525,7 +1525,7 @@ JSGraph.prototype = {
     }
   },
 
-  gauge_log_x: function () {
+  gauge_log_x () {
     let max, min, i, m, width, height, x, n, inc, str, len, text;
 
     if (this.max_x <= 0 || this.min_x <= 0) {
@@ -1580,7 +1580,7 @@ JSGraph.prototype = {
     }
   },
 
-  gauge_log_y: function () {
+  gauge_log_y () {
     let max, min, i, m, width, height, n, y, inc, x, str, len, text;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
@@ -1643,24 +1643,24 @@ JSGraph.prototype = {
     return;
   },
 
-  restore_position: function() {
+  restore_position() {
     let pos, str;
     str = document.cookie.split(';').find(row => row.trim().startsWith(this.position_cookie));
     if (str === undefined) {
       return;
     }
     pos = str.split(/[=:]/);
-    this.parent_frame.style.left = pos[1] + 'px';
-    this.parent_frame.style.top = pos[2] + 'px';
-    this.parent_frame.style.width = pos[3] + 'px';
-    this.parent_frame.style.height = pos[4] + 'px';
+    this.parent_frame.style.left = `${pos[1]}px`;
+    this.parent_frame.style.top = `${pos[2]}px`;
+    this.parent_frame.style.width = `${pos[3]}px`;
+    this.parent_frame.style.height = `${pos[4]}px`;
   },
 
-  save_position: function(l, t, w, h) {
+  save_position(l, t, w, h) {
     document.cookie = `${this.position_cookie}=${l}:${t}:${w}:${h};max-age=31536000;SameSite=Strict;`;
   },
 
-  update_position: function () {
+  update_position () {
     const parent_frame = this.parent_frame;
     const frame = this.frame;
     const width  = parseInt(parent_frame.style.width, 10);
@@ -1683,28 +1683,28 @@ JSGraph.prototype = {
     this.move_to_center(this.caption_x, left, width);
     this.caption_x.y(top + height + this.caption_x.text.offset_y);
 
-    this.scale_x.style.left = left + 'px';
-    this.scale_x.style.top  = (top + height + this.scale_x.offset) + 'px';
+    this.scale_x.style.left = `${left}px`;
+    this.scale_x.style.top  = `${top + height + this.scale_x.offset}px`;
 
-    this.scale_y.style.left = (left + this.scale_y.offset) + 'px';
-    this.scale_y.style.top  = top + 'px';
+    this.scale_y.style.left = `${left + this.scale_y.offset}px`;
+    this.scale_y.style.top  = `${top}px`;
 
-    this.legend.style.left = (left + width + this.legend.offset_x) + 'px';
-    this.legend.style.top = (top + this.legend.offset_y) + 'px';
+    this.legend.style.left = `${left + width + this.legend.offset_x}px`;
+    this.legend.style.top = `${top + this.legend.offset_y}px`;
 
-    this.graph.style.width = (width + this.offset_x + this.margin_x) + 'px';
-    this.graph.style.height = (height + this.offset_y + this.margin_y) + 'px';
+    this.graph.style.width = `${width + this.offset_x + this.margin_x}px`;
+    this.graph.style.height = `${height + this.offset_y + this.margin_y}px`;
 
     this.save_position(left, top, width, height);
   },
 
-  set_size: function (w, h) {
-    this.parent_frame.style.width = w + "px";
-    this.parent_frame.style.height = h + "px";
+  set_size (w, h) {
+    this.parent_frame.style.width = `${w}px`;
+    this.parent_frame.style.height = `${h}px`;
     this.update_position();
   },
 
-  move_to_center: function(obj, left, width) {
+  move_to_center(obj, left, width) {
     if (! obj.moved) {
       const w = obj.get_width();
       obj.x(left + (width - w) / 2);
@@ -1713,7 +1713,7 @@ JSGraph.prototype = {
     }
   },
 
-  clear: function () {
+  clear () {
     let node;
 
     node = this.scale_x.childNodes;
@@ -1734,7 +1734,7 @@ JSGraph.prototype = {
     this.canvas.clearRect(0, 0, this.frame.width, this.frame.height);
   },
 
-  draw: function () {
+  draw () {
     document.body.style.cursor='wait';
     this.clear();
     this.update_position();
@@ -1762,11 +1762,11 @@ JSGraph.prototype = {
     }
   },
 
-  set_draw_event_listner: function (func) {
+  set_draw_event_listner (func) {
     this.draw_event_listner = func;
   },
 
-  scale_x_type: function (type) {
+  scale_x_type (type) {
     switch (type) {
     case "linear":
       this.scale_x.type = this.SCALE_TYPE_LINEAR;
@@ -1785,7 +1785,7 @@ JSGraph.prototype = {
     }
   },
 
-  scale_y_type: function (type) {
+  scale_y_type (type) {
     if (type == "log") {
       this.scale_y.type = this.SCALE_TYPE_LOG;
     } else {
@@ -1793,7 +1793,7 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_out_x: function () {
+  zoom_out_x () {
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x /= this.zoom_ratio;
       this.max_x *= this.zoom_ratio;
@@ -1804,7 +1804,7 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_out_y: function () {
+  zoom_out_y () {
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y /= this.zoom_ratio;
       this.max_y *= this.zoom_ratio;
@@ -1815,12 +1815,12 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_out: function () {
+  zoom_out () {
     this.zoom_out_x();
     this.zoom_out_y();
   },
 
-  zoom_in_x: function () {
+  zoom_in_x () {
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       this.min_x *= this.zoom_ratio;
       this.max_x /= this.zoom_ratio;
@@ -1831,7 +1831,7 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_in_y: function () {
+  zoom_in_y () {
     if (this.scale_y.type == this.SCALE_TYPE_LOG) {
       this.min_y *= this.zoom_ratio;
       this.max_y /= this.zoom_ratio;
@@ -1842,12 +1842,12 @@ JSGraph.prototype = {
     }
   },
 
-  zoom_in: function () {
+  zoom_in () {
     this.zoom_in_x();
     this.zoom_in_y();
   },
 
-  set_scale: function (minx, miny, maxx, maxy) {
+  set_scale (minx, miny, maxx, maxy) {
     if (minx) {
       this.min_x = minx;
     }
@@ -1862,7 +1862,7 @@ JSGraph.prototype = {
     }
   },
 
-  centering: function (x, y) {
+  centering (x, y) {
     let w, h, minx, maxx, miny, maxy;
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       w = Math.sqrt(this.max_x / this.min_x);
@@ -1885,7 +1885,7 @@ JSGraph.prototype = {
     this.set_scale(minx, miny, maxx, maxy);
   },
 
-  load: function() {
+  load() {
     const self = this, title = this.title.get_text();
     const recursive_load = function(files, i) {
       const data = new Data();
@@ -1895,7 +1895,7 @@ JSGraph.prototype = {
       data.set_style(self.Style);
       data.load(files[i], self.X, self.Y, self.FS, self.RS);
       data.set_text(files[i]);
-      data.wait(function() {
+      data.wait(() => {
 	if (i < files.length - 1) {
 	  recursive_load(files, i + 1);
 	} else {
@@ -1929,11 +1929,11 @@ function Data() {
 }
 
 Data.prototype = {
-  length: function () {
+  length () {
     return this.data.length;
   },
 
-  clear: function () {
+  clear () {
     this.min_x = 0;
     this.max_x = 1;
     this.min_y = 0;
@@ -1941,7 +1941,7 @@ Data.prototype = {
     this.data.length = 0;
   },
 
-  add_data: function (x, y) {
+  add_data (x, y) {
     if (!isFinite(x) || !isFinite(y)) {
       return;
     }
@@ -1970,7 +1970,7 @@ Data.prototype = {
     }
   },
 
-  str2data: function (s, sep1, sep2) {
+  str2data (s, sep1, sep2) {
     /* this function is obsolete */
     const data = s.split(sep1);
 
@@ -1982,7 +1982,7 @@ Data.prototype = {
     });
   },
 
-  read_data: function () {
+  read_data () {
     let m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
 
     switch (arguments.length) {
@@ -2022,7 +2022,7 @@ Data.prototype = {
     });
   },
 
-  load: function (path) {
+  load (path) {
     const self = this;
     const arg = [].slice.apply(arguments);
     this.loaded = false;
@@ -2042,7 +2042,7 @@ Data.prototype = {
     XMLHttp.send(null);
   },
 
-  wait: function(cb) {
+  wait(cb) {
     const data = this;
     wait_until_data_loaded = function () {
       if (data.loaded) {
@@ -2055,7 +2055,7 @@ Data.prototype = {
     wait_until_data_loaded();
   },
 
-  autoscale: function () {
+  autoscale () {
     const minmax = {
       minx: Infinity,
       maxx: -Infinity,
@@ -2102,35 +2102,35 @@ Data.prototype = {
     this.max_y = minmax.maxy;
   },
 
-  set_text: function (s) {
+  set_text (s) {
     this.caption = s;
   },
 
-  set_color: function (s) {
+  set_color (s) {
     this.color = s;
   },
 
-  set_style: function (s) {
+  set_style (s) {
     this.style = s;
   },
 
-  set_line_width: function (w) {
+  set_line_width (w) {
     this.width = w;
   },
 
-  set_mark_size: function (s) {
+  set_mark_size (s) {
     this.size = s;
   },
 
-  map: function (cb) {
+  map (cb) {
     return this.data.map(cb);
   },
 
-  forEach: function (cb) {
+  forEach (cb) {
     this.data.forEach(cb);
   },
 
-  reduce: function (cb, initialValue) {
+  reduce (cb, initialValue) {
     return this.data.reduce(cb, initialValue);
   },
 };
