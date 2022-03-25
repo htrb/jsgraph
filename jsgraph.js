@@ -1510,7 +1510,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_x () {
-    let max, min, i, m, width, height, x, n, inc, str, len, text;
+    let max, min, i, m, x, n, inc, str, text;
 
     if (this.max_x <= 0 || this.min_x <= 0) {
       return;
@@ -1535,7 +1535,6 @@ JSGraph.prototype = {
 
       str = i.toFixed(0);
       n = this.get_x(x);
-      len = str.length;
       text = new GraphText(`10<sup>${str}</sup>`);
       text.init(this.scale_x, n, this.scale_x.offset);
       text.x(n - text.get_width() / 2);
@@ -1565,7 +1564,7 @@ JSGraph.prototype = {
   },
 
   gauge_log_y () {
-    let max, min, i, m, width, height, n, y, inc, x, str, len, text;
+    let max, min, i, m, n, y, inc, x, str, text;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
@@ -1591,7 +1590,6 @@ JSGraph.prototype = {
 
       str = i.toFixed(0);
       n = this.get_y(y);
-      len = str.length;
       text = new GraphText(`10<sup>${str}</sup>`);
       text.init(this.scale_y, this.scale_y.offset, n - Font_size);
       const x0 = this.scale_y.offset - text.get_width();
