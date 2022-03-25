@@ -222,9 +222,9 @@ function mouse_resize_move_dom (e) {
     Mouse_y = e.clientY;
     if (this.frame) {
       if (this.firstChild) {
-	while (this.firstChild) {
-	  this.removeChild(this.firstChild);
-	}
+        while (this.firstChild) {
+          this.removeChild(this.firstChild);
+        }
       }
       this.graph.update_position();
     }
@@ -343,10 +343,10 @@ function mouse_up_scale_dom () {
       const w = parseInt(scale.style.width, 10);
       const h = parseInt(scale.style.height, 10);
       if (w > Scale_region_size_min && h > Scale_region_size_min) {
-	scale.graph.set_scale(scale.graph.get_data_x(x),
-			      scale.graph.get_data_y(y),
-			      scale.graph.get_data_x(x + w),
-			      scale.graph.get_data_y(y + h));
+        scale.graph.set_scale(scale.graph.get_data_x(x),
+                              scale.graph.get_data_y(y),
+                              scale.graph.get_data_x(x + w),
+                              scale.graph.get_data_y(y + h));
       }
     } else {
       const x = scale.graph.get_data_x(Mouse_x);
@@ -386,16 +386,16 @@ function mouse_move_scale_dom (e) {
       w = x;
       h = y;
       if (Mouse_client_x > e.clientX) {
-	x = parseInt(scale.style.left, 10) + w;
-	w = parseInt(scale.style.width, 10) - w;
-	x--;
-	scale.style.left = `${x}px`;
+        x = parseInt(scale.style.left, 10) + w;
+        w = parseInt(scale.style.width, 10) - w;
+        x--;
+        scale.style.left = `${x}px`;
       }
       if (Mouse_client_y > e.clientY) {
-	y = parseInt(scale.style.top, 10) + h;
-	h = parseInt(scale.style.height, 10) - h;
-	y--;
-	scale.style.top = `${y}px`;
+        y = parseInt(scale.style.top, 10) + h;
+        h = parseInt(scale.style.height, 10) - h;
+        y--;
+        scale.style.top = `${y}px`;
       }
       w++;
       h++;
@@ -792,21 +792,21 @@ JSGraph.prototype = {
       element.autoscale();
 
       if (! element.draw) {
-	return mm;
+        return mm;
       }
 
       if (element.min_x < mm.minx) {
-	mm.minx = element.min_x;
+        mm.minx = element.min_x;
       }
       if (element.max_x > mm.maxx) {
-	mm.maxx = element.max_x
+        mm.maxx = element.max_x
       }
 
       if (element.min_y < mm.miny) {
-	mm.miny = element.min_y;
+        mm.miny = element.min_y;
       }
       if (element.max_y > mm.maxy) {
-	mm.maxy = element.max_y
+        mm.maxy = element.max_y
       }
       return mm;
     }, minmax);
@@ -820,8 +820,8 @@ JSGraph.prototype = {
       this.max_x = minmax.maxx * 1.1;
     } else {
       if (minmax.maxx - minmax.minx < 1E-15) {
-	minmax.minx -= Math.abs(minmax.minx) * 0.1;
-	minmax.maxx += Math.abs(minmax.maxx) * 0.1;
+        minmax.minx -= Math.abs(minmax.minx) * 0.1;
+        minmax.maxx += Math.abs(minmax.maxx) * 0.1;
       }
       this.min_x = minmax.minx - (minmax.maxx - minmax.minx) * 0.05;
       this.max_x = minmax.maxx + (minmax.maxx - minmax.minx) * 0.05;
@@ -831,8 +831,8 @@ JSGraph.prototype = {
       this.max_y = minmax.maxy * 1.1;
     } else {
       if (minmax.maxy - minmax.miny < 1E-15) {
-	minmax.miny -= Math.abs(minmax.miny) * 0.1;
-	minmax.maxy += Math.abs(minmax.maxy) * 0.1;
+        minmax.miny -= Math.abs(minmax.miny) * 0.1;
+        minmax.maxy += Math.abs(minmax.maxy) * 0.1;
       }
       this.min_y = minmax.miny - (minmax.maxy - minmax.miny) * 0.05;
       this.max_y = minmax.maxy + (minmax.maxy - minmax.miny) * 0.05;
@@ -869,32 +869,32 @@ JSGraph.prototype = {
     const s2 = s1 / 2.0;
     const c = data.color;
     data.data.forEach(di => this.fill_rectangle(this.get_x(di[0]) - s2,
-						this.get_y(di[1]) - s2,
-						s1, s1, c));
+                                                this.get_y(di[1]) - s2,
+                                                s1, s1, c));
   },
 
   draw_data () {
     this.data.forEach(element => {
       if (element.draw && element.length() > 0) {
-	switch (element.style) {
-	case "c":
-	  this.draw_each_data_c(element);
-	  break;
-	case "l":
-	  this.draw_each_data_l(element);
-	  break;
-	case "lc":
-	  this.draw_each_data_l(element);
-	  this.draw_each_data_c(element);
-	  break;
-	case "lr":
-	  this.draw_each_data_l(element);
-	  this.draw_each_data_r(element);
-	  break;
-	default:
-	  this.draw_each_data_r(element);
-	}
-	this.add_legend(element.caption, element.color);
+        switch (element.style) {
+        case "c":
+          this.draw_each_data_c(element);
+          break;
+        case "l":
+          this.draw_each_data_l(element);
+          break;
+        case "lc":
+          this.draw_each_data_l(element);
+          this.draw_each_data_c(element);
+          break;
+        case "lr":
+          this.draw_each_data_l(element);
+          this.draw_each_data_r(element);
+          break;
+        default:
+          this.draw_each_data_r(element);
+        }
+        this.add_legend(element.caption, element.color);
       }
     });
   },
@@ -1039,7 +1039,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
+        str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
       }
       n = this.get_x(j * inc);
       text = new GraphText(String(str));
@@ -1058,9 +1058,9 @@ JSGraph.prototype = {
     for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_x(d * inc);
       if (m == 5) {
-	this.draw_gauge2_x(n);
+        this.draw_gauge2_x(n);
       } else {
-	this.draw_gauge3_x(n);
+        this.draw_gauge3_x(n);
       }
     }
 
@@ -1068,12 +1068,12 @@ JSGraph.prototype = {
       n = this.get_x(start * inc);
       this.draw_gauge1_x(n);
       for (m = 1, d = start + 0.1; m < 10; m++, d += 0.1) {
-	n = this.get_x(d * inc);
-	if (m == 5) {
-	  this.draw_gauge2_x(n);
-	} else {
-	  this.draw_gauge3_x(n);
-	}
+        n = this.get_x(d * inc);
+        if (m == 5) {
+          this.draw_gauge2_x(n);
+        } else {
+          this.draw_gauge3_x(n);
+        }
       }
     }
   },
@@ -1114,13 +1114,13 @@ JSGraph.prototype = {
 
       switch (this.scale_x.type) {
       case this.SCALE_TYPE_UNIX:
-	min_date.setUnix(this.min_x);
-	max_date.setUnix(this.max_x);
-	break;
+        min_date.setUnix(this.min_x);
+        max_date.setUnix(this.max_x);
+        break;
       case this.SCALE_TYPE_MJD:
-	min_date.setMJD(this.min_x);
-	max_date.setMJD(this.max_x);
-	break;
+        min_date.setMJD(this.min_x);
+        max_date.setMJD(this.max_x);
+        break;
       }
       this.min_x = 1970 + min_date.getTime() / (365.2425 * 24 * 60 * 60 * 1000);
       this.max_x = 1970 + max_date.getTime() / (365.2425 * 24 * 60 * 60 * 1000);
@@ -1141,21 +1141,21 @@ JSGraph.prototype = {
       style = "day";
       d = date.getUTCDate();
       if (span > 20) {
-	inc = 4;
-	d = Math.floor((d - 1) / inc) * inc + 1;
+        inc = 4;
+        d = Math.floor((d - 1) / inc) * inc + 1;
       } else if (span > 12) {
-	inc = 2;
-	d = Math.floor((d - 1) / inc) * inc + 1;
+        inc = 2;
+        d = Math.floor((d - 1) / inc) * inc + 1;
       } else {
-	inc = 1;
+        inc = 1;
       }
       date.set_ymd(false, false, d);
     } else {
       style = "hour";
       if (span > 0.5) {
-	inc = 2;
+        inc = 2;
       } else {
-	inc = 1;
+        inc = 1;
       }
       date.set_ymd(false, false, d);
     }
@@ -1163,174 +1163,174 @@ JSGraph.prototype = {
     while (date.getTime() < max_date.getTime()) {
       switch (this.scale_x.type) {
       case this.SCALE_TYPE_UNIX:
-	d = date.getUnix();
-	break;
+        d = date.getUnix();
+        break;
       case this.SCALE_TYPE_MJD:
-	d = date.getMJD();
-	break;
+        d = date.getMJD();
+        break;
       }
 
       n = this.get_x(d);
 
       switch (style) {
       case "year":
-	if (date.getUTCMonth() == 0) {
-	  if (d < this.min_x) {
-	    break;
-	  }
-	  this.draw_gauge1_x(n);
-	  text = new GraphText(String(date.getUTCFullYear()));
-	  text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
-	} else {
-	  this.draw_gauge3_x(n);
-	}
-	break;
+        if (date.getUTCMonth() == 0) {
+          if (d < this.min_x) {
+            break;
+          }
+          this.draw_gauge1_x(n);
+          text = new GraphText(String(date.getUTCFullYear()));
+          text.init(this.scale_x, n - 3 * Font_size / 4, this.scale_x.offset);
+        } else {
+          this.draw_gauge3_x(n);
+        }
+        break;
       case "month":
-	if (date.getUTCDate() == 1) {
-	  if (d < this.min_x) {
-	    break;
-	  }
-	  this.draw_gauge1_x(n);
-	  if (date.getUTCMonth() == 0) {
-	    str = `${date.getUTCFullYear()}/1`;
-	    len = 6;
-	  } else {
-	    str = String(date.getUTCMonth() + 1);
-	    len = str.length;
-	  }
-	  if (d > this.min_x) {
-	    text = new GraphText((str));
-	    text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
-	  }
-	} else {
-	  this.draw_gauge3_x(n);
-	}
-	break;
+        if (date.getUTCDate() == 1) {
+          if (d < this.min_x) {
+            break;
+          }
+          this.draw_gauge1_x(n);
+          if (date.getUTCMonth() == 0) {
+            str = `${date.getUTCFullYear()}/1`;
+            len = 6;
+          } else {
+            str = String(date.getUTCMonth() + 1);
+            len = str.length;
+          }
+          if (d > this.min_x) {
+            text = new GraphText((str));
+            text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+          }
+        } else {
+          this.draw_gauge3_x(n);
+        }
+        break;
       case "day":
-	if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
-	  str = `1/1<br>${date.getUTCFullYear()}`;
-	  len = 3;
-	} else if (date.getUTCDate() == 1) {
-	  str = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
-	  len = str.length;
-	} else {
-	  str = String(date.getUTCDate());
-	  len = str.length;
-	}
-	if (d > this.min_x && (inc != 4 || date.getUTCDate() < 28)) {
-	  text = new GraphText((str));
-	  text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
-	  this.draw_gauge1_x(n);
-	} else {
-	  this.draw_gauge2_x(n);
-	}
-	for (i = 3 * inc; i < 24 * inc; i += 3 * inc) {
-	  switch (this.scale_x.type) {
-	  case this.SCALE_TYPE_UNIX:
-	    n = this.get_x(d + 60 * 60 * i);
-	    break;
-	  case this.SCALE_TYPE_MJD:
-	    n = this.get_x(d + i / 24.0);
-	    break;
-	  }
-	  if (i % 24 == 0 || inc == 1 && i % 12 == 0) {
-	    this.draw_gauge2_x(n);
-	  } else {
-	    this.draw_gauge3_x(n);
-	  }
-	}
-	break;
+        if (date.getUTCMonth() == 0 && date.getUTCDate() == 1) {
+          str = `1/1<br>${date.getUTCFullYear()}`;
+          len = 3;
+        } else if (date.getUTCDate() == 1) {
+          str = `${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+          len = str.length;
+        } else {
+          str = String(date.getUTCDate());
+          len = str.length;
+        }
+        if (d > this.min_x && (inc != 4 || date.getUTCDate() < 28)) {
+          text = new GraphText((str));
+          text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+          this.draw_gauge1_x(n);
+        } else {
+          this.draw_gauge2_x(n);
+        }
+        for (i = 3 * inc; i < 24 * inc; i += 3 * inc) {
+          switch (this.scale_x.type) {
+          case this.SCALE_TYPE_UNIX:
+            n = this.get_x(d + 60 * 60 * i);
+            break;
+          case this.SCALE_TYPE_MJD:
+            n = this.get_x(d + i / 24.0);
+            break;
+          }
+          if (i % 24 == 0 || inc == 1 && i % 12 == 0) {
+            this.draw_gauge2_x(n);
+          } else {
+            this.draw_gauge3_x(n);
+          }
+        }
+        break;
       case "hour":
-	let x;
-	let h = date.getUTCHours();
-	for (i = 0; i < inc; i++, h++) {
-	  if (inc == 1 || h % 2 == 0) {
-	    this.draw_gauge1_x(n);
-	    if (d > this.min_x) {
-	      if (h == 0) {
-		str = `0<br>${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
-		len = 1;
-	      } else {
-		str = String(h);
-		len = str.length;
-	      }
-	      text = new GraphText(str);
-	      text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
-	    }
-	  }
-	  x = d;
-	  if (inc == 2) {
-	    for (j = 0; j < 2; j++) {
-	      switch (this.scale_x.type) {
-	      case this.SCALE_TYPE_UNIX:
-		d += 30 * 60;
-		n = this.get_x(d);
-		break;
-	      case this.SCALE_TYPE_MJD:
-		d += 1 / 48.0;
-		n = this.get_x(d);
-		break;
-	      }
-	      if (j == 0) {
-		this.draw_gauge3_x(n);
-	      } else {
-		this.draw_gauge2_x(n);
-	      }
-	    }
-	  } else if (inc == 1) {
-	    for (j = 0; j < 6; j++) {
-	      switch (this.scale_x.type) {
-	      case this.SCALE_TYPE_UNIX:
-		d +=  10 * 60;
-		n = this.get_x(d);
-		break;
-	      case this.SCALE_TYPE_MJD:
-		d += 1 / 24.0 / 6;
-		n = this.get_x(d);
-		break;
-	      }
-	      if (j == 2) {
-		this.draw_gauge2_x(n);
-	      } else {
-		this.draw_gauge3_x(n);
-	      }
-	    }
-	  }
-	}
-	break;
+        let x;
+        let h = date.getUTCHours();
+        for (i = 0; i < inc; i++, h++) {
+          if (inc == 1 || h % 2 == 0) {
+            this.draw_gauge1_x(n);
+            if (d > this.min_x) {
+              if (h == 0) {
+                str = `0<br>${date.getUTCFullYear()}/${date.getUTCMonth() + 1}/${date.getUTCDate()}`;
+                len = 1;
+              } else {
+                str = String(h);
+                len = str.length;
+              }
+              text = new GraphText(str);
+              text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
+            }
+          }
+          x = d;
+          if (inc == 2) {
+            for (j = 0; j < 2; j++) {
+              switch (this.scale_x.type) {
+              case this.SCALE_TYPE_UNIX:
+                d += 30 * 60;
+                n = this.get_x(d);
+                break;
+              case this.SCALE_TYPE_MJD:
+                d += 1 / 48.0;
+                n = this.get_x(d);
+                break;
+              }
+              if (j == 0) {
+                this.draw_gauge3_x(n);
+              } else {
+                this.draw_gauge2_x(n);
+              }
+            }
+          } else if (inc == 1) {
+            for (j = 0; j < 6; j++) {
+              switch (this.scale_x.type) {
+              case this.SCALE_TYPE_UNIX:
+                d +=  10 * 60;
+                n = this.get_x(d);
+                break;
+              case this.SCALE_TYPE_MJD:
+                d += 1 / 24.0 / 6;
+                n = this.get_x(d);
+                break;
+              }
+              if (j == 2) {
+                this.draw_gauge2_x(n);
+              } else {
+                this.draw_gauge3_x(n);
+              }
+            }
+          }
+        }
+        break;
       }
       switch (style) {
       case "year":
-	date.nextMonth();
-	break;
+        date.nextMonth();
+        break;
       case "month":
-	switch (date.getUTCDate()) {
-	case 1:
-	  date.set_ymd(false, false, 10);
-	  break;
-	case 10:
-	  date.set_ymd(false, false, 20);
-	  break;
-	case 20:
-	  date.nextMonth();
-	  date.setUTCDate(1);
-	  break;
-	}
-	//	  l += date.getUTCFullYear() + " ";
-	break;
+        switch (date.getUTCDate()) {
+        case 1:
+          date.set_ymd(false, false, 10);
+          break;
+        case 10:
+          date.set_ymd(false, false, 20);
+          break;
+        case 20:
+          date.nextMonth();
+          date.setUTCDate(1);
+          break;
+        }
+        //        l += date.getUTCFullYear() + " ";
+        break;
       case "day":
-	m = date.getUTCMonth();
-	date.nextDate(inc);
-	if (m != date.getUTCMonth()) {
-	  date.setUTCDate(1);
-	}
-	break;
+        m = date.getUTCMonth();
+        date.nextDate(inc);
+        if (m != date.getUTCMonth()) {
+          date.setUTCDate(1);
+        }
+        break;
       case "hour":
-	date.nextHour(inc);
-	break;
+        date.nextHour(inc);
+        break;
       default:
-	date.nextDate();
-	break;
+        date.nextDate();
+        break;
       }
     }
 
@@ -1339,38 +1339,38 @@ JSGraph.prototype = {
       break;
     case "month":
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
-	break;
+        break;
       } else {
-	text = new GraphText(String(min_date.getUTCFullYear()));
-	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+        text = new GraphText(String(min_date.getUTCFullYear()));
+        text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
     case "day":
       if (min_date.getUTCFullYear() != max_date.getUTCFullYear()) {
-	break;
+        break;
       } else if (min_date.getUTCMonth() != max_date.getUTCMonth()) {
-	text = new GraphText(String(min_date.getUTCFullYear()));
-	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+        text = new GraphText(String(min_date.getUTCFullYear()));
+        text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else if (min_date.getUTCDate() != max_date.getUTCDate()) {
-	text = new GraphText(`${min_date.getUTCFullYear()}/${min_date.getUTCMonth() + 1}`);
-	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+        text = new GraphText(`${min_date.getUTCFullYear()}/${min_date.getUTCMonth() + 1}`);
+        text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       } else {
-	text = new GraphText(`${min_date.getUTCFullYear()
-			      }/${
-			      min_date.getUTCMonth() + 1
-			      }/${
-			      min_date.getUTCDate()}`);
-	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+        text = new GraphText(`${min_date.getUTCFullYear()
+                              }/${
+                              min_date.getUTCMonth() + 1
+                              }/${
+                              min_date.getUTCDate()}`);
+        text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
       break;
     case "hour":
       if (min_date.getUTCDate() == max_date.getUTCDate()) {
-	text = new GraphText(`${min_date.getUTCFullYear()
-			      }/${
-			      min_date.getUTCMonth() + 1
-			      }/${
-			      min_date.getUTCDate()}`);
-	text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
+        text = new GraphText(`${min_date.getUTCFullYear()
+                              }/${
+                              min_date.getUTCMonth() + 1
+                              }/${
+                              min_date.getUTCDate()}`);
+        text.init(this.scale_x, 0, this.scale_x.offset + Font_size);
       }
     }
   },
@@ -1382,10 +1382,10 @@ JSGraph.prototype = {
 
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       if (max <= 0 || min <= 0 || x <= 0) {
-	return -1;
+        return -1;
       }
       return w * (Math.log10(x) - Math.log10(min))
-	/ (Math.log10(max) - Math.log10(min));
+        / (Math.log10(max) - Math.log10(min));
     } else {
       return w * (x - min)/(max - min);
     }
@@ -1394,8 +1394,8 @@ JSGraph.prototype = {
   get_data_x (x) {
     if (this.scale_x.type == this.SCALE_TYPE_LOG) {
       return Math.pow(10,
-		      x / this.frame.width * (Math.log10(this.max_x) - Math.log10(this.min_x))
-		      + Math.log10(this.min_x));
+                      x / this.frame.width * (Math.log10(this.max_x) - Math.log10(this.min_x))
+                      + Math.log10(this.min_x));
     } else {
       return this.min_x + (this.max_x - this.min_x) * x / this.frame.width;
     }
@@ -1406,7 +1406,7 @@ JSGraph.prototype = {
       const x0 = this.caption_y.get_x() + this.caption_y.get_width();
       const x1 = this.scale_y.offsetLeft + x;
       if (x1 < x0) {
-	this.caption_y.x(this.caption_y.get_x() - (x0 - x1) - 10);
+        this.caption_y.x(this.caption_y.get_x() - (x0 - x1) - 10);
       }
     }
   },
@@ -1449,7 +1449,7 @@ JSGraph.prototype = {
       decpt = 1 + (l - len);
 
       if (l > decpt) {
-	str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
+        str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
       }
       n = this.get_y(j * inc);
       text = new GraphText(String(str));
@@ -1473,9 +1473,9 @@ JSGraph.prototype = {
     for (m = 1, d = start - 0.1; m < 10; m++, d -= 0.1) {
       n = this.get_y(d * inc);
       if (m == 5) {
-	this.draw_gauge2_y(n);
+        this.draw_gauge2_y(n);
       } else {
-	this.draw_gauge3_y(n);
+        this.draw_gauge3_y(n);
       }
     }
 
@@ -1483,12 +1483,12 @@ JSGraph.prototype = {
       n = this.get_y(start * inc);
       this.draw_gauge1_y(n);
       for (m = 1, d = start + 0.1; m < 10; m++, d += 0.1) {
-	n = this.get_y(d*inc);
-	if (m == 5) {
-	  this.draw_gauge2_y(n);
-	} else {
-	  this.draw_gauge3_y(n);
-	}
+        n = this.get_y(d*inc);
+        if (m == 5) {
+          this.draw_gauge2_y(n);
+        } else {
+          this.draw_gauge3_y(n);
+        }
       }
     }
   },
@@ -1502,10 +1502,10 @@ JSGraph.prototype = {
       return h * (1 - (y - min)/(max - min));
     } else {
       if (max <= 0 || min <= 0 || y <= 0) {
-	return -1;
+        return -1;
       }
       return h * (Math.log10(max) - Math.log10(y))
-	/ (Math.log10(max) - Math.log10(min));
+        / (Math.log10(max) - Math.log10(min));
     }
   },
 
@@ -1514,8 +1514,8 @@ JSGraph.prototype = {
       return this.min_y + (this.max_y - this.min_y)* (1 - y / this.frame.height);
     } else {
       return Math.pow(10,
-		      Math.log10(this.max_y) - y / this.frame.height *
-		      (Math.log10(this.max_y) - Math.log10(this.min_y)));
+                      Math.log10(this.max_y) - y / this.frame.height *
+                      (Math.log10(this.max_y) - Math.log10(this.min_y)));
     }
   },
 
@@ -1540,7 +1540,7 @@ JSGraph.prototype = {
     for (i = Math.ceil(min); i < max; i += inc) {
       x = Math.pow(10, i);
       if (x > this.max_x) {
-	break;
+        break;
       }
 
       str = i.toFixed(0);
@@ -1557,19 +1557,19 @@ JSGraph.prototype = {
 
       n = this.get_x(x);
       if (inc == 1) {
-	for (m = 2; m < 10; m++) {
-	  n = this.get_x(x * m);
-	  if (m == 5) {
-	    this.draw_gauge2_x(n);
-	  } else {
-	    this.draw_gauge3_x(n);
-	  }
-	}
+        for (m = 2; m < 10; m++) {
+          n = this.get_x(x * m);
+          if (m == 5) {
+            this.draw_gauge2_x(n);
+          } else {
+            this.draw_gauge3_x(n);
+          }
+        }
       } else {
-	for (m = 1; m <= inc; m++) {
-	  n = this.get_x(x *= 10);
-	  this.draw_gauge3_x(n);
-	}
+        for (m = 1; m <= inc; m++) {
+          n = this.get_x(x *= 10);
+          this.draw_gauge3_x(n);
+        }
       }
     }
   },
@@ -1598,7 +1598,7 @@ JSGraph.prototype = {
 
       y = Math.pow(10, i);
       if (y > this.max_y) {
-	break;
+        break;
       }
 
       str = i.toFixed(0);
@@ -1619,19 +1619,19 @@ JSGraph.prototype = {
 
       n = this.get_y(y);
       if (inc == 1) {
-	for (m = 2; m < 10; m++) {
-	  n = this.get_y(y * m);
-	  if (m == 5) {
-	    this.draw_gauge2_y(n);
-	  } else {
-	    this.draw_gauge3_y(n);
-	  }
-	}
+        for (m = 2; m < 10; m++) {
+          n = this.get_y(y * m);
+          if (m == 5) {
+            this.draw_gauge2_y(n);
+          } else {
+            this.draw_gauge3_y(n);
+          }
+        }
       } else {
-	for (m = 1; m <= inc; m++) {
-	  n = this.get_y(y *= 10);
-	  this.draw_gauge3_y(n);
-	}
+        for (m = 1; m <= inc; m++) {
+          n = this.get_y(y *= 10);
+          this.draw_gauge3_y(n);
+        }
       }
     }
     return;
@@ -1890,13 +1890,13 @@ JSGraph.prototype = {
       data.load(files[i], self.X, self.Y, self.FS, self.RS);
       data.set_text(files[i]);
       data.wait(() => {
-	if (i < files.length - 1) {
-	  recursive_load(files, i + 1);
-	} else {
-	  self.title.set_text(title);
-	  self.autoscale();
-	  self.draw();
-	}
+        if (i < files.length - 1) {
+          recursive_load(files, i + 1);
+        } else {
+          self.title.set_text(title);
+          self.autoscale();
+          self.draw();
+        }
       });
     }
     recursive_load(args, 0);
@@ -1947,15 +1947,15 @@ Data.prototype = {
       this.draw = true;
     } else {
       if (x < this.min_x) {
-	this.min_x = x;
+        this.min_x = x;
       } else if (x > this.max_x) {
-	this.max_x = x;
+        this.max_x = x;
       }
 
       if (y < this.min_y) {
-	this.min_y = y;
+        this.min_y = y;
       } else if (y > this.max_y) {
-	this.max_y = y;
+        this.max_y = y;
       }
     }
     this.data.push([x, y]);
@@ -1971,7 +1971,7 @@ Data.prototype = {
     data.forEach(di => {
       const xy_data = di.split(sep2);
       if (xy_data.length > 1) {
-	this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
+        this.add_data(parseFloat(xy_data[0]), parseFloat(xy_data[1]));
       }
     });
   },
@@ -2001,19 +2001,19 @@ Data.prototype = {
       m = xy_data.length;
 
       if (col_x < 0) {
-	x = col_x + m + 1;
+        x = col_x + m + 1;
       }
 
       if (col_y < 0) {
-	y = col_y + m + 1;
+        y = col_y + m + 1;
       }
 
       if (xy_data.length > 1) {
-	const fx = parseFloat(xy_data[x]);
-	const fy = parseFloat(xy_data[y]);
-	if (! Number.isNaN(fx) && ! Number.isNaN(fy)) {
-	  this.add_data(fx, fy);
-	}
+        const fx = parseFloat(xy_data[x]);
+        const fy = parseFloat(xy_data[y]);
+        if (! Number.isNaN(fx) && ! Number.isNaN(fy)) {
+          this.add_data(fx, fy);
+        }
       }
     });
   },
@@ -2026,13 +2026,13 @@ Data.prototype = {
     XMLHttp.open('GET', path, true);
     XMLHttp.onreadystatechange = function() {
       if (XMLHttp.readyState == 4) {
-	if (XMLHttp.status != 200) {
-	  self.loaded = true;
-	  return;
-	}
-	arg[0] = XMLHttp.responseText;
-	self.read_data.apply(self, arg);
-	self.loaded = true;
+        if (XMLHttp.status != 200) {
+          self.loaded = true;
+          return;
+        }
+        arg[0] = XMLHttp.responseText;
+        self.read_data.apply(self, arg);
+        self.loaded = true;
       }
     }
     XMLHttp.send(null);
@@ -2042,10 +2042,10 @@ Data.prototype = {
     const data = this;
     wait_until_data_loaded = function () {
       if (data.loaded) {
-	cb();
-	return;
+        cb();
+        return;
       } else {
-	window.setTimeout("wait_until_data_loaded()", 100);
+        window.setTimeout("wait_until_data_loaded()", 100);
       }
     }
     wait_until_data_loaded();
@@ -2066,20 +2066,20 @@ Data.prototype = {
 
     this.data.reduce((mm, element) => {
       if (! isFinite(element[0]) || ! isFinite(element[1])) {
-	return mm;
+        return mm;
       }
       if (element[0] < mm.minx) {
-	mm.minx = element[0];
+        mm.minx = element[0];
       }
       if (element[0] > mm.maxx) {
-	mm.maxx = element[0];
+        mm.maxx = element[0];
       }
 
       if (element[1] < mm.miny) {
-	mm.miny = element[1];
+        mm.miny = element[1];
       }
       if (element[1] > mm.maxy) {
-	mm.maxy = element[1];
+        mm.maxy = element[1];
       }
       return mm;
     }, minmax);
