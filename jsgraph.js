@@ -1237,7 +1237,7 @@ JSGraph.prototype = {
           }
         }
         break;
-      case "hour":
+      case "hour": {
         let h = date.getUTCHours();
         for (i = 0; i < inc; i++, h++) {
           if (inc == 1 || h % 2 == 0) {
@@ -1291,6 +1291,7 @@ JSGraph.prototype = {
               }
             }
           }
+        }
         }
         break;
       }
