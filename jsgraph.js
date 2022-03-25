@@ -215,9 +215,7 @@ function move (node, x, y) {
   node.offset_y += y;
 }
 
-function mouse_resize_move_dom () {
-  const e = arguments[0];
-
+function mouse_resize_move_dom (e) {
   if (Is_mouse_down) {
     resize_move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
@@ -239,8 +237,7 @@ function mouse_resize_move_dom () {
   }
 }
 
-function mouse_move_dom () {
-  const e = arguments[0];
+function mouse_move_dom (e) {
   if (Is_mouse_down) {
     move(this, e.clientX - Mouse_x, e.clientY - Mouse_y);
     Mouse_x = e.clientX;
@@ -251,8 +248,7 @@ function mouse_move_dom () {
   }
 }
 
-function mouse_down_dom () {
-  const e = arguments[0];
+function mouse_down_dom (e) {
   const x = e.layerX;
   const y = e.layerY;
   const width  = parseInt(this.style.width, 10);
@@ -308,8 +304,7 @@ function mouse_over_dom () {
   this.style.cursor='move';
 }
 
-function mouse_down_scale_dom () {
-  const e = arguments[0];
+function mouse_down_scale_dom (e) {
   const x = e.layerX;
   const y = e.layerY;
   if (e.button != 0) {
@@ -369,9 +364,8 @@ function mouse_up_scale_dom () {
   scale.style.height = '0px';
 }
 
-function mouse_move_scale_dom () {
+function mouse_move_scale_dom (e) {
   let x, y;
-  const e = arguments[0];
   x = e.layerX;
   y = e.layerY;
 
