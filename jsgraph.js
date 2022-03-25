@@ -1292,7 +1292,7 @@ JSGraph.prototype = {
             }
           }
         }
-        }
+      }
         break;
       }
       switch (style) {
