@@ -705,13 +705,13 @@ JSGraph.prototype = {
   },
 
   event_key_down(e) {
-    if (event.keyCode == 17) {
+    if (e.keyCode == 17) {
       this.resize_mode();
     }
   },
 
   event_key_up(e) {
-    if (event.keyCode == 17) {
+    if (e.keyCode == 17) {
       mouse_up_dom.call(this.parent_frame);
       this.scale_mode();
     }
