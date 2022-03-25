@@ -477,11 +477,11 @@ GraphText.prototype = {
     return this.text.clientHeight;
   },
 
-  get_x (x) {
+  get_x () {
     return this.text.offsetLeft;
   },
 
-  get_y (y) {
+  get_y () {
     return this.text.offsetTop;
   }
 };
