@@ -1510,14 +1510,14 @@ JSGraph.prototype = {
   },
 
   gauge_log_x () {
-    let max, min, i, m, x, n, inc, str, text;
+    let i, m, x, n, inc, str, text;
 
     if (this.max_x <= 0 || this.min_x <= 0) {
       return;
     }
 
-    max = Math.log10(this.max_x);
-    min = Math.log10(this.min_x);
+    const max = Math.log10(this.max_x);
+    const min = Math.log10(this.min_x);
     if (max - min < 1) {
       this.gauge_x();
       return;
@@ -1564,14 +1564,14 @@ JSGraph.prototype = {
   },
 
   gauge_log_y () {
-    let max, min, i, m, n, y, inc, x, str, text;
+    let i, m, n, y, inc, x, str, text;
 
     if (this.max_y <= 0 || this.min_y <= 0) {
       return;
     }
 
-    max = Math.log10(this.max_y);
-    min = Math.log10(this.min_y);
+    const max = Math.log10(this.max_y);
+    const min = Math.log10(this.min_y);
     if (max - min < 1) {
       this.gauge_y();
       return;
