@@ -408,9 +408,6 @@ function mouse_move_scale_dom (e) {
   }
 }
 
-function event_none_dom () {
-  return false;
-}
 /**********************************************************************
 Definition of Text Object.
 ***********************************************************************/
