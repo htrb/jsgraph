@@ -2030,7 +2030,7 @@ Data.prototype = {
         cb();
         return;
       } else {
-        window.setTimeout("wait_until_data_loaded()", 100);
+        window.setTimeout(wait_until_data_loaded, 100);
       }
     }
     wait_until_data_loaded();
