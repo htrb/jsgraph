@@ -1238,7 +1238,6 @@ JSGraph.prototype = {
         }
         break;
       case "hour":
-        let x;
         let h = date.getUTCHours();
         for (i = 0; i < inc; i++, h++) {
           if (inc == 1 || h % 2 == 0) {
@@ -1255,7 +1254,6 @@ JSGraph.prototype = {
               text.init(this.scale_x, n - (len - 1) * Font_size / 4, this.scale_x.offset);
             }
           }
-          x = d;
           if (inc == 2) {
             for (j = 0; j < 2; j++) {
               switch (this.scale_x.type) {
