@@ -101,22 +101,22 @@ Date.prototype.nextMonth = function () {
   this.setUTCFullYear(y);
 }
 
-Date.prototype.nextDate = function () {
+Date.prototype.nextDate = function (...args) {
   const t = this.getTime();
   let mul = 1;
 
-  if (arguments.length > 0) {
-    mul = arguments[0];
+  if (args.length > 0) {
+    mul = args[0];
   }
   this.setTime(t + 86400000 * mul);
 }
 
-Date.prototype.nextHour = function () {
+Date.prototype.nextHour = function (...args) {
   const t = this.getTime();
   let mul = 1;
 
-  if (arguments.length > 0) {
-    mul = arguments[0];
+  if (args.length > 0) {
+    mul = args[0];
   }
   this.setTime(t + 3600000 * mul);
 }
@@ -421,14 +421,14 @@ function event_none_dom () {
 Definition of Text Object.
 ***********************************************************************/
 
-function GraphText() {
+function GraphText(...args) {
   const text = document.createElement('span');
 
   text.style.position = 'absolute';
   text.style.fontSize = `${Font_size}px`;
   text.style.whiteSpace = 'nowrap';
-  if (arguments.length > 0) {
-    text.innerHTML = arguments[0];
+  if (args.length > 0) {
+    text.innerHTML = args[0];
   }
   this.text = text;
 }
@@ -528,9 +528,9 @@ Caption.prototype = new GraphText("");
 /**********************************************************************
 Definition of JSGraph Object.
 ***********************************************************************/
-function JSGraph() {
-  if (arguments.length > 0) {
-    this.init(arguments[0]);
+function JSGraph(...args) {
+  if (args.length > 0) {
+    this.init(args[0]);
   }
   this.Colors = [
     '#9900cc',
@@ -1885,7 +1885,7 @@ JSGraph.prototype = {
     this.set_scale(minx, miny, maxx, maxy);
   },
 
-  load() {
+  load(...args) {
     const self = this, title = this.title.get_text();
     const recursive_load = function(files, i) {
       const data = new Data();
@@ -1905,7 +1905,7 @@ JSGraph.prototype = {
 	}
       });
     }
-    recursive_load(arguments, 0);
+    recursive_load(args, 0);
   }
 };
 
@@ -1982,20 +1982,22 @@ Data.prototype = {
     });
   },
 
-  read_data () {
+  read_data (...args) {
     let m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
 
-    switch (arguments.length) {
+    switch (args.length) {
     case 5:
-      rs = arguments[4];
+      rs = args[4];
+      // fallthrough
     case 4:
-      fs = arguments[3];
+      fs = args[3];
+      // fallthrough
     case 3:
-      col_y = parseInt(arguments[2], 10) - 1;
-      col_x = parseInt(arguments[1], 10) - 1;
+      col_y = parseInt(args[2], 10) - 1;
+      col_x = parseInt(args[1], 10) - 1;
       break;
     }
-    const data = arguments[0].split(rs);
+    const data = args[0].split(rs);
 
     x = col_x;
     y = col_y;
