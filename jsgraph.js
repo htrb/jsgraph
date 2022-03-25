@@ -2003,9 +2003,9 @@ Data.prototype = {
     });
   },
 
-  load (path) {
+  load (...arg) {
     const self = this;
-    const arg = [].slice.apply(arguments);
+    const path = arg[0];
     this.loaded = false;
 
     XMLHttp.open('GET', path, true);
@@ -2016,7 +2016,7 @@ Data.prototype = {
           return;
         }
         arg[0] = XMLHttp.responseText;
-        self.read_data.apply(self, arg);
+        self.read_data(...arg);
         self.loaded = true;
       }
     }
