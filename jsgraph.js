@@ -999,7 +999,7 @@ JSGraph.prototype = {
   },
 
   gauge_x () {
-    let inc, d, j, start, l, len, n, m, diff;
+    let inc, d, j, start, l, n, m, diff;
     let str, text;
     const frame = this.frame;
     const width = parseInt(frame.style.width, 10);
@@ -1025,15 +1025,13 @@ JSGraph.prototype = {
 
     start = Math.ceil(this.min_x / inc);
     str = Math.abs(start * diff).toFixed(0);
-    len = str.length;
+    const len = str.length;
 
     m = this.max_x / inc;
     for (j = start; j <= m; j++) {
-      let decpt;
-
       str = (j * diff).toFixed(0);
       l = str.length;
-      decpt = 1 + (l - len);
+      const decpt = 1 + (l - len);
 
       if (l > decpt) {
         str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
@@ -1076,8 +1074,7 @@ JSGraph.prototype = {
   },
 
   gauge_date_x () {
-    let d, inc = 0, span, style, len, n, m, date_conv, str, text, i, j;
-    const frame = this.frame;
+    let d, inc = 0, style, len, n, m, date_conv, str, text, i, j;
     const min_date = new Date(), date = new Date(), max_date = new Date();
 
     if (this.min_x == this.max_x) {
@@ -1104,7 +1101,7 @@ JSGraph.prototype = {
       break;
     }
 
-    span = (this.max_x - this.min_x) / date_conv;
+    const span = (this.max_x - this.min_x) / date_conv;
     if (span > 4000) {
       const min = this.min_x;
       const max = this.max_x;
@@ -1408,9 +1405,8 @@ JSGraph.prototype = {
   },
 
   gauge_y () {
-    let inc, d, j, start, l, len, n, m, diff, x;
+    let inc, d, j, start, l, n, m, diff, x;
     let str, text;
-    const frame = this.frame;
 
     if (this.min_y == this.max_y) {
       this.min_y -= 1;
@@ -1433,16 +1429,14 @@ JSGraph.prototype = {
 
     start = Math.ceil(this.min_y / inc);
     str = Math.abs(start * diff).toFixed(0);
-    len = str.length;
+    const len = str.length;
 
     m = this.max_y / inc;
     x = this.scale_y.offset;
     for (j = start; j <= m; j++) {
-      let decpt, x0;
-
       str = (j * diff).toFixed(0);
       l = str.length;
-      decpt = 1 + (l - len);
+      const decpt = 1 + (l - len);
 
       if (l > decpt) {
         str = `${str.substring(0, decpt)}.${str.substring(decpt, l)}`;
@@ -1450,7 +1444,7 @@ JSGraph.prototype = {
       n = this.get_y(j * inc);
       text = new GraphText(String(str));
       text.init(this.scale_y, this.scale_y.offset, n);
-      x0 = this.scale_y.offset - text.get_width();
+      const x0 = this.scale_y.offset - text.get_width();
       text.x(x0);
       text.y(n - text.get_height() / 2);
       x = (x0 < x) ? x0 : x;
@@ -1590,8 +1584,6 @@ JSGraph.prototype = {
 
     x = this.scale_y.offset;
     for (i = Math.ceil(min); i < max; i += inc) {
-      let x0;
-
       y = Math.pow(10, i);
       if (y > this.max_y) {
         break;
@@ -1602,7 +1594,7 @@ JSGraph.prototype = {
       len = str.length;
       text = new GraphText(`10<sup>${str}</sup>`);
       text.init(this.scale_y, this.scale_y.offset, n - Font_size);
-      x0 = this.scale_y.offset - text.get_width();
+      const x0 = this.scale_y.offset - text.get_width();
       text.x(x0);
       this.draw_gauge1_y(n);
       x = (x0 < x) ? x0 : x;
@@ -1634,12 +1626,11 @@ JSGraph.prototype = {
   },
 
   restore_position() {
-    let pos, str;
-    str = document.cookie.split(';').find(row => row.trim().startsWith(this.position_cookie));
+    const str = document.cookie.split(';').find(row => row.trim().startsWith(this.position_cookie));
     if (str === undefined) {
       return;
     }
-    pos = str.split(/[=:]/);
+    const pos = str.split(/[=:]/);
     this.parent_frame.style.left = `${pos[1]}px`;
     this.parent_frame.style.top = `${pos[2]}px`;
     this.parent_frame.style.width = `${pos[3]}px`;
@@ -2036,7 +2027,7 @@ Data.prototype = {
 
   wait(cb) {
     const data = this;
-    wait_until_data_loaded = function () {
+    const wait_until_data_loaded = function () {
       if (data.loaded) {
         cb();
         return;
