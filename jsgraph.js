@@ -1864,27 +1864,25 @@ JSGraph.prototype = {
     this.set_scale(minx, miny, maxx, maxy);
   },
 
-  load(...args) {
+  async load_data(file, i) {
+    const data = new Data();
+    const color = self.Colors[i % self.Colors.length];
+    self.add_data(data);
+    data.set_color(color);
+    data.set_style(self.Style);
+    data.set_text(file);
+    await data.load(file, self.X, self.Y, self.FS, self.RS);
+    self.title.set_text(`Data loading... [${i + 1}]`);
+    return data;
+  },
+
+  async load(...args) {
     const self = this, title = this.title.get_text();
-    const recursive_load = function(files, i) {
-      const data = new Data();
-      self.title.set_text(`Data loading... [${i + 1}/${files.length}]`);
-      self.add_data(data);
-      data.set_color(self.Colors[i % self.Colors.length]);
-      data.set_style(self.Style);
-      data.load(files[i], self.X, self.Y, self.FS, self.RS);
-      data.set_text(files[i]);
-      data.wait(() => {
-        if (i < files.length - 1) {
-          recursive_load(files, i + 1);
-        } else {
-          self.title.set_text(title);
-          self.autoscale();
-          self.draw();
-        }
-      });
-    }
-    recursive_load(args, 0);
+    const promise = args.map((file, i) => self.load_data(file, i));
+    await Promise.all(promise);
+    self.title.set_text(title);
+    self.autoscale();
+    self.draw();
   }
 };
 
