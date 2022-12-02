@@ -2003,24 +2003,18 @@ Data.prototype = {
     });
   },
 
-  load (...arg) {
+  async load (...arg) {
     const self = this;
     const path = arg[0];
+    const args = arg.concat();
     this.loaded = false;
 
-    XMLHttp.open('GET', path, true);
-    XMLHttp.onreadystatechange = function() {
-      if (XMLHttp.readyState == 4) {
-        if (XMLHttp.status != 200) {
-          self.loaded = true;
-          return;
-        }
-        arg[0] = XMLHttp.responseText;
-        self.read_data(...arg);
-        self.loaded = true;
-      }
-    }
-    XMLHttp.send(null);
+    const response = await fetch(path);
+    const text = await response.text()
+    args[0] = text;
+    self.read_data(...args);
+    self.loaded = true;
+    return self
   },
 
   wait(cb) {
