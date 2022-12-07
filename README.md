@@ -52,10 +52,9 @@
 というメソッドも使用できます。
 
 	data.load(path, [nx, ny, [FS,] [RS]]);
-で XMLHttpRequest によるデータ取得も出来ます。 data.load(path) でデータ取得した場合は
+で fetch によるデータ取得も出来ます。 data.load(path) でデータ取得した場合は
 
-	data.wait(function(){graph.autoscale(); graph.draw()});
-の様に data.wait(func) でデータの取得を待ってからグラフを描画してください。
+Data.prototype,load() は Promise  を返すので await で読み込み後の処理を記述できます。
 
 	data.set_color('#0000ff');
 	data.set_text('Data2');
@@ -92,6 +91,9 @@ scale_x_type(type), scale_y_type(type) で軸のタイプを選択。x 軸は "l
 
 ## 履歴
 
+- 2022/12/07
+	- JSGraph.prototype.load(), Data.prototype.load() が Promise を返すようにした。
+	- XMLHttpRequest の代わりに fetch() を使うようにした。
 - 2022/02/13
 	- IE サポートを削除
 	- Ctrl の押下で resize_mode になるようにした。
