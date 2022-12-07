@@ -33,7 +33,7 @@ let Mouse_client_y = 0;
 let Mouse_position = 'C';
 const Edge_width = 30;
 let Font_size = 16; /* px */
-let XMLHttp = null;
+let XMLHttp = null; // for backward compatibility
 
 /**********************************************************************
 Utility functions
