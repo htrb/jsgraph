@@ -544,7 +544,7 @@ function JSGraph(...args) {
   this.Style = "lc";
   this.X = 1;
   this.Y = 2;
-  this.FS = new RegExp("[ ,\t]+");
+  this.FS = /[ ,\t]+/
   this.RS = "\n";
 }
 
