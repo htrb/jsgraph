@@ -1960,7 +1960,7 @@ Data.prototype = {
   },
 
   read_data (...args) {
-    let m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = new RegExp("[ ,\t]+");
+    let m, x, y, col_x = 0, col_y = 1, rs = "\n", fs = /[ ,\t]+/;
 
     switch (args.length) {
     case 5:
