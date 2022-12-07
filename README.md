@@ -52,8 +52,7 @@
 というメソッドも使用できます。
 
 	data.load(path, [nx, ny, [FS,] [RS]]);
-で fetch によるデータ取得も出来ます。 data.load(path) でデータ取得した場合は
-
+で fetch によるデータ取得も出来ます。
 Data.prototype,load() は Promise  を返すので await で読み込み後の処理を記述できます。
 
 	data.set_color('#0000ff');
