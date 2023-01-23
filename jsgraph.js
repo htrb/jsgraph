@@ -2007,7 +2007,7 @@ Data.prototype = {
     const args = arg.concat();
     this.loaded = false;
 
-    const response = await fetch(path);
+    const response = await fetch(path, {cache: 'no-cache'});
     const text = await response.text()
     args[0] = text;
     self.read_data(...args);
