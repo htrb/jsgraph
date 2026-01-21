@@ -674,6 +674,7 @@ JSGraph.prototype = {
     this.caption_y = new Caption("Y-Axis");
     this.caption_y.init(graph, 0, 0);
     this.caption_y.text.offset_x = -100;
+    this.caption_y.vertical();
     this.caption_y.text.offset_y = (parseInt(frame.style.height, 10) - Font_size) / 2;
 
     this.caption_x = new Caption("X-Axis");
