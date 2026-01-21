@@ -33,23 +33,10 @@ let Mouse_client_y = 0;
 let Mouse_position = 'C';
 const Edge_width = 30;
 let Font_size = 16; /* px */
-let XMLHttp = null; // for backward compatibility
 
 /**********************************************************************
 Utility functions
 ***********************************************************************/
-const create_http_request = function () {
-  let xmlhttp = false;
-
-  if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
-    xmlhttp = new XMLHttpRequest();
-    xmlhttp.overrideMimeType("text/plain");
-  }
-  return xmlhttp;
-}
-
-XMLHttp = create_http_request();
-
 Math.log10 = function(x) {
   return this.log(x) / this.LN10;
 }
