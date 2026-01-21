@@ -604,6 +604,8 @@ JSGraph.prototype = {
     parent_frame.style.borderWidth = '3px';
     parent_frame.style.borderStyle = 'ridge';
     parent_frame.graph = this;
+    parent_frame.style.resize = 'both';
+    resizeObserver.observe(parent_frame);
 
     graph.appendChild(parent_frame);
     this.parent_frame = parent_frame;
