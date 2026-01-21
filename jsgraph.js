@@ -592,6 +592,7 @@ JSGraph.prototype = {
     parent_frame.style.borderStyle = 'ridge';
     parent_frame.graph = this;
     parent_frame.style.resize = 'both';
+    parent_frame.style.boxSizing = 'content-box';
     resizeObserver.observe(parent_frame);
 
     graph.appendChild(parent_frame);
