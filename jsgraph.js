@@ -446,6 +446,14 @@ GraphText.prototype = {
     }
   },
 
+  vertical () {
+    this.text.style.transform = `rotate(-90deg)`;
+  },
+
+  horizontal () {
+    this.text.style.transform = `rotate(0deg)`;
+  },
+
   size (size) {
     this.text.style.fontSize = `${size}px`;
   },
