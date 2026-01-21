@@ -408,6 +408,16 @@ function mouse_move_scale_dom (e) {
   }
 }
 
+const resizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    const frame = entry.target;
+    if (frame.graph) {
+      frame.graph.update_position();
+      frame.graph.draw();
+    }
+  }
+});
+
 /**********************************************************************
 Definition of Text Object.
 ***********************************************************************/
